@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
 import { MobileNav } from "./mobile-nav";
+import { authClient } from "@/lib/auth-client";
 import { useScroll } from "@/hooks/use-scroll";
+import { UserNav } from "@/components/nav-user";
 import { Button, buttonVariants } from "@/components/ui/button";
 
 export const navLinks = [
@@ -25,6 +28,14 @@ export const navLinks = [
 
 export function SiteHeader() {
   const scrolled = useScroll(10);
+  const { data: session } = authClient.useSession();
+
+  const pathname = usePathname();
+  const urls = ["/dashboard", "/login", "/signup"];
+
+  if (urls.some((url) => pathname.startsWith(url))) {
+    return null;
+  }
 
   return (
     <header
@@ -47,17 +58,20 @@ export function SiteHeader() {
               {link.label}
             </a>
           ))}
-          <Link href="/login" className="mr-2">
-            <Button variant="outline" className="cursor-pointer">
-              Sign In
-            </Button>
-          </Link>
-
-          <Link href="/signup">
-            <Button className="cursor-pointer">Get Started</Button>
-          </Link>
-
-          {/* TODO: Add user profile dropdown if the user is logged in */}
+          {session ? (
+            <UserNav user={session.user} />
+          ) : (
+            <>
+              <Link href="/login" className="mr-2">
+                <Button variant="outline" className="cursor-pointer">
+                  Sign In
+                </Button>
+              </Link>
+              <Link href="/signup">
+                <Button className="cursor-pointer">Get Started</Button>
+              </Link>
+            </>
+          )}
         </div>
         <MobileNav />
       </nav>
