@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Figtree } from "next/font/google";
 
 import "@/styles/globals.css";
+import siteConfig from "@/config/site";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
-import siteConfig from "@/config/site";
+import { SiteHeader } from "@/components/site";
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -92,6 +93,7 @@ export default function RootLayout({
           disableTransitionOnChange
           enableSystem
         >
+          <SiteHeader />
           {children}
           <Toaster />
         </ThemeProvider>

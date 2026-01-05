@@ -11,7 +11,7 @@ export default function SignupPage() {
           className="flex items-center gap-2 self-center font-medium"
           href="/"
         >
-          <div className="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
+          <div className="flex size-6 items-center justify-center rounded-md text-primary-foreground">
             <Image
               alt="Inflow Logo"
               height={50}

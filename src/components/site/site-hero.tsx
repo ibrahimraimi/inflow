@@ -1,0 +1,44 @@
+import Link from "next/link";
+import Image from "next/image";
+
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+
+interface Hero8Props {
+  className?: string;
+}
+
+export function SiteHero({ className }: Hero8Props) {
+  return (
+    <section className={cn("py-32", className)}>
+      <div className="overflow-hidden border-b border-muted">
+        <div className="container">
+          <div className="mx-auto flex flex-col items-center">
+            <div className="z-10 items-center text-center">
+              <h1 className="mb-8 text-4xl font-semibold text-pretty lg:text-7xl lg:max-w-5xl">
+                The modern analytics platform for effortless insights.
+              </h1>
+              <p className="mx-auto max-w-3xl text-muted-foreground lg:text-xl">
+                Inflow makes it easy to collect, analyze, and understand your
+                website data, so you can focus on{" "}
+                <span className="font-bold">growth.</span>
+              </p>
+              <div className="mt-12 flex w-full flex-col justify-center gap-2 sm:flex-row">
+                <Link href="/signup">
+                  <Button>Get started</Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+          <Image
+            src="https://deifkwefumgah.cloudfront.net/shadcnblocks/block/placeholder-1.svg"
+            alt="placeholder"
+            width={1120}
+            height={700}
+            className="mx-auto mt-24 max-h-175 w-full max-w-7xl rounded-lg border p-1 object-cover shadow-lg"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
