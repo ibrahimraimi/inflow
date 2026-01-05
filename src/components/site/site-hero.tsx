@@ -23,10 +23,18 @@ export function SiteHero({ className }: Hero8Props) {
                 website data, so you can focus on{" "}
                 <span className="font-bold">growth.</span>
               </p>
-              <div className="mt-12 flex w-full flex-col justify-center gap-2 sm:flex-row">
-                <Link href="/signup">
-                  <Button>Get started</Button>
-                </Link>
+              <div className="mt-12 flex flex-col justify-center items-center gap-2 sm:flex-row">
+                <div className="bg-foreground/10 rounded-[calc(var(--radius-xl)+0.125rem)] border p-0.5">
+                  <Button
+                    asChild
+                    size="lg"
+                    className="rounded-xl px-5 text-base"
+                  >
+                    <Link href="/login">
+                      <span className="text-nowrap">Get Started</span>
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

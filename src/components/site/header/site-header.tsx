@@ -50,13 +50,13 @@ export function SiteHeader() {
         </div>
         <div className="hidden items-center gap-1 md:flex">
           {navLinks.map((link) => (
-            <a
-              className={buttonVariants({ variant: "ghost" })}
+            <Link
+              className={buttonVariants({ variant: "link" })}
               href={link.href}
               key={link.label}
             >
               {link.label}
-            </a>
+            </Link>
           ))}
           {session ? (
             <UserNav user={session.user} />

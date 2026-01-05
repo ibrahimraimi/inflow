@@ -19,7 +19,7 @@ export function Cta({
   buttons = {
     primary: {
       text: "Get Started",
-      url: "https://www.shadcnblocks.com",
+      url: "/dashboard",
     },
   },
   className,
@@ -34,9 +34,17 @@ export function Cta({
             </h3>
             <div className="flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
               {buttons.primary && (
-                <Button size="lg" className="w-full sm:w-auto" asChild>
-                  <Link href={buttons.primary.url}>{buttons.primary.text}</Link>
-                </Button>
+                <div className="bg-foreground/10 rounded-[calc(var(--radius-xl)+0.125rem)] border p-0.5">
+                  <Button
+                    asChild
+                    size="lg"
+                    className="rounded-xl px-5 text-base"
+                  >
+                    <Link href={buttons.primary.url}>
+                      {buttons.primary.text}
+                    </Link>
+                  </Button>
+                </div>
               )}
             </div>
           </div>

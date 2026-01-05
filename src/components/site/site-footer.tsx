@@ -73,13 +73,13 @@ export function SiteFooter() {
               <Logo />
             </div>
             <p className="max-w-sm text-balance font-mono text-muted-foreground text-sm">
-              A comprehensive financial technology platform.
+              A comprehensive analytics platform for your SAAS business.
             </p>
             <div className="flex gap-2">
               {socialLinks.map((item, index) => (
                 <Button
                   key={`social-${item.link}-${index}`}
-                  size="icon-sm"
+                  size="icon"
                   variant="outline"
                 >
                   <Link href={item.link} target="_blank">
