@@ -31,9 +31,7 @@ export function SiteHeader() {
   const { data: session } = authClient.useSession();
 
   const pathname = usePathname();
-  const urls = ["/dashboard", "/login", "/signup"];
-
-  if (urls.some((url) => pathname.startsWith(url))) {
+  if (["/login", "/signup"].some((url) => pathname.startsWith(url))) {
     return null;
   }
 
@@ -48,16 +46,22 @@ export function SiteHeader() {
         <div className="rounded-md p-2 hover:bg-accent">
           <Logo />
         </div>
-        <div className="hidden items-center gap-1 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              className={buttonVariants({ variant: "link" })}
-              href={link.href}
-              key={link.label}
-            >
-              {link.label}
-            </Link>
-          ))}
+        <div
+          className={cn(
+            "items-center gap-1",
+            pathname.startsWith("/dashboard") ? "flex" : "hidden md:flex"
+          )}
+        >
+          {!pathname.startsWith("/dashboard") &&
+            navLinks.map((link) => (
+              <Link
+                className={buttonVariants({ variant: "link" })}
+                href={link.href}
+                key={link.label}
+              >
+                {link.label}
+              </Link>
+            ))}
           {session ? (
             <UserNav user={session.user} />
           ) : (
@@ -73,7 +77,7 @@ export function SiteHeader() {
             </>
           )}
         </div>
-        <MobileNav />
+        {!pathname.startsWith("/dashboard") && <MobileNav />}
       </nav>
     </header>
   );
