@@ -1,10 +1,12 @@
 "use client";
 
-import { PlusIcon, Search, SquarePen } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useState } from "react";
+
+import { PlusIcon, Search, SquarePen } from "lucide-react";
+
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function DashboardPage() {
   const [websites] = useState([
@@ -39,7 +41,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="w-full rounded-xl border bg-card text-card-foreground shadow-sm">
+      <div className="w-full rounded-xl border bg-card text-card-foreground shadow-sm border-dashed">
         <div className="p-6">
           <div className="relative max-w-sm mb-6">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -51,7 +53,7 @@ export default function DashboardPage() {
 
           <div className="w-full">
             <div className="flex items-center mb-4 px-2 text-xs font-bold text-muted-foreground tracking-wide uppercase">
-              <div className="w-1/2 max-w-[300px]">Name</div>
+              <div className="w-1/2 max-w-75">Name</div>
               <div className="flex-1">Domain</div>
               <div className="ml-auto sr-only">Actions</div>
             </div>
@@ -62,7 +64,7 @@ export default function DashboardPage() {
                   key={site.id}
                   className="flex items-center justify-between px-2 py-4 hover:bg-muted/30 transition-colors group cursor-pointer"
                 >
-                  <div className="flex items-center gap-3 w-1/2 max-w-[300px]">
+                  <div className="flex items-center gap-3 w-1/2 max-w-75">
                     <div
                       className={cn(
                         "size-6 rounded flex items-center justify-center text-[10px] font-bold shadow-sm",
