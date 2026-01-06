@@ -7,6 +7,7 @@ import { PlusIcon, Search, SquarePen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const [websites] = useState([
@@ -27,17 +28,21 @@ export default function DashboardPage() {
   ]);
 
   return (
-    <div className="mt-8 w-full">
+    <div className="lg:mt-8 mt-20 w-full">
       <div className="flex items-center justify-between mb-8 border-b pb-6">
-        <h1 className="font-bold text-4xl tracking-tight">Websites</h1>
+        <h1 className="font-bold text-xl lg:text-4xl tracking-tight">
+          Websites
+        </h1>
         <div className="bg-foreground/10 rounded-[calc(var(--radius-lg)+0.125rem)] border p-0.5">
-          <Button
-            size="default"
-            className="rounded-lg px-4 text-sm font-medium"
-          >
-            <PlusIcon className="w-4 h-4 mr-2" />
-            <span className="text-nowrap">Add website</span>
-          </Button>
+          <Link href="/dashboard/new">
+            <Button
+              size="default"
+              className="rounded-lg px-4 text-sm font-medium cursor-pointer"
+            >
+              <PlusIcon className="w-4 h-4" />
+              <span className="text-nowrap">Add website</span>
+            </Button>
+          </Link>
         </div>
       </div>
 

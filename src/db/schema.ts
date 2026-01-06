@@ -1,5 +1,13 @@
 import { relations } from "drizzle-orm";
-import { boolean, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  integer,
+  varchar,
+} from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -120,6 +128,17 @@ export const invitation = pgTable("invitation", {
   status: text("status").default("pending").notNull(),
   expiresAt: timestamp("expires_at").notNull(),
   inviterId: text("inviter_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+});
+
+export const websites = pgTable("websites", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  websiteId: varchar({ length: 255 }).notNull().unique(),
+  domain: varchar({ length: 255 }).notNull().unique(),
+  timeZone: varchar({ length: 100 }).notNull(),
+  enableLocalhostTracking: boolean().default(false),
+  userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
 });
