@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
-import { Logo } from "@/components/logo";
+import { LogoPrimary } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { GithubIcon, InstagramIcon, TwitterIcon } from "lucide-react";
 
@@ -70,7 +70,7 @@ export function SiteFooter() {
         <div className="grid grid-cols-6 gap-6 p-4">
           <div className="col-span-6 flex flex-col gap-4 pt-5 md:col-span-4">
             <div className="w-max">
-              <Logo />
+              <LogoPrimary />
             </div>
             <p className="max-w-sm text-balance font-mono text-muted-foreground text-sm">
               A comprehensive analytics platform for your SAAS business.

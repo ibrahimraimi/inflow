@@ -29,17 +29,20 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Globe, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 
 const formSchema = z.object({
+  websiteName: z.string().min(1, "Name is required"),
   domain: z.string().min(1, "Domain is required"),
   timezone: z.string().min(1, "Timezone is required"),
 });
 
 export default function AddWebsiteForm() {
+  const [websiteName, setWebsiteName] = useState("");
   const [domain, setDomain] = useState("");
   const [timeZone, setTimeZone] = useState("");
   const [loading, setLoading] = useState(false);
@@ -50,6 +53,7 @@ export default function AddWebsiteForm() {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      websiteName: "",
       domain: "",
       timezone: "",
     },
@@ -62,6 +66,7 @@ export default function AddWebsiteForm() {
       const websiteId = crypto.randomUUID();
       const result = await axios.post("/api/website", {
         websiteId: websiteId,
+        websiteName: websiteName,
         domain: domain,
         timeZone: timeZone,
         enableLocalhostTracking: enableLocalhostTracking,
@@ -82,6 +87,7 @@ export default function AddWebsiteForm() {
       }
     } catch (error) {
       toast.error("An error occurred");
+      console.error("Error adding website:", error);
     } finally {
       setLoading(false);
     }
@@ -91,6 +97,32 @@ export default function AddWebsiteForm() {
     <div className="p-4">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="websiteName"
+            render={({ field }) => (
+              <FormItem>
+                <div className="grid items-center mb-4 px-2">
+                  <FormLabel className="text-xs font-bold text-muted-foreground tracking-wide uppercase mb-2">
+                    Name
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        field.onChange(value);
+                        setWebsiteName(value);
+                      }}
+                      placeholder="My Website"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="domain"

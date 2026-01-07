@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
-import { Logo } from "@/components/logo";
+import { LogoPrimary } from "@/components/logo";
 import { MobileNav } from "./mobile-nav";
 import { authClient } from "@/lib/auth-client";
 import { useScroll } from "@/hooks/use-scroll";
@@ -31,7 +31,9 @@ export function SiteHeader() {
   const { data: session } = authClient.useSession();
 
   const pathname = usePathname();
-  if (["/login", "/signup"].some((url) => pathname.startsWith(url))) {
+  if (
+    ["/login", "/signup", "/dashboard"].some((url) => pathname.startsWith(url))
+  ) {
     return null;
   }
 
@@ -44,7 +46,7 @@ export function SiteHeader() {
     >
       <nav className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between">
         <div className="rounded-md p-2 hover:bg-accent">
-          <Logo />
+          <LogoPrimary />
         </div>
         <div
           className={cn(

@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { db } from "@/db/drizzle";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 
 import { auth } from "@/lib/auth";
 import { websites } from "@/db/schema";
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const { websiteId, domain, timeZone, enableLocalhostTracking } =
+  const { websiteId, websiteName, domain, timeZone, enableLocalhostTracking } =
     await req.json();
 
   // Check if domain already exists
@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
     .insert(websites)
     .values({
       websiteId: websiteId,
+      websiteName: websiteName,
       domain: domain,
       timeZone: timeZone,
       enableLocalhostTracking: enableLocalhostTracking,
@@ -46,4 +47,24 @@ export async function POST(req: NextRequest) {
     .returning();
 
   return NextResponse.json(result, { status: 201 });
+}
+
+export async function GET(req: NextRequest) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  const userId = session.user.id;
+
+  const result = await db
+    .select()
+    .from(websites)
+    .where(eq(websites.userId, userId))
+    .orderBy(desc(websites.id));
+
+  return NextResponse.json(result, { status: 200 });
 }
