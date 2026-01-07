@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
 import * as z from "zod";
+import axios from "axios";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import {
   Form,
   FormControl,
@@ -25,8 +28,9 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-  InputGroupText,
 } from "@/components/ui/input-group";
+import { toast } from "sonner";
+import { Globe, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -36,6 +40,13 @@ const formSchema = z.object({
 });
 
 export default function AddWebsiteForm() {
+  const [domain, setDomain] = useState("");
+  const [timeZone, setTimeZone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [enableLocalhostTracking, setEnableLocalhostTracking] = useState(false);
+
+  const router = useRouter();
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -44,8 +55,36 @@ export default function AddWebsiteForm() {
     },
   });
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const onSubmit = async () => {
+    setLoading(true);
+
+    try {
+      const websiteId = crypto.randomUUID();
+      const result = await axios.post("/api/website", {
+        websiteId: websiteId,
+        domain: domain,
+        timeZone: timeZone,
+        enableLocalhostTracking: enableLocalhostTracking,
+      });
+
+      if (result.status === 201) {
+        toast.success("Website added successfully!");
+      }
+
+      if (result.data && result.data.length > 0) {
+        router.push(
+          `/dashboard/new?step=script&websiteId=${result.data[0].websiteId}&domain=${result.data[0].domain}`
+        );
+      } else if (result.data?.message) {
+        toast.error(result.data.message || "An error occurred");
+      } else {
+        toast.error("An error occurred");
+      }
+    } catch (error) {
+      toast.error("An error occurred");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -58,17 +97,23 @@ export default function AddWebsiteForm() {
             render={({ field }) => (
               <FormItem>
                 <div className="grid items-center mb-4 px-2">
-                  <FormLabel className="text-xs font-bold text-muted-foreground tracking-wide uppercase">
+                  <FormLabel className="text-xs font-bold text-muted-foreground tracking-wide uppercase mb-2">
                     Domain
                   </FormLabel>
                   <FormControl>
                     <InputGroup>
                       <InputGroupInput
-                        {...field}
+                        type="url"
+                        value={field.value}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          field.onChange(value);
+                          setDomain(value);
+                        }}
                         placeholder="yourwebsite.com"
                       />
                       <InputGroupAddon>
-                        <InputGroupText>https://</InputGroupText>
+                        <Globe />
                       </InputGroupAddon>
                     </InputGroup>
                   </FormControl>
@@ -88,7 +133,10 @@ export default function AddWebsiteForm() {
                     Timezone
                   </FormLabel>
                   <Select
-                    onValueChange={field.onChange}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      setTimeZone(value);
+                    }}
                     defaultValue={field.value}
                   >
                     <FormControl>
@@ -194,13 +242,21 @@ export default function AddWebsiteForm() {
           />
 
           <div className="mb-4 px-2 flex gap-2 items-center">
-            <Checkbox />
+            <Checkbox
+              onCheckedChange={(value: boolean) =>
+                setEnableLocalhostTracking(value)
+              }
+            />
             <span>Enable localhost tracking in development.</span>
           </div>
 
           <div className="px-2">
-            <Button type="submit" className="w-full">
-              Add website
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                "Add Website"
+              )}
             </Button>
           </div>
         </form>
