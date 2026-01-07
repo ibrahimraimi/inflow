@@ -135,6 +135,7 @@ export const invitation = pgTable("invitation", {
 export const websites = pgTable("websites", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   websiteId: varchar({ length: 255 }).notNull().unique(),
+  websiteName: varchar({ length: 255 }).notNull(),
   domain: varchar({ length: 255 }).notNull().unique(),
   timeZone: varchar({ length: 100 }).notNull(),
   enableLocalhostTracking: boolean().default(false),
