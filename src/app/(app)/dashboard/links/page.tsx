@@ -104,7 +104,7 @@ export default function LinksPage() {
               <div className="w-1/4 min-w-37.5">Link</div>
               <div className="flex-1 min-w-50">Destination URL</div>
               <div className="w-30">Created</div>
-              <div className="w-30 ml-auto sr-only">Actions</div>
+              <div className="w-30 flex justify-end">Actions</div>
             </div>
 
             <div className="divide-y divide-border/40 border-t border-border/40">
@@ -112,10 +112,7 @@ export default function LinksPage() {
                 // biome-ignore lint/complexity/noUselessFragments: false positive
                 <>
                   {[...Array(5)].map((_, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-4 px-2 py-4"
-                    >
+                    <div key={index} className="flex items-center px-2 py-4">
                       <Skeleton className="h-4 w-1/4 min-w-37.7" />
                       <Skeleton className="h-4 w-1/4 min-w-37.7" />
                       <Skeleton className="h-4 flex-1 min-w-50" />
@@ -136,7 +133,7 @@ export default function LinksPage() {
                   {filteredLinks.map((link) => (
                     <div
                       key={link.id}
-                      className="flex items-center gap-4 px-2 py-4 hover:bg-muted/30 transition-colors group"
+                      className="flex items-center px-2 py-4 hover:bg-muted/30 transition-colors group"
                     >
                       <div className="w-1/4 min-w-37.5">
                         <span className="font-medium text-sm text-foreground truncate block">
@@ -184,16 +181,18 @@ export default function LinksPage() {
                         </span>
                       </div>
 
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => {
-                          toast.info("Link actions coming soon!");
-                        }}
-                        className="h-8 w-8 text-muted-foreground opacity-70 hover:opacity-100 hover:text-foreground hover:bg-muted ml-auto"
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
+                      <div className="w-30 flex justify-end">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            toast.info("Link actions coming soon!");
+                          }}
+                          className="h-8 w-8 text-muted-foreground opacity-70 hover:opacity-100 hover:text-foreground hover:bg-muted"
+                        >
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </>

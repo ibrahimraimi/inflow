@@ -1,0 +1,1 @@
+ALTER TABLE "page_views" ALTER COLUMN "url" DROP NOT NULL;

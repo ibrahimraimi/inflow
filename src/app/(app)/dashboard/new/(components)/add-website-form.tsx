@@ -7,6 +7,7 @@ import * as z from "zod";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import {
   Form,
   FormControl,
@@ -29,11 +30,13 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { Input } from "@/components/ui/input";
+
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 import { Globe, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import InstallScriptDialog from "./install-script-dialog";
 
 const formSchema = z.object({
   websiteName: z.string().min(1, "Name is required"),
@@ -47,6 +50,8 @@ export default function AddWebsiteForm() {
   const [timeZone, setTimeZone] = useState("");
   const [loading, setLoading] = useState(false);
   const [enableLocalhostTracking, setEnableLocalhostTracking] = useState(false);
+  const [showInstallDialog, setShowInstallDialog] = useState(false);
+  const [websiteData, setWebsiteData] = useState({ id: "", domain: "" });
 
   const router = useRouter();
 
@@ -77,9 +82,11 @@ export default function AddWebsiteForm() {
       }
 
       if (result.data && result.data.length > 0) {
-        router.push(
-          `/dashboard/new?step=script&websiteId=${result.data[0].websiteId}&domain=${result.data[0].domain}`
-        );
+        setWebsiteData({
+          id: result.data[0].websiteId,
+          domain: result.data[0].domain,
+        });
+        setShowInstallDialog(true);
       } else if (result.data?.message) {
         toast.error(result.data.message || "An error occurred");
       } else {
@@ -293,6 +300,12 @@ export default function AddWebsiteForm() {
           </div>
         </form>
       </Form>
+      <InstallScriptDialog
+        open={showInstallDialog}
+        onOpenChange={setShowInstallDialog}
+        websiteId={websiteData.id}
+        domain={websiteData.domain}
+      />
     </div>
   );
 }
