@@ -84,6 +84,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={figtree.variable} suppressHydrationWarning>
+      <head>
+        <script
+          defer
+          data-website-id="e1201afa-3309-48d5-850b-eb208a1d7aee"
+          data-domain="http://localhost:3000"
+          src="http://localhost:3000/analytics.js"
+        ></script>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

@@ -144,6 +144,48 @@ export const websites = pgTable("websites", {
     .references(() => user.id, { onDelete: "cascade" }),
 });
 
+export const links = pgTable("links", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  linkId: varchar("link_id", { length: 255 }).notNull().unique(),
+  name: varchar({ length: 255 }).notNull(),
+  shortCode: varchar("short_code", { length: 255 }).notNull().unique(),
+  destinationUrl: text("destination_url").notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+
+export const pageViews = pgTable("page_views", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  clientId: varchar("client_id", { length: 255 }),
+  websiteId: varchar("website_id", { length: 255 })
+    .notNull()
+    .references(() => websites.websiteId, { onDelete: "cascade" }),
+  domain: varchar("domain", { length: 255 }).notNull(),
+  url: text("url"),
+  type: varchar("type", { length: 100 }).notNull(),
+  referrer: varchar("referrer", { length: 2048 }),
+  entryTime: varchar("entry_time", { length: 100 }),
+  exitTime: varchar("exit_time", { length: 100 }),
+  totalActiveTime: integer("total_active_time"),
+  urlParams: varchar("url_params"),
+  utmSource: varchar("utm_source", { length: 255 }),
+  utmMedium: varchar("utm_medium", { length: 255 }),
+  utmCampaign: varchar("utm_campaign", { length: 255 }),
+  utmTerm: varchar("utm_term", { length: 255 }),
+  utmContent: varchar("utm_content", { length: 255 }),
+  device: varchar("device"),
+  os: varchar("os"),
+  browser: varchar("browser"),
+  city: varchar("city"),
+  region: varchar("region"),
+  country: varchar("country"),
+  refParams: varchar("ref_params"),
+});
+
 export const schema = {
   user,
   session,
@@ -152,6 +194,9 @@ export const schema = {
   organization,
   member,
   invitation,
+  websites,
+  links,
+  pageViews,
   organizationRelations,
   memberRelations,
 };
