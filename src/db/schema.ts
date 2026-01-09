@@ -183,6 +183,7 @@ export const pageViews = pgTable("page_views", {
   city: varchar("city"),
   region: varchar("region"),
   country: varchar("country"),
+  countryCode: varchar("country_code"),
   refParams: varchar("ref_params"),
 });
 
