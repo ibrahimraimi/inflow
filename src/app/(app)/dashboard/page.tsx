@@ -4,23 +4,27 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import axios from "axios";
+import { toast } from "sonner";
 import { PlusIcon, Search, SquarePen } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import type { WebsiteType } from "@/configs/types";
 import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "sonner";
+import type { AnalyticsType, WebsiteType } from "@/configs/types";
 
 export default function DashboardPage() {
-  const [websiteList, setWebsiteList] = useState<WebsiteType[]>([]);
+  const [websiteList, setWebsiteList] = useState<
+    { website: WebsiteType; analytics: AnalyticsType }[]
+  >([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const GetUserWebsite = useCallback(async () => {
     setLoading(true);
-    const result = await axios.get("/api/website");
+    const result = await axios.get("/api/website", {
+      params: { websiteOnly: "false" },
+    });
     setWebsiteList(result.data);
 
     setLoading(false);
@@ -31,9 +35,11 @@ export default function DashboardPage() {
   }, [GetUserWebsite]);
 
   const filteredWebsites = websiteList.filter(
-    (site) =>
-      site.websiteName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      site.domain.toLowerCase().includes(searchQuery.toLowerCase())
+    (item) =>
+      item.website.websiteName
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      item.website.domain.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -97,7 +103,7 @@ export default function DashboardPage() {
               ) : (
                 // biome-ignore lint/complexity/noUselessFragments: false positive
                 <>
-                  {filteredWebsites.map((site) => (
+                  {filteredWebsites.map(({ website: site }) => (
                     <div
                       key={site.id}
                       className="flex items-center justify-between px-2 py-4 hover:bg-muted/30 transition-colors group cursor-pointer"
