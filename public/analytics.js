@@ -21,7 +21,7 @@
   const script = document.currentScript;
   const websiteId = script.getAttribute("data-website-id");
   const domain = script.getAttribute("data-domain");
-  const entryTime = Date.now();
+  const entryTime = Math.floor(Date.now() / 1000);
   const referrer = document.referrer || "Direct";
 
   // Get UTM Source from URL
@@ -61,12 +61,12 @@
   /**
    * Active Time Tracking
    */
-  let activeStartTime = Date.now();
+  let activeStartTime = Math.floor(Date.now() / 1000);
   let totalActiveTime = 0;
 
   const handleExit = () => {
-    const exitTime = Date.now();
-    totalActiveTime += Date.now() - activeStartTime;
+    const exitTime = Math.floor(Date.now() / 1000);
+    totalActiveTime += Math.floor(Date.now() / 1000) - activeStartTime;
 
     fetch(`http://localhost:3000/api/track`, {
       method: "POST",

@@ -77,7 +77,8 @@ export default function DashboardPage() {
             <div className="flex items-center mb-4 px-2 text-xs font-bold text-muted-foreground tracking-wide uppercase">
               <div className="w-1/2 max-w-75">Name</div>
               <div className="flex-1">Domain</div>
-              <div className="ml-auto sr-only">Actions</div>
+              <div className="flex-1">Page View (last 24h)</div>
+              <div className="flex justify-end">Actions</div>
             </div>
 
             <div className="divide-y divide-border/40 border-t border-border/40">
@@ -96,6 +97,9 @@ export default function DashboardPage() {
                       <div className="flex-1">
                         <Skeleton className="h-4 w-48" />
                       </div>
+                      <div className="flex-1">
+                        <Skeleton className="h-4 w-24" />
+                      </div>
                       <Skeleton className="h-8 w-8 rounded ml-auto" />
                     </div>
                   ))}
@@ -103,7 +107,7 @@ export default function DashboardPage() {
               ) : (
                 // biome-ignore lint/complexity/noUselessFragments: false positive
                 <>
-                  {filteredWebsites.map(({ website: site }) => (
+                  {filteredWebsites.map(({ website: site, analytics }) => (
                     <div
                       key={site.id}
                       className="flex items-center justify-between px-2 py-4 hover:bg-muted/30 transition-colors group cursor-pointer"
@@ -122,6 +126,9 @@ export default function DashboardPage() {
                       </div>
                       <div className="flex-1 text-muted-foreground text-sm">
                         {site.domain.replace("https://", "")}
+                      </div>
+                      <div className="flex-1 text-muted-foreground text-sm font-mono">
+                        {analytics?.last24hVisitors || 0}
                       </div>
                       <Button
                         variant="ghost"
