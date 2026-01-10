@@ -87,7 +87,7 @@ export default function RootLayout({
       <head>
         <script
           defer
-          data-website-id="e1201afa-3309-48d5-850b-eb208a1d7aee"
+          data-website-id="77d3b396-82ae-42e3-b78d-1a8e962503cd"
           data-domain="http://localhost:3000"
           src="http://localhost:3000/analytics.js"
         ></script>

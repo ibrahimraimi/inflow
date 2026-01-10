@@ -68,6 +68,7 @@ export async function POST(req: NextRequest) {
       .set({
         exitTime: body.exitTime,
         totalActiveTime: body.totalActiveTime,
+        exitUrl: body.exitUrl,
       })
       .where(eq(pageViews.clientId, body?.clientId))
       .returning();

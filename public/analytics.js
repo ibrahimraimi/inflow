@@ -4,19 +4,25 @@
     return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
   }
 
+  // Session Duration
+  const sessionDuration = 12 * 60 * 50 * 1000; // 12 hours in milliseconds
+  const currentTime = Date.now();
+  let sessionTime = localStorage.getItem("inflow_session_time");
+
   let clientId = localStorage.getItem("inflow_client_id");
-  if (!clientId) {
+
+  if (!clientId || currentTime - sessionTime > sessionDuration) {
+    if (clientId) {
+      localStorage.removeItem("inflow_client)id");
+      localStorage.removeItem("inflow_session_time");
+    }
+
     clientId = generateUUID();
     localStorage.setItem("inflow_client_id", clientId);
+    localStorage.setItem("inflow_session_time", currentTime);
+  } else {
+    // console.log("Existing Session:", clientId);
   }
-
-  //? Alternative UUID generator
-  //   function generateUUID() {
-  //   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-  //     const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-  //     return v.toString(16);
-  //   });
-  // }
 
   const script = document.currentScript;
   const websiteId = script.getAttribute("data-website-id");
@@ -58,9 +64,7 @@
     body: JSON.stringify(data),
   });
 
-  /**
-   * Active Time Tracking
-   */
+  // Active Time Tracking
   let activeStartTime = Math.floor(Date.now() / 1000);
   let totalActiveTime = 0;
 
@@ -81,12 +85,10 @@
         exitTime: exitTime,
         totalActiveTime: totalActiveTime,
         clientId: clientId,
+        exitUrl: window.location.href,
       }),
     });
-
-    localStorage.clear();
   };
 
   window.addEventListener("beforeunload", handleExit);
-  // window.addEventListener("pagehide", handleExit);
 })();
