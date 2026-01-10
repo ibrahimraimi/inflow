@@ -185,6 +185,7 @@ export const pageViews = pgTable("page_views", {
   country: varchar("country"),
   countryCode: varchar("country_code"),
   refParams: varchar("ref_params"),
+  exitUrl: varchar("exit_url"),
 });
 
 export const schema = {

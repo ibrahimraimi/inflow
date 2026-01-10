@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { AnalyticsType, WebsiteType } from "@/configs/types";
+import { format } from "date-fns-tz";
 
 export default function DashboardPage() {
   const [websiteList, setWebsiteList] = useState<
@@ -22,7 +23,8 @@ export default function DashboardPage() {
 
   const GetUserWebsite = useCallback(async () => {
     setLoading(true);
-    const result = await axios.get("/api/website", {
+    const today = format(new Date(), "yyyy-MM-dd");
+    const result = await axios.get(`/api/website?from=${today}&to=${today}`, {
       params: { websiteOnly: "false" },
     });
     setWebsiteList(result.data);
@@ -112,7 +114,10 @@ export default function DashboardPage() {
                       key={site.id}
                       className="flex items-center justify-between px-2 py-4 hover:bg-muted/30 transition-colors group cursor-pointer"
                     >
-                      <div className="flex items-center gap-3 w-1/2 max-w-75">
+                      <Link
+                        href={`/dashboard/${site.websiteId}`}
+                        className="flex items-center gap-3 w-1/2 max-w-75 underline underline-offset-4 decoration-muted"
+                      >
                         <div
                           className={cn(
                             "size-6 rounded flex items-center justify-center text-[10px] font-bold shadow-sm bg-primary/10 text-primary"
@@ -123,23 +128,22 @@ export default function DashboardPage() {
                         <span className="font-medium text-sm text-foreground">
                           {site.websiteName}
                         </span>
-                      </div>
+                      </Link>
                       <div className="flex-1 text-muted-foreground text-sm">
                         {site.domain.replace("https://", "")}
                       </div>
                       <div className="flex-1 text-muted-foreground text-sm font-mono">
                         {analytics?.last24hVisitors || 0}
                       </div>
-                      <Button
-                        variant="ghost"
-                        onClick={() => {
-                          toast.info("Feature not implemented yet!");
-                        }}
-                        size="icon"
-                        className="h-8 w-8 text-muted-foreground opacity-70 hover:opacity-100 hover:text-foreground hover:bg-muted ml-auto cursor-pointer"
-                      >
-                        <SquarePen className="w-4 h-4" />
-                      </Button>
+                      <Link href={`/dashboard/${site.websiteId}/edit`}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground opacity-70 hover:opacity-100 hover:text-foreground hover:bg-muted ml-auto cursor-pointer"
+                        >
+                          <SquarePen className="w-4 h-4" />
+                        </Button>
+                      </Link>
                     </div>
                   ))}
                 </>
