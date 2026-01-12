@@ -47,7 +47,7 @@ export default function InstallScriptDialog({
       <DialogContent className="sm:max-w-175">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
-            Install the WebTrack Script
+            Add the tracking script to your website
           </DialogTitle>
           <DialogDescription className="text-base pt-2">
             Copy and paste the following script into the{" "}

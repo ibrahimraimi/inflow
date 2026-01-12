@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import AddWebsiteForm from "./(components)/add-website-form";
+import AddWebsiteForm from "../_components/add-website-form";
 
 export default function AddWebsite() {
   return (

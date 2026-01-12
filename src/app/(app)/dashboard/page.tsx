@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import axios from "axios";
 import { toast } from "sonner";
+import { format } from "date-fns-tz";
 import { PlusIcon, Search, SquarePen } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -12,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { AnalyticsType, WebsiteType } from "@/configs/types";
-import { format } from "date-fns-tz";
 
 export default function DashboardPage() {
   const [websiteList, setWebsiteList] = useState<

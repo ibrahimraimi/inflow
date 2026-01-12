@@ -67,7 +67,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="h-6 w-6"
+            className="h-8 w-8"
             onClick={() => setIsCollapsed(true)}
           >
             <PanelLeft className="h-4 w-4" />
@@ -81,7 +81,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 mb-2 self-center"
+              className="h-8 w-8 mb-2 self-center"
               onClick={() => setIsCollapsed(false)}
             >
               <PanelRight className="h-4 w-4" />
