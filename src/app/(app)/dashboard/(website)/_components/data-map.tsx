@@ -12,11 +12,27 @@ import {
 } from "@/components/ui/tooltip";
 import { useMemo } from "react";
 
+import { MapData, TrafficData } from "@/configs/types";
+
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
+interface GeographyObject {
+  rsmKey: string;
+  id: string | number;
+  properties: {
+    name: string;
+    ISO_A2?: string;
+    iso_a2?: string;
+    ISO_A3?: string;
+    iso_a3?: string;
+    code?: string;
+    [key: string]: unknown;
+  };
+}
+
 interface DataMapProps {
-  mapData?: { code?: string; name?: string; visitors: number }[];
-  trafficData?: { day: number; hour: number; visitors: number }[];
+  mapData?: MapData[];
+  trafficData?: TrafficData[];
 }
 
 export function DataMap({ mapData = [], trafficData = [] }: DataMapProps) {
@@ -43,7 +59,7 @@ export function DataMap({ mapData = [], trafficData = [] }: DataMapProps) {
   }, [trafficData]);
 
   // Map data lookup
-  const getCountryVisitors = (geo: any) => {
+  const getCountryVisitors = (geo: GeographyObject) => {
     if (!geo.properties) return 0;
 
     // Check common property keys for country codes (2-letter, 3-letter, and Name)
@@ -61,7 +77,8 @@ export function DataMap({ mapData = [], trafficData = [] }: DataMapProps) {
       const found = mapData.find(
         (d) =>
           d.code?.toLowerCase() === code?.toString().toLowerCase() ||
-          d.name?.toLowerCase() === code?.toString().toLowerCase()
+          ("name" in d &&
+            String(d.name).toLowerCase() === code?.toString().toLowerCase())
       );
       if (found) return found.visitors;
     }

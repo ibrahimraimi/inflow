@@ -1,10 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "next/navigation";
-
-import axios from "axios";
 import {
   ArrowLeft,
   ChevronLeft,
@@ -29,63 +27,29 @@ import { MetricCard } from "../_components/metric-card";
 import { ChartAreaInteractive } from "../_components/chart";
 import { DataTable } from "../_components/data-table";
 import { DataMap } from "../_components/data-map";
-
-interface AnalyticsData {
-  metrics: {
-    visitors: number;
-    views: number;
-    visits: number;
-    bounceRate: number;
-    duration: number;
-  };
-  chart: { date: string; visitors: number; views: number }[];
-  tables: {
-    pages: any[];
-    sources: any[];
-    browsers: any[];
-    os: any[];
-    devices: any[];
-    countries: any[];
-    regions: any[];
-    cities: any[];
-  };
-  map: any[];
-  traffic: any[];
-}
+import { useWebsite } from "@/hooks/use-website";
+import { useAnalytics } from "@/hooks/use-analytics";
+import type { AnalyticsData } from "@/configs/types";
 
 export default function WebsiteDetailPage() {
   const params = useParams();
   const websiteId = params.id as string;
 
-  const [website, setWebsite] = useState<WebsiteType | null>(null);
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
-  const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState("today");
   const [filterOpen, setFilterOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [websiteRes, analyticsRes] = await Promise.all([
-          axios.get(`/api/website/${websiteId}`),
-          axios.get(`/api/website/${websiteId}/analytics`, {
-            params: { range: dateRange },
-          }),
-        ]);
-        setWebsite(websiteRes.data);
-        setAnalytics(analyticsRes.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const {
+    website,
+    isLoading: websiteLoading,
+    isError: websiteError,
+  } = useWebsite(websiteId);
+  const {
+    analytics,
+    isLoading: analyticsLoading,
+    isError: analyticsError,
+  } = useAnalytics(websiteId, dateRange);
 
-    if (websiteId) {
-      fetchData();
-    }
-  }, [websiteId, dateRange]);
+  const loading = websiteLoading || analyticsLoading;
 
   if (loading) {
     return (

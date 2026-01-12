@@ -16,7 +16,7 @@ interface DataItem {
   path?: string;
   visitors: number;
   percentage: number;
-  icon?: string;
+  icon?: string | null;
 }
 
 interface DataTableProps {

@@ -4,6 +4,12 @@ import { db } from "@/db/drizzle";
 import { and, eq, gte, lte, sql, count, desc } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { pageViews, websites } from "@/db/schema";
+import type {
+  AnalyticsData,
+  ChartData,
+  MetricItem,
+  TrafficData,
+} from "@/configs/types";
 
 export async function GET(
   req: NextRequest,
@@ -132,7 +138,7 @@ export async function GET(
     const isHourly = range === "today" || range === "last_24_hours";
     const dateTruncUnit = isHourly ? "hour" : "day";
 
-    const chartDataResult: any = await db.execute(sql`
+    const chartDataResult = await db.execute(sql`
       SELECT 
         date_trunc(${dateTruncUnit}, (CASE WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp ELSE NULL END)) as date,
         count(*) as views,
@@ -146,16 +152,21 @@ export async function GET(
       ORDER BY 1 ASC
     `);
 
-    const chartRows = chartDataResult.rows || chartDataResult;
-    const chartData = chartRows.map((row: any) => ({
+    const chartRows = (chartDataResult.rows ||
+      chartDataResult) as unknown as Array<{
+      date: string;
+      views: string | number;
+      visitors: string | number;
+    }>;
+    const chartData: ChartData[] = chartRows.map((row) => ({
       date: row.date,
       views: Number(row.views),
       visitors: Number(row.visitors),
     }));
 
     // 3. Breakdowns (Tables)
-    const getBreakdown = async (field: any) => {
-      return await db
+    const getBreakdown = async (field: unknown) => {
+      return (await db
         .select({
           name: field,
           visitors: count(),
@@ -165,7 +176,11 @@ export async function GET(
         .where(whereClause)
         .groupBy(field)
         .orderBy(desc(sql`count(*)`))
-        .limit(10);
+        .limit(10)) as Array<{
+        name: string | null;
+        visitors: number;
+        uniqueVisitors: number;
+      }>;
     };
 
     const [
@@ -200,7 +215,16 @@ export async function GET(
       getBreakdown(pageViews.city),
     ]);
 
-    const formatBreakdown = (data: any[], total: number, type?: string) => {
+    const formatBreakdown = (
+      data: Array<{
+        name: string | null;
+        visitors: number;
+        uniqueVisitors: number;
+        code?: string | null;
+      }>,
+      total: number,
+      type?: string
+    ): MetricItem[] => {
       return data.map((item) => {
         let icon = null;
         const name = (item.name || "").toLowerCase();
@@ -253,12 +277,12 @@ export async function GET(
         }
 
         return {
-          ...item,
+          name: item.name || "Unknown",
+          visitors: item.visitors,
+          uniqueVisitors: item.uniqueVisitors,
           icon,
           percentage:
-            total > 0
-              ? Math.round((Number(item.uniqueVisitors) / visitors) * 100)
-              : 0,
+            total > 0 ? Math.round((item.uniqueVisitors / total) * 100) : 0,
         };
       });
     };
@@ -274,7 +298,7 @@ export async function GET(
       .groupBy(pageViews.countryCode);
 
     // 5. Traffic Heatmap
-    const trafficDataResult: any = await db.execute(sql`
+    const trafficDataResult = await db.execute(sql`
       SELECT 
         extract(dow from (CASE WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp ELSE NULL END)) as day,
         extract(hour from (CASE WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp ELSE NULL END)) as hour,
@@ -287,8 +311,13 @@ export async function GET(
       GROUP BY 1, 2
     `);
 
-    const trafficRows = trafficDataResult.rows || trafficDataResult;
-    const trafficData = trafficRows.map((row: any) => ({
+    const trafficRows = (trafficDataResult.rows ||
+      trafficDataResult) as unknown as Array<{
+      day: string | number;
+      hour: string | number;
+      visitors: string | number;
+    }>;
+    const trafficData: TrafficData[] = trafficRows.map((row) => ({
       day: Number(row.day),
       hour: Number(row.hour),
       visitors: Number(row.visitors),
@@ -316,10 +345,12 @@ export async function GET(
       map: mapDataResult,
       traffic: trafficData,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Analytics API Error:", error);
+    const message =
+      error instanceof Error ? error.message : "Internal Server Error";
     return NextResponse.json(
-      { error: "Internal Server Error", details: error.message },
+      { error: "Internal Server Error", details: message },
       { status: 500 }
     );
   }
