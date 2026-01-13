@@ -40,7 +40,7 @@ export function SiteHero({ className }: Hero8Props) {
           </div>
           <div className="mx-auto mt-24 max-w-7xl">
             <Image
-              src="/assets/hero-image.png"
+              src="/assets/hero.png"
               alt="Analytics Dashboard"
               width={1440}
               height={900}
