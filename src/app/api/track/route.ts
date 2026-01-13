@@ -21,9 +21,7 @@ export async function POST(req: NextRequest) {
     "";
 
   // Fetch geolocation data based on IP
-  const geoRes = await fetch(
-    `https://free.freeipapi.com/api/json/103.216.221.79`
-  );
+  const geoRes = await fetch(`https://free.freeipapi.com/api/json/${ip}`);
   const geoInfo = await geoRes.json();
 
   console.log("Device Info:", deviceInfo);
