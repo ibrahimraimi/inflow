@@ -1,5 +1,5 @@
 <a href="https://inflow.com">
-  <img alt="A modern, comprehensive analytics platform designed to help you collect, analyze, and understand your website data effortlessly." src="./public/assets/banner.png">
+  <img alt="A modern, comprehensive analytics platform designed to help you collect, analyze, and understand your website data effortlessly." src="./public/images/banner.png">
 </a>
 
 <h3 align="center">Inflow Analytics</h3>

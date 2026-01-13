@@ -4,9 +4,9 @@ import { Geist, Geist_Mono, Figtree } from "next/font/google";
 import "@/styles/globals.css";
 import siteConfig from "@/configs/site";
 import { Toaster } from "@/components/ui/sonner";
-import { ThemeProvider } from "@/components/theme-provider";
-import { SiteHeader } from "@/components/site";
 import { SWRProvider } from "@/components/swr-provider";
+import { SiteFooter, SiteHeader } from "@/components/site";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -98,13 +98,14 @@ export default function RootLayout({
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="system"
           disableTransitionOnChange
           enableSystem
         >
           <SWRProvider>
             <SiteHeader />
             {children}
+            <SiteFooter />
             <Toaster />
           </SWRProvider>
         </ThemeProvider>
