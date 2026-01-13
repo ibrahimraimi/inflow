@@ -38,15 +38,20 @@ export function SiteHero({ className }: Hero8Props) {
               </div>
             </div>
           </div>
-          <div className="mx-auto mt-24 max-w-7xl">
-            <Image
-              src="/assets/hero.png"
-              alt="Analytics Dashboard"
-              width={1440}
-              height={900}
-              className="w-full h-auto rounded-lg border border-border/50 shadow-2xl object-cover"
-              priority
+          <div className="relative mt-8 -mr-56 overflow-hidden sm:mt-12 sm:mr-0 md:mt-20">
+            <div
+              className="to-background absolute inset-0 z-10 bg-linear-to-b from-transparent from-35%"
+              aria-hidden
             />
+            <div className="mx-auto max-w-5xl overflow-hidden">
+              <Image
+                className="relative z-2 rounded-2xl"
+                alt="Inflow Analytics Dashboard Interface"
+                height="2240"
+                src="/images/hero.png"
+                width="1376"
+              />
+            </div>
           </div>
         </div>
       </div>

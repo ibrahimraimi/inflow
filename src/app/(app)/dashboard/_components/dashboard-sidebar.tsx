@@ -24,10 +24,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import {
-  LogoThirdVariantWithName,
-  LogoThirdVariantWithoutName,
-} from "@/components/logo";
+import { LogoMarkDark, LogoMarkLight } from "@/components/logo";
 import { UserNav } from "@/components/nav-user";
 import { Button } from "@/components/ui/button";
 
@@ -126,9 +123,36 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
     >
       <div className="flex h-14 items-center px-2 justify-between mb-4">
         {isCollapsed ? (
-          <LogoThirdVariantWithoutName />
+          <Link
+            className="flex items-center space-x-2"
+            aria-label="home"
+            href="/"
+          >
+            <LogoMarkDark
+              className="text-foreground h-7 w-7 dark:hidden"
+              aria-hidden={true}
+            />
+            <LogoMarkLight
+              className="text-foreground hidden h-7 w-7 dark:block"
+              aria-hidden={true}
+            />
+          </Link>
         ) : (
-          <LogoThirdVariantWithName />
+          <Link
+            className="flex items-center space-x-2"
+            aria-label="home"
+            href="/"
+          >
+            <LogoMarkDark
+              className="text-foreground h-7 w-7 dark:hidden"
+              aria-hidden={true}
+            />
+            <LogoMarkLight
+              className="text-foreground hidden h-7 w-7 dark:block"
+              aria-hidden={true}
+            />
+            <span className="text-xl">Inflow</span>
+          </Link>
         )}
         {!isCollapsed && (
           <Button

@@ -69,7 +69,7 @@ export function Testimonial({ className }: TestimonialProps) {
     <section className={cn("py-32", className)}>
       <div className="container">
         <Carousel className="w-full">
-          <div className="mb-8 flex justify-between px-1 lg:mb-12">
+          <div className="mb-8 flex justify-between lg:mb-12">
             <h2 className="text-2xl font-semibold lg:text-5xl">
               Why Clients Love Us
             </h2>
