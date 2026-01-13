@@ -11,7 +11,7 @@ interface Hero8Props {
 export function SiteHero({ className }: Hero8Props) {
   return (
     <section className={cn("py-32", className)}>
-      <div className="overflow-hidden border-b border-muted">
+      <div className="overflow-hidden border-muted">
         <div className="container">
           <div className="mx-auto flex flex-col items-center">
             <div className="z-10 items-center text-center">
@@ -38,13 +38,16 @@ export function SiteHero({ className }: Hero8Props) {
               </div>
             </div>
           </div>
-          <Image
-            src="https://deifkwefumgah.cloudfront.net/shadcnblocks/block/placeholder-1.svg"
-            alt="placeholder"
-            width={1120}
-            height={700}
-            className="mx-auto mt-24 max-h-175 w-full max-w-7xl rounded-lg border p-1 object-cover shadow-lg"
-          />
+          <div className="mx-auto mt-24 max-w-7xl">
+            <Image
+              src="/assets/hero.png"
+              alt="Analytics Dashboard"
+              width={1440}
+              height={900}
+              className="w-full h-auto rounded-lg border border-border/50 shadow-2xl object-cover"
+              priority
+            />
+          </div>
         </div>
       </div>
     </section>

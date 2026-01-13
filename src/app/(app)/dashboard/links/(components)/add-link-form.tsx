@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import * as z from "zod";
 import axios from "axios";
+import { useSWRConfig } from "swr";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -43,6 +44,7 @@ export default function AddLinkForm() {
   const [destinationUrl, setDestinationUrl] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const { mutate } = useSWRConfig();
   const router = useRouter();
 
   const form = useForm({
@@ -72,7 +74,7 @@ export default function AddLinkForm() {
         setName("");
         setShortCode("");
         setDestinationUrl("");
-        router.refresh();
+        mutate("/api/links");
       } else if (result.data?.message) {
         toast.error(result.data.message || "An error occurred");
       } else {

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import * as z from "zod";
 import axios from "axios";
+import { useSWRConfig } from "swr";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -53,6 +54,7 @@ export default function AddWebsiteForm() {
   const [showInstallDialog, setShowInstallDialog] = useState(false);
   const [websiteData, setWebsiteData] = useState({ id: "", domain: "" });
 
+  const { mutate } = useSWRConfig();
   const router = useRouter();
 
   const form = useForm({
@@ -79,6 +81,9 @@ export default function AddWebsiteForm() {
 
       if (result.status === 201) {
         toast.success("Website added successfully!");
+        mutate(
+          (key) => Array.isArray(key) && key[0].startsWith("/api/website")
+        );
       }
 
       if (result.data && result.data.length > 0) {

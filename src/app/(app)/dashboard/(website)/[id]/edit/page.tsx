@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 import axios from "axios";
+import { useSWRConfig } from "swr";
 import { toast } from "sonner";
 import { ArrowLeft, Copy, Loader2 } from "lucide-react";
 
@@ -13,38 +14,31 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { WebsiteType } from "@/configs/types";
 import { Button } from "@/components/ui/button";
+import { useWebsite } from "@/hooks/use-website";
 
 export default function EditWebsitePage() {
   const params = useParams();
   const router = useRouter();
   const websiteId = params.id as string;
 
-  const [website, setWebsite] = useState<WebsiteType | null>(null);
   const [name, setName] = useState("");
   const [domain, setDomain] = useState("");
-  const [loading, setLoading] = useState(true);
   const [saveLoading, setSaveLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchWebsite = async () => {
-      try {
-        const response = await axios.get(`/api/website/${websiteId}`);
-        setWebsite(response.data);
-        setName(response.data.websiteName);
-        setDomain(response.data.domain);
-      } catch (error) {
-        toast.error("Failed to load website");
-        console.error("Error fetching website:", error);
-        router.push("/dashboard");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const { mutate: mutateGlobal } = useSWRConfig();
+  const {
+    website,
+    isLoading: loading,
+    isError,
+    mutate,
+  } = useWebsite(websiteId);
 
-    if (websiteId) {
-      fetchWebsite();
+  useEffect(() => {
+    if (website) {
+      setName(website.websiteName);
+      setDomain(website.domain);
     }
-  }, [websiteId, router]);
+  }, [website]);
 
   const trackingCode = website
     ? `<script defer data-website-id="${website.websiteId}" data-domain="${website.domain}" src="${window.location.origin}/analytics.js"></script>`
@@ -67,10 +61,13 @@ export default function EditWebsitePage() {
         websiteName: name,
         domain: domain,
       });
+      mutate();
       toast.success("Website updated successfully!");
-      router.refresh();
-    } catch (error: any) {
-      const message = error.response?.data?.error || "Failed to update website";
+    } catch (error: unknown) {
+      let message = "Failed to update website";
+      if (axios.isAxiosError(error) && error.response?.data?.error) {
+        message = error.response.data.error;
+      }
       toast.error(message);
       console.error("Error updating website:", error);
     } finally {
@@ -89,8 +86,8 @@ export default function EditWebsitePage() {
 
     try {
       await axios.post(`/api/website/${websiteId}/reset`);
+      mutate();
       toast.success("Website statistics reset successfully!");
-      router.refresh();
     } catch (error) {
       toast.error("Failed to reset website");
       console.error("Error resetting website:", error);
@@ -108,6 +105,12 @@ export default function EditWebsitePage() {
 
     try {
       await axios.delete(`/api/website/${websiteId}`);
+      mutateGlobal(
+        (key: unknown) =>
+          Array.isArray(key) &&
+          typeof key[0] === "string" &&
+          key[0].startsWith("/api/website")
+      );
       toast.success("Website deleted successfully!");
       router.push("/dashboard");
     } catch (error) {

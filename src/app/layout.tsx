@@ -6,6 +6,7 @@ import siteConfig from "@/configs/site";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SiteHeader } from "@/components/site";
+import { SWRProvider } from "@/components/swr-provider";
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -97,13 +98,15 @@ export default function RootLayout({
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           disableTransitionOnChange
           enableSystem
         >
-          <SiteHeader />
-          {children}
-          <Toaster />
+          <SWRProvider>
+            <SiteHeader />
+            {children}
+            <Toaster />
+          </SWRProvider>
         </ThemeProvider>
       </body>
     </html>

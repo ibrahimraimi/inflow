@@ -17,6 +17,7 @@ import {
   formatReferrals,
   formatWithImage,
 } from "@/lib/helpers";
+import type { WebsiteWithAnalytics } from "@/configs/types";
 
 export async function POST(req: NextRequest) {
   const session = await auth.api.getSession({
@@ -121,7 +122,7 @@ export async function GET(req: NextRequest) {
     )
     .orderBy(desc(websites.id));
 
-  const result: any[] = [];
+  const result: WebsiteWithAnalytics[] = [];
 
   /* LOOP WEBSITES & AGGREGATE DATA */
   for (const site of userWebsites) {
@@ -211,7 +212,8 @@ export async function GET(req: NextRequest) {
 
     /* HOURLY VISITORS */
     const hourlyMap: Record<string, Set<string>> = {};
-    const hourlyVisitors: any[] = [];
+    const hourlyVisitors: WebsiteWithAnalytics["analytics"]["hourlyVisitors"] =
+      [];
 
     if (views.length > 0) {
       const start = fromUnix

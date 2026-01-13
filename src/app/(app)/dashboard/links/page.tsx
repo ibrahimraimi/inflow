@@ -1,9 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
-
-import axios from "axios";
+import { useState } from "react";
 import {
   PlusIcon,
   Search,
@@ -16,37 +14,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-
-interface LinkType {
-  id: string;
-  linkId: string;
-  name: string;
-  shortCode: string;
-  destinationUrl: string;
-  createdAt: string;
-}
+import { useLinks } from "@/hooks/use-links";
+import type { LinkType } from "@/configs/types";
 
 export default function LinksPage() {
-  const [linkList, setLinkList] = useState<LinkType[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const { links: linkList, isLoading: loading, isError } = useLinks();
   const [searchQuery, setSearchQuery] = useState<string>("");
-
-  const GetUserLinks = useCallback(async () => {
-    setLoading(true);
-    try {
-      const result = await axios.get("/api/links");
-      setLinkList(result.data);
-    } catch (error) {
-      toast.error("Failed to load links");
-      console.error("Error loading links:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    GetUserLinks();
-  }, [GetUserLinks]);
 
   const filteredLinks = linkList.filter(
     (link) =>

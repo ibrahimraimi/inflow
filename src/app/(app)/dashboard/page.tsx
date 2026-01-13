@@ -1,40 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
-import axios from "axios";
-import { toast } from "sonner";
 import { PlusIcon, Search, SquarePen } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { AnalyticsType, WebsiteType } from "@/configs/types";
-import { format } from "date-fns-tz";
+import { useWebsites } from "@/hooks/use-websites";
 
 export default function DashboardPage() {
-  const [websiteList, setWebsiteList] = useState<
-    { website: WebsiteType; analytics: AnalyticsType }[]
-  >([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const { websites: websiteList, isLoading: loading, isError } = useWebsites();
   const [searchQuery, setSearchQuery] = useState<string>("");
-
-  const GetUserWebsite = useCallback(async () => {
-    setLoading(true);
-    const today = format(new Date(), "yyyy-MM-dd");
-    const result = await axios.get(`/api/website?from=${today}&to=${today}`, {
-      params: { websiteOnly: "false" },
-    });
-    setWebsiteList(result.data);
-
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    GetUserWebsite();
-  }, [GetUserWebsite]);
 
   const filteredWebsites = websiteList.filter(
     (item) =>
