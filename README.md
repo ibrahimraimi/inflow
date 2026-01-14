@@ -9,8 +9,18 @@
     <br />
     <a href="#introduction"><strong>Introduction</strong></a> •
     <a href="#tech-stack"><strong>Tech Stack</strong></a> •
-    <a href="#getting-started"><strong>Getting Started</strong></a>
+    <a href="#getting-started"><strong>Getting Started</strong></a> •
+    <a href="#docker--deployment"><strong>Docker & Deployment</strong></a>
 </p>
+
+<!-- <p align="center">
+  <a href="https://github.com/ibrahimraimi/inflow/actions/workflows/ci.yml">
+    <img src="https://github.com/ibrahimraimi/inflow/actions/workflows/ci.yml/badge.svg" alt="CI">
+  </a>
+  <a href="https://github.com/ibrahimraimi/inflow/actions/workflows/docker-build.yml">
+    <img src="https://github.com/ibrahimraimi/inflow/actions/workflows/docker-build.yml/badge.svg" alt="Docker Build">
+  </a>
+</p> -->
 
 <br/>
 
@@ -57,10 +67,10 @@ bun install
 3. Set up environment variables:
 
 ```bash
-cp .env.dev .env.local
+cp .env.dev .env.dev
 ```
 
-Fill in your environment variables in `.env.local`:
+Fill in your environment variables in `.env.dev`:
 
 ```env
 # Database
@@ -121,6 +131,63 @@ The application uses a PostgreSQL database with the following main entities:
 - `bun db:migrate` - Run database migrations
 - `bun db:push` - Push schema changes to database
 - `bun db:pull` - Pull schema from database
+
+Or use the Makefile for common tasks:
+
+```bash
+make help        # Show all available commands
+make dev         # Start development server
+make ci          # Run CI checks locally (lint, type-check, build)
+make docker-up   # Start with Docker
+```
+
+## Docker & Deployment
+
+### Running with Docker
+
+1. Build and run with Docker Compose:
+
+```bash
+docker compose up --build
+```
+
+2. Or use the Makefile:
+
+```bash
+make docker-up
+```
+
+The application will be available at [http://localhost:3000](http://localhost:3000).
+
+### CI/CD Pipeline
+
+This project includes a complete CI/CD pipeline with GitHub Actions:
+
+- **Continuous Integration**: Automated linting, type checking, and builds on every PR
+- **Docker Build**: Multi-platform Docker images published to GitHub Container Registry
+- **Deployment**: Automated deployment to production on merge to main
+
+#### Setup Instructions
+
+1. Configure GitHub Secrets (Settings → Secrets → Actions):
+   - `DEPLOY_HOST` - Production server hostname
+   - `DEPLOY_USER` - SSH username
+   - `DEPLOY_SSH_KEY` - Private SSH key
+   - `DEPLOY_PATH` - Application path on server
+
+2. Create a production environment with variable:
+   - `APP_URL` - Your production URL
+
+For detailed setup instructions, see [.github/SETUP.md](.github/SETUP.md).
+
+### Pulling from GitHub Container Registry
+
+After pushing to main, Docker images are available at:
+
+```bash
+docker pull ghcr.io/ibrahimraimi/inflow:latest
+docker run -p 3000:3000 --env-file .env.prod ghcr.io/ibrahimraimi/inflow:latest
+```
 
 ## License
 

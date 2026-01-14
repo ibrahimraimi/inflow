@@ -168,13 +168,13 @@ export async function GET(
     const getBreakdown = async (field: unknown) => {
       return (await db
         .select({
-          name: field,
+          name: field as any,
           visitors: count(),
           uniqueVisitors: sql<number>`count(distinct ${pageViews.clientId})`,
         })
         .from(pageViews)
         .where(whereClause)
-        .groupBy(field)
+        .groupBy(field as any)
         .orderBy(desc(sql`count(*)`))
         .limit(10)) as Array<{
         name: string | null;

@@ -8,8 +8,6 @@ import { UAParser } from "ua-parser-js";
 export async function POST(req: NextRequest) {
   const body = await req.json();
 
-  console.log("Data:", body);
-
   // Fetch all required data from analytics.js
   const parser = new UAParser(req.headers.get("user-agent") || "");
   const deviceInfo = parser.getDevice()?.model || "Unknown Device";
@@ -23,11 +21,6 @@ export async function POST(req: NextRequest) {
   // Fetch geolocation data based on IP
   const geoRes = await fetch(`https://free.freeipapi.com/api/json/${ip}`);
   const geoInfo = await geoRes.json();
-
-  console.log("Device Info:", deviceInfo);
-  console.log("OS Info:", osInfo);
-  console.log("Browser Info:", browserInfo);
-  console.log("Geolocation Info:", geoInfo);
 
   let result;
 
@@ -71,8 +64,6 @@ export async function POST(req: NextRequest) {
       .where(eq(pageViews.clientId, body?.clientId))
       .returning();
   }
-
-  console.log("Database Insertion Result:", result);
 
   return NextResponse.json({
     message: "Data received successfully",

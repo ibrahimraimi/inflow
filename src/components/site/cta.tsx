@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 interface CtaProps {
-  heading: string;
+  heading?: string;
   buttons?: {
     primary?: {
       text: string;

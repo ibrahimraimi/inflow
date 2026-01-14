@@ -21,7 +21,6 @@
     localStorage.setItem("inflow_client_id", clientId);
     localStorage.setItem("inflow_session_time", currentTime);
   } else {
-    // console.log("Existing Session:", clientId);
   }
 
   const script = document.currentScript;
