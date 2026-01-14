@@ -17,7 +17,6 @@ export async function GET(
       headers: await headers(),
     });
 
-    console.log(data);
     return NextResponse.redirect(new URL("/dashboard", request.url));
   } catch (error) {
     console.error(error);

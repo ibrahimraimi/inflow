@@ -1,6 +1,9 @@
+import { Suspense } from "react";
+
 import Link from "next/link";
 import Image from "next/image";
 
+import { Loader2 } from "lucide-react";
 import { ResetPasswordForm } from "@/components/forms/reset-password-form";
 
 export default function ResetPasswordPage() {
@@ -22,7 +25,15 @@ export default function ResetPasswordPage() {
           </div>
           Inflow
         </Link>
-        <ResetPasswordForm />
+        <Suspense
+          fallback={
+            <div className="flex min-h-screen w-full items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          }
+        >
+          <ResetPasswordForm />
+        </Suspense>
       </div>
     </div>
   );

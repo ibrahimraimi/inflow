@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, ExternalLink, Sun, Moon, Loader2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -12,14 +11,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import ThemeToggle from "@/components/theme-toggle";
 
 export default function SettingsPage() {
   const [dateRange, setDateRange] = useState("last_24_hours");
   const [timezone, setTimezone] = useState("africa_lagos");
   const [language, setLanguage] = useState("en_us");
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
 
   const handleReset = (field: string) => {
     switch (field) {
@@ -133,32 +131,7 @@ export default function SettingsPage() {
             Theme
           </Label>
           <div className="flex p-1 w-fit rounded-md bg-muted/50 gap-1 mt-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setTheme("light")}
-              className={cn(
-                "h-7 w-7 rounded-sm transition-all",
-                theme === "light"
-                  ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90"
-                  : "text-muted-foreground hover:bg-muted"
-              )}
-            >
-              <Sun className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setTheme("dark")}
-              className={cn(
-                "h-7 w-7 rounded-sm transition-all",
-                theme === "dark"
-                  ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90"
-                  : "text-muted-foreground hover:bg-muted"
-              )}
-            >
-              <Moon className="h-3.5 w-3.5" />
-            </Button>
+            <ThemeToggle />
           </div>
         </div>
       </div>
