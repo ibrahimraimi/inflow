@@ -136,12 +136,32 @@ export async function GET(req: NextRequest) {
           eq(pageViews.websiteId, site.websiteId),
           ...(fromUnix && toUnix
             ? [
-                gte(sql`${pageViews.entryTime}::bigint`, fromUnix),
-                lte(sql`${pageViews.entryTime}::bigint`, toUnix),
+                gte(
+                  sql`(CASE 
+                    WHEN ${pageViews.entryTime} ~ '^[0-9]+$' THEN ${pageViews.entryTime}::bigint
+                    WHEN ${pageViews.entryTime} ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN extract(epoch from ${pageViews.entryTime}::timestamp)::bigint
+                    ELSE 0
+                  END)`,
+                  fromUnix
+                ),
+                lte(
+                  sql`(CASE 
+                    WHEN ${pageViews.entryTime} ~ '^[0-9]+$' THEN ${pageViews.entryTime}::bigint
+                    WHEN ${pageViews.entryTime} ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN extract(epoch from ${pageViews.entryTime}::timestamp)::bigint
+                    ELSE 0
+                  END)`,
+                  toUnix
+                ),
               ]
             : [])
         )
       );
+
+    const parseEntryTime = (t: string | null) => {
+      if (!t) return null;
+      if (/^\d+$/.test(t)) return new Date(Number(t) * 1000);
+      return new Date(t);
+    };
 
     const makeSetMap = () => ({}) as Record<string, Set<string>>;
 
@@ -216,12 +236,16 @@ export async function GET(req: NextRequest) {
       [];
 
     if (views.length > 0) {
+      const viewDates = views
+        .map((v) => parseEntryTime(v.entryTime))
+        .filter((d): d is Date => d !== null);
+
       const start = fromUnix
         ? new Date(fromUnix * 1000)
-        : new Date(Math.min(...views.map((v) => Number(v.entryTime) * 1000)));
+        : new Date(Math.min(...viewDates.map((d) => d.getTime())));
       const end = toUnix
         ? new Date(toUnix * 1000)
-        : new Date(Math.max(...views.map((v) => Number(v.entryTime) * 1000)));
+        : new Date(Math.max(...viewDates.map((d) => d.getTime())));
 
       let cursor = new Date(start);
 
@@ -253,8 +277,9 @@ export async function GET(req: NextRequest) {
       }
 
       views.forEach((v) => {
-        if (!v.entryTime || !v.clientId) return;
-        const local = toZonedTime(new Date(Number(v.entryTime) * 1000), siteTZ);
+        const entryDate = parseEntryTime(v.entryTime);
+        if (!entryDate || !v.clientId) return;
+        const local = toZonedTime(entryDate, siteTZ);
         const date = formatDateInTz(local, siteTZ);
         hourlyMap[`${date}-${local.getHours()}`]?.add(v.clientId);
       });
@@ -268,8 +293,9 @@ export async function GET(req: NextRequest) {
     const dailyMap: Record<string, Set<string>> = {};
 
     views.forEach((v) => {
-      if (!v.entryTime || !v.clientId) return;
-      const local = toZonedTime(new Date(Number(v.entryTime) * 1000), siteTZ);
+      const entryDate = parseEntryTime(v.entryTime);
+      if (!entryDate || !v.clientId) return;
+      const local = toZonedTime(entryDate, siteTZ);
       const date = formatDateInTz(local, siteTZ);
       dailyMap[date] ??= new Set();
       dailyMap[date].add(v.clientId);
@@ -282,8 +308,9 @@ export async function GET(req: NextRequest) {
 
     /* LAST 24H VISITORS */
     const last24hViews = views.filter((v) => {
-      if (!v.entryTime) return false;
-      const entryTime = Number(v.entryTime);
+      const entryDate = parseEntryTime(v.entryTime);
+      if (!entryDate) return false;
+      const entryTime = Math.floor(entryDate.getTime() / 1000);
       const now = Math.floor(Date.now() / 1000);
       return entryTime >= now - 24 * 60 * 60;
     });

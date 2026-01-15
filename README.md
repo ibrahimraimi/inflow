@@ -26,7 +26,7 @@
 
 ## Introduction
 
-A modern, comprehensive analytics platform designed to help you collect, analyze, and understand your website data effortlessly.
+A modern, comprehensive open-source self-hosted analytics platform designed to help you collect, analyze, and understand your website data effortlessly.
 
 ## Tech Stack
 
@@ -67,10 +67,10 @@ bun install
 3. Set up environment variables:
 
 ```bash
-cp .env.dev .env.dev
+cp .env .env
 ```
 
-Fill in your environment variables in `.env.dev`:
+Fill in your environment variables in `.env`:
 
 ```env
 # Database

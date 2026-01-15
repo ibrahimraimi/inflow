@@ -97,12 +97,17 @@ export async function GET(
         break;
     }
 
-    // Common Where Clause with Regex Check for YYYY-MM-DD
+    // Common Logic for normalizing entry_time
+    const entryTimeAsTimestamp = sql`(CASE 
+      WHEN ${pageViews.entryTime} ~ '^[0-9]+$' THEN to_timestamp(${pageViews.entryTime}::bigint)
+      WHEN ${pageViews.entryTime} ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN ${pageViews.entryTime}::timestamp
+      ELSE NULL
+    END)`;
+
     const whereClause = and(
       eq(pageViews.websiteId, id),
-      gte(pageViews.entryTime, startDate.toISOString()),
-      lte(pageViews.entryTime, endDate.toISOString()),
-      sql`${pageViews.entryTime} ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}'`
+      gte(entryTimeAsTimestamp, startDate),
+      lte(entryTimeAsTimestamp, endDate)
     );
 
     // 1. Metrics
@@ -140,14 +145,25 @@ export async function GET(
 
     const chartDataResult = await db.execute(sql`
       SELECT 
-        date_trunc(${dateTruncUnit}, (CASE WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp ELSE NULL END)) as date,
+        date_trunc(${dateTruncUnit}, (CASE 
+          WHEN "entry_time" ~ '^[0-9]+$' THEN to_timestamp("entry_time"::bigint)
+          WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp
+          ELSE NULL
+        END)) as date,
         count(*) as views,
         count(distinct "client_id") as visitors
       FROM ${pageViews}
       WHERE ${pageViews.websiteId} = ${id}
-      AND "entry_time" >= ${startDate.toISOString()}
-      AND "entry_time" <= ${endDate.toISOString()}
-      AND "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+      AND (CASE 
+          WHEN "entry_time" ~ '^[0-9]+$' THEN to_timestamp("entry_time"::bigint)
+          WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp
+          ELSE NULL
+        END) >= ${startDate.toISOString()}::timestamp
+      AND (CASE 
+          WHEN "entry_time" ~ '^[0-9]+$' THEN to_timestamp("entry_time"::bigint)
+          WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp
+          ELSE NULL
+        END) <= ${endDate.toISOString()}::timestamp
       GROUP BY 1
       ORDER BY 1 ASC
     `);
@@ -300,14 +316,29 @@ export async function GET(
     // 5. Traffic Heatmap
     const trafficDataResult = await db.execute(sql`
       SELECT 
-        extract(dow from (CASE WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp ELSE NULL END)) as day,
-        extract(hour from (CASE WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp ELSE NULL END)) as hour,
+        extract(dow from (CASE 
+          WHEN "entry_time" ~ '^[0-9]+$' THEN to_timestamp("entry_time"::bigint)
+          WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp
+          ELSE NULL
+        END)) as day,
+        extract(hour from (CASE 
+          WHEN "entry_time" ~ '^[0-9]+$' THEN to_timestamp("entry_time"::bigint)
+          WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp
+          ELSE NULL
+        END)) as hour,
         count(distinct "client_id") as visitors
       FROM ${pageViews}
       WHERE ${pageViews.websiteId} = ${id}
-      AND "entry_time" >= ${startDate.toISOString()}
-      AND "entry_time" <= ${endDate.toISOString()}
-      AND "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+      AND (CASE 
+          WHEN "entry_time" ~ '^[0-9]+$' THEN to_timestamp("entry_time"::bigint)
+          WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp
+          ELSE NULL
+        END) >= ${startDate.toISOString()}::timestamp
+      AND (CASE 
+          WHEN "entry_time" ~ '^[0-9]+$' THEN to_timestamp("entry_time"::bigint)
+          WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp
+          ELSE NULL
+        END) <= ${endDate.toISOString()}::timestamp
       GROUP BY 1, 2
     `);
 

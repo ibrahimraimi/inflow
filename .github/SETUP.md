@@ -71,7 +71,7 @@ On your production server, you'll need:
 
 1. Docker and Docker Compose installed
 2. Your repository cloned at the `DEPLOY_PATH`
-3. `.env.dev` or `.env.prod` file with all required environment variables
+3. `.env` or `.env.prod` file with all required environment variables
 4. SSH access configured with the deploy key
 
 ### Server Preparation
@@ -86,8 +86,8 @@ git clone https://github.com/ibrahimraimi/inflow.git
 cd inflow
 
 # Create environment file
-cp .env.prod .env.dev
-# Edit .env.dev with your production values
+cp .env.prod .env
+# Edit .env with your production values
 
 # Add the deploy SSH key to authorized_keys
 echo "<your-deploy-public-key>" >> ~/.ssh/authorized_keys

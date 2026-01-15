@@ -107,8 +107,8 @@ git clone https://github.com/ibrahimraimi/inflow.git
 cd inflow
 
 # Setup environment
-cp .env.prod .env.dev
-nano .env.dev  # Edit with production values
+cp .env.prod .env
+nano .env  # Edit with production values
 
 # Initial deployment
 docker compose up -d

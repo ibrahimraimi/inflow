@@ -16,7 +16,7 @@ services:
       - EMAIL_SENDER_NAME=${EMAIL_SENDER_NAME}
       - EMAIL_SENDER_ADDRESS=${EMAIL_SENDER_ADDRESS}
     env_file:
-      - .env.dev
+      - .env
     restart: unless-stopped
     networks:
       - inflow-network
