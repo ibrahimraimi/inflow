@@ -4,7 +4,7 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { schema } from "./schema";
 
 config({ path: ".env" });
-config({ path: ".env.dev" });
+config({ path: ".env" });
 
 const databaseUrl = process.env.DATABASE_URL;
 

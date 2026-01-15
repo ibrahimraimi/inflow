@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { MetricCard } from "../_components/metric-card";
 import { ChartAreaInteractive } from "../_components/chart";
 import { DataTable } from "../_components/data-table";
@@ -46,12 +47,11 @@ export default function WebsiteDetailPage() {
   const {
     analytics,
     isLoading: analyticsLoading,
+    isValidating: analyticsValidating,
     isError: analyticsError,
   } = useAnalytics(websiteId, dateRange);
 
-  const loading = websiteLoading || analyticsLoading;
-
-  if (loading) {
+  if (websiteLoading) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -161,85 +161,117 @@ export default function WebsiteDetailPage() {
       </div>
 
       {/* Metrics */}
-      <div className="grid grid-cols-5 gap-2 mb-6">
-        <MetricCard
-          title="Visitors"
-          value={analytics?.metrics?.visitors.toLocaleString() || "0"}
-          change={0}
-        />
-        <MetricCard
-          title="Visits"
-          value={analytics?.metrics?.visits.toLocaleString() || "0"}
-          change={0}
-        />
-        <MetricCard
-          title="Views"
-          value={analytics?.metrics?.views.toLocaleString() || "0"}
-          change={0}
-        />
-        <MetricCard
-          title="Bounce rate"
-          value={`${analytics?.metrics?.bounceRate.toFixed(0) || "0"}%`}
-          change={0}
-          isNegative
-        />
-        <MetricCard
-          title="Visit duration"
-          value={`${analytics?.metrics?.duration.toFixed(0) || "0"}s`}
-          change={0}
-        />
+      <div className="relative">
+        {analyticsValidating && (
+          <div className="absolute -top-6 right-0 flex items-center gap-2 text-xs text-muted-foreground animate-pulse">
+            <Loader2 className="h-3 w-3 animate-spin" />
+            Updating...
+          </div>
+        )}
+        <div className="grid grid-cols-5 gap-2 mb-6">
+          {!analytics && analyticsLoading ? (
+            Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-24 w-full rounded-xl" />
+            ))
+          ) : (
+            <>
+              <MetricCard
+                title="Visitors"
+                value={analytics?.metrics?.visitors.toLocaleString() || "0"}
+                change={0}
+              />
+              <MetricCard
+                title="Visits"
+                value={analytics?.metrics?.visits.toLocaleString() || "0"}
+                change={0}
+              />
+              <MetricCard
+                title="Views"
+                value={analytics?.metrics?.views.toLocaleString() || "0"}
+                change={0}
+              />
+              <MetricCard
+                title="Bounce rate"
+                value={`${Number(analytics?.metrics?.bounceRate || 0).toFixed(0)}%`}
+                change={0}
+                isNegative
+              />
+              <MetricCard
+                title="Visit duration"
+                value={`${Number(analytics?.metrics?.duration || 0).toFixed(0)}s`}
+                change={0}
+              />
+            </>
+          )}
+        </div>
       </div>
 
       <div className="space-y-6">
-        <ChartAreaInteractive data={analytics?.chart} />
+        {!analytics && analyticsLoading ? (
+          <Skeleton className="h-[300px] w-full rounded-xl" />
+        ) : (
+          <ChartAreaInteractive data={analytics?.chart} />
+        )}
       </div>
 
       <div className="space-y-6 min-h-screen pt-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-          <DataTable
-            title="Pages"
-            tabs={["Path", "Entry", "Exit"]}
-            data={{
-              Path: analytics?.tables.pages || [],
-              Entry: [],
-              Exit: [],
-            }}
-            type="path"
-          />
-          <DataTable
-            title="Sources"
-            tabs={["Referrers", "Channels"]}
-            data={{
-              Referrers: analytics?.tables.sources || [],
-              Channels: [],
-            }}
-            type="source"
-          />
-          <DataTable
-            title="Environment"
-            tabs={["Browsers", "OS", "Devices"]}
-            data={{
-              Browsers: analytics?.tables.browsers || [],
-              OS: analytics?.tables.os || [],
-              Devices: analytics?.tables.devices || [],
-            }}
-            type="browser"
-          />
-          <DataTable
-            title="Location"
-            tabs={["Countries", "Regions", "Cities"]}
-            data={{
-              Countries: analytics?.tables.countries || [],
-              Regions: analytics?.tables.regions || [],
-              Cities: analytics?.tables.cities || [],
-            }}
-            type="country"
-          />
+          {!analytics && analyticsLoading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-[300px] w-full rounded-xl" />
+            ))
+          ) : (
+            <>
+              <DataTable
+                title="Pages"
+                tabs={["Path", "Entry", "Exit"]}
+                data={{
+                  Path: analytics?.tables.pages || [],
+                  Entry: [],
+                  Exit: [],
+                }}
+                type="path"
+              />
+              <DataTable
+                title="Sources"
+                tabs={["Referrers", "Channels"]}
+                data={{
+                  Referrers: analytics?.tables.sources || [],
+                  Channels: [],
+                }}
+                type="source"
+              />
+              <DataTable
+                title="Environment"
+                tabs={["Browsers", "OS", "Devices"]}
+                data={{
+                  Browsers: analytics?.tables.browsers || [],
+                  OS: analytics?.tables.os || [],
+                  Devices: analytics?.tables.devices || [],
+                }}
+                type="browser"
+              />
+              <DataTable
+                title="Location"
+                tabs={["Countries", "Regions", "Cities"]}
+                data={{
+                  Countries: analytics?.tables.countries || [],
+                  Regions: analytics?.tables.regions || [],
+                  Cities: analytics?.tables.cities || [],
+                }}
+                type="country"
+              />
+            </>
+          )}
         </div>
-        <DataMap
-          mapData={analytics?.map || []}
-          trafficData={analytics?.traffic || []}
-        />
+        {!analytics && analyticsLoading ? (
+          <Skeleton className="h-[400px] w-full rounded-xl" />
+        ) : (
+          <DataMap
+            mapData={analytics?.map || []}
+            trafficData={analytics?.traffic || []}
+          />
+        )}
       </div>
     </div>
   );

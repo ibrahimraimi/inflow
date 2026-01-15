@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "Inflow",
   title: "Inflow",
   description:
-    "Inflow is a simple, fast, privacy-friendly alternative to Google Analytics.",
+    "Inflow is a simple open source, fast, privacy-friendly self-hosted analytics platform.",
   url: "https://inflow.com",
   baseUrl:
     process.env.NODE_ENV === "production"
@@ -32,7 +32,7 @@ export const siteConfig = {
   },
   locale: "en-US",
   language: "en",
-  copyright: `© ${new Date().getFullYear()} Your Site Name. All rights reserved.`,
+  copyright: `© ${new Date().getFullYear()} Inflow. All rights reserved.`,
   foundedYear: 2026,
 } as const;
 

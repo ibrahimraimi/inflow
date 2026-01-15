@@ -2,7 +2,7 @@ import { db } from "@/db/drizzle";
 import { pageViews } from "@/db/schema";
 import { type NextRequest, NextResponse } from "next/server";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { UAParser } from "ua-parser-js";
 
 export async function POST(req: NextRequest) {
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
         url: body.url,
         type: body.type,
         referrer: body.referrer,
-        entryTime: body.entryTime,
+        entryTime: body.entryTime || new Date().toISOString(),
         exitTime: body.exitTime,
         totalActiveTime: body.totalActiveTime,
         urlParams: body.urlParams,
@@ -57,11 +57,16 @@ export async function POST(req: NextRequest) {
     await db
       .update(pageViews)
       .set({
-        exitTime: body.exitTime,
+        exitTime: body.exitTime || new Date().toISOString(),
         totalActiveTime: body.totalActiveTime,
         exitUrl: body.exitUrl,
       })
-      .where(eq(pageViews.clientId, body?.clientId))
+      .where(
+        and(
+          eq(pageViews.clientId, body?.clientId),
+          eq(pageViews.websiteId, body?.websiteId)
+        )
+      )
       .returning();
   }
 
