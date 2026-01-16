@@ -18,13 +18,13 @@ RUN bun db:generate
 # Set dummy variables for build time to prevent crashes during static analysis
 ARG DATABASE_URL="postgresql://user:password@localhost/placeholder"
 ARG BETTER_AUTH_SECRET="placeholder_secret_at_least_32_characters_long"
-ARG BETTER_AUTH_URL="https://inflow.studio21.studio"
-ARG NEXT_PUBLIC_APP_URL="https://inflow.studio21.studio"
+ARG BETTER_AUTH_URL="https://placeholder.example.com"
+ARG NEXT_PUBLIC_APP_URL="https://placeholder.example.com"
 ARG RESEND_API_KEY="re_placeholder"
 ARG GOOGLE_CLIENT_ID="placeholder_id"
 ARG GOOGLE_CLIENT_SECRET="placeholder_secret"
-ARG EMAIL_SENDER_NAME="Inflow"
-ARG EMAIL_SENDER_ADDRESS="onboarding@resend.dev"
+ARG EMAIL_SENDER_NAME="PlaceholderName"
+ARG EMAIL_SENDER_ADDRESS="noreply@placeholder.example.com"
 
 ENV DATABASE_URL=$DATABASE_URL
 ENV BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET

@@ -3,12 +3,18 @@ export const siteConfig = {
   title: "Inflow",
   description:
     "Inflow is a simple open source, fast, privacy-friendly self-hosted analytics platform.",
-  url: "https://inflow.studio21.studio",
+  url:
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.BETTER_AUTH_URL ||
+    "http://localhost:3000",
   baseUrl:
-    process.env.NODE_ENV === "production"
-      ? "https://inflow.studio21.studio"
-      : "https://inflow.studio21.studio",
-  domain: "https://inflow.studio21.studio",
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.BETTER_AUTH_URL ||
+    "http://localhost:3000",
+  domain:
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.BETTER_AUTH_URL ||
+    "http://localhost:3000",
   keywords: [],
   author: {
     name: "Ibrahim Raimi",

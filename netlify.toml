@@ -3,4 +3,5 @@
   publish = ".next"
 
 [build.environment]
-  SECRETS_SCAN_OMIT_KEYS = "EMAIL_SENDER_NAME,EMAIL_SENDER_ADDRESS,BASE_URL"
+  SECRETS_SCAN_OMIT_KEYS = "EMAIL_SENDER_NAME,EMAIL_SENDER_ADDRESS,BASE_URL,BETTER_AUTH_URL"
+  SECRETS_SCAN_OMIT_PATHS = ".netlify/**,.next/**,.git/**,node_modules/**,bun.lockb,README.md,.github/**"
