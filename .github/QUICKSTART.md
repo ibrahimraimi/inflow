@@ -38,7 +38,7 @@ Create environment: `production`
 Add variable:
 
 ```
-APP_URL = https://inflow.com
+APP_URL = https://inflow.studio21.studio
 ```
 
 ### 3. Enable GitHub Container Registry

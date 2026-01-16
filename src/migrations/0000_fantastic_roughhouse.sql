@@ -25,6 +25,18 @@ CREATE TABLE "invitation" (
 	"inviter_id" text NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "links" (
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "links_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"link_id" varchar(255) NOT NULL,
+	"name" varchar(255) NOT NULL,
+	"short_code" varchar(255) NOT NULL,
+	"destination_url" text NOT NULL,
+	"user_id" text NOT NULL,
+	"created_at" timestamp NOT NULL,
+	CONSTRAINT "links_link_id_unique" UNIQUE("link_id"),
+	CONSTRAINT "links_short_code_unique" UNIQUE("short_code")
+);
+--> statement-breakpoint
 CREATE TABLE "member" (
 	"id" text PRIMARY KEY NOT NULL,
 	"organization_id" text NOT NULL,
@@ -41,6 +53,34 @@ CREATE TABLE "organization" (
 	"created_at" timestamp NOT NULL,
 	"metadata" text,
 	CONSTRAINT "organization_slug_unique" UNIQUE("slug")
+);
+--> statement-breakpoint
+CREATE TABLE "page_views" (
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "page_views_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"client_id" varchar(255),
+	"website_id" varchar(255) NOT NULL,
+	"domain" varchar(255) NOT NULL,
+	"url" text,
+	"type" varchar(100) NOT NULL,
+	"referrer" varchar(2048),
+	"entry_time" varchar(100),
+	"exit_time" varchar(100),
+	"total_active_time" integer,
+	"url_params" varchar,
+	"utm_source" varchar(255),
+	"utm_medium" varchar(255),
+	"utm_campaign" varchar(255),
+	"utm_term" varchar(255),
+	"utm_content" varchar(255),
+	"device" varchar,
+	"os" varchar,
+	"browser" varchar,
+	"city" varchar,
+	"region" varchar,
+	"country" varchar,
+	"country_code" varchar,
+	"ref_params" varchar,
+	"exit_url" varchar
 );
 --> statement-breakpoint
 CREATE TABLE "session" (
@@ -76,9 +116,24 @@ CREATE TABLE "verification" (
 	"updated_at" timestamp
 );
 --> statement-breakpoint
+CREATE TABLE "websites" (
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "websites_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"websiteId" varchar(255) NOT NULL,
+	"websiteName" varchar(255) NOT NULL,
+	"domain" varchar(255) NOT NULL,
+	"timeZone" varchar(100) NOT NULL,
+	"enableLocalhostTracking" boolean DEFAULT false,
+	"user_id" text NOT NULL,
+	CONSTRAINT "websites_websiteId_unique" UNIQUE("websiteId"),
+	CONSTRAINT "websites_domain_unique" UNIQUE("domain")
+);
+--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "invitation" ADD CONSTRAINT "invitation_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "invitation" ADD CONSTRAINT "invitation_inviter_id_user_id_fk" FOREIGN KEY ("inviter_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "links" ADD CONSTRAINT "links_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "member" ADD CONSTRAINT "member_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "member" ADD CONSTRAINT "member_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "page_views" ADD CONSTRAINT "page_views_website_id_websites_websiteId_fk" FOREIGN KEY ("website_id") REFERENCES "public"."websites"("websiteId") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "websites" ADD CONSTRAINT "websites_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
