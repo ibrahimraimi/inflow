@@ -7,7 +7,7 @@ export const siteConfig = {
   baseUrl:
     process.env.NODE_ENV === "production"
       ? "https://inflow.studio21.studio"
-      : "http://localhost:3000",
+      : "https://inflow.studio21.studio",
   domain: "https://inflow.studio21.studio",
   keywords: [],
   author: {

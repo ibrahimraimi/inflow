@@ -5,6 +5,6 @@ import {
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
-  baseURL: process.env.BASE_URL || "http://localhost:3000",
+  baseURL: process.env.BASE_URL || "https://inflow.studio21.studio",
   plugins: [organizationClient(), lastLoginMethodClient()],
 });
