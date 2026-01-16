@@ -5,6 +5,6 @@ export default function robots() {
       allow: "/",
       disallow: ["/api/", "/dashboard/"],
     },
-    sitemap: "https://inflow.com/sitemap.xml",
+    sitemap: "https://inflow.studio21.studio/sitemap.xml",
   };
 }

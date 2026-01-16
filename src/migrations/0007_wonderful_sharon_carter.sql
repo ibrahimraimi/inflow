@@ -1,1 +1,0 @@
-ALTER TABLE "page_views" ADD COLUMN "country_code" varchar;

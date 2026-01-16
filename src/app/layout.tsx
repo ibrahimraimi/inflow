@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://inflow.com"),
+  metadataBase: new URL("https://inflow.studio21.studio"),
   alternates: {
     canonical: "/",
   },

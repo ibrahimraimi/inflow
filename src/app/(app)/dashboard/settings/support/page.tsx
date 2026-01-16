@@ -75,7 +75,7 @@ export default function SupportSettingsPage() {
             asChild
           >
             <a
-              href="https://inflow.com/docs"
+              href="https://inflow.studio21.studio/docs"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2"

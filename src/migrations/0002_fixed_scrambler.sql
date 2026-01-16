@@ -1,1 +1,0 @@
-ALTER TABLE "websites" ADD COLUMN "websiteName" varchar(255) NOT NULL;

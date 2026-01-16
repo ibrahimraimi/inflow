@@ -1,4 +1,4 @@
-<a href="https://inflow.com">
+<a href="https://inflow.studio21.studio">
   <img alt="A modern, comprehensive analytics platform designed to help you collect, analyze, and understand your website data effortlessly." src="./public/images/banner.png">
 </a>
 

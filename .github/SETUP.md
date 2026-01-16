@@ -36,7 +36,7 @@ Go to your repository Settings → Secrets and Variables → Actions and add:
 
 Go to Settings → Environments → Create "production" environment and add:
 
-- `APP_URL` - Your production app URL (e.g., https://inflow.com)
+- `APP_URL` - Your production app URL (e.g., https://inflow.studio21.studio)
 
 ## Docker Setup
 
