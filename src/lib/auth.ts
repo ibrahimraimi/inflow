@@ -15,6 +15,7 @@ import OrganizationInvitationEmail from "@/components/emails/organization-invita
 const resend = new Resend(process.env.RESEND_API_KEY as string);
 
 export const auth = betterAuth({
+  secret: process.env.BETTER_AUTH_SECRET || "fallback_secret_for_build",
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
       await resend.emails.send({

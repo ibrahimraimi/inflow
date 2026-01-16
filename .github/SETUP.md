@@ -48,7 +48,7 @@ Go to Settings → Environments → Create "production" environment and add:
 docker compose up --build
 ```
 
-2. Access the app at http://localhost:3000
+2. Access the app at https://inflow.studio21.studio
 
 ### Docker Image from GitHub Container Registry
 

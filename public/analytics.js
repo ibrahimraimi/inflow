@@ -55,7 +55,7 @@
     refParams,
   };
 
-  fetch(`http://localhost:3000/api/track`, {
+  fetch(`https://inflow.studio21.studio/api/track`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -71,7 +71,7 @@
     const exitTime = new Date().toISOString();
     totalActiveTime = Math.floor((Date.now() - startTime) / 1000);
 
-    fetch(`http://localhost:3000/api/track`, {
+    fetch(`https://inflow.studio21.studio/api/track`, {
       method: "POST",
       keepalive: true,
       headers: {

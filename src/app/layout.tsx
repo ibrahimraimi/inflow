@@ -89,8 +89,8 @@ export default function RootLayout({
         <script
           defer
           data-website-id="77d3b396-82ae-42e3-b78d-1a8e962503cd"
-          data-domain="http://localhost:3000"
-          src="http://localhost:3000/analytics.js"
+          data-domain="https://inflow.studio21.studio"
+          src="https://inflow.studio21.studio/analytics.js"
         ></script>
       </head>
       <body

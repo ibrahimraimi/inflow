@@ -77,9 +77,9 @@ Fill in your environment variables in `.env`:
 DATABASE_URL="postgresql://username:password@host:port/database"
 
 # Authentication
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
+NEXT_PUBLIC_APP_URL="https://inflow.studio21.studio"
 BETTER_AUTH_SECRET="your-secret-key"
-BETTER_AUTH_URL="http://localhost:3000"
+BETTER_AUTH_URL="https://inflow.studio21.studio"
 
 # Google OAuth (optional)
 GOOGLE_CLIENT_ID="your-google-client-id"
@@ -107,7 +107,7 @@ bun db:migrate
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [https://inflow.studio21.studio](https://inflow.studio21.studio) in your browser.
 
 ## Database Schema
 
@@ -157,7 +157,7 @@ docker compose up --build
 make docker-up
 ```
 
-The application will be available at [http://localhost:3000](http://localhost:3000).
+The application will be available at [https://inflow.studio21.studio](https://inflow.studio21.studio).
 
 ### CI/CD Pipeline
 
