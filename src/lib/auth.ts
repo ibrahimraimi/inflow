@@ -11,6 +11,7 @@ import VerifyEmail from "@/components/emails/verify-email";
 import { getActiveOrganization } from "@/server/organizations";
 import ForgotPasswordEmail from "@/components/emails/reset-password";
 import OrganizationInvitationEmail from "@/components/emails/organization-invitation";
+import { getBaseUrl } from "@/lib/url";
 
 const resend = new Resend(process.env.RESEND_API_KEY as string);
 
@@ -54,7 +55,7 @@ export const auth = betterAuth({
       create: {
         before: async (session) => {
           const activeOrganization = await getActiveOrganization(
-            session.userId
+            session.userId,
           );
           return {
             data: {
@@ -73,7 +74,7 @@ export const auth = betterAuth({
   plugins: [
     organization({
       sendInvitationEmail: async (data) => {
-        const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL}/api/accept-invitation/${data.id}`;
+        const inviteLink = `${getBaseUrl()}/api/accept-invitation/${data.id}`;
 
         await resend.emails.send({
           from: `${process.env.EMAIL_SENDER_NAME} <${process.env.EMAIL_SENDER_ADDRESS}>`,

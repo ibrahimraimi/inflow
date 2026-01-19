@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Loader2, Key, Mail, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+
+import { Copy, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -13,18 +14,35 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { authClient } from "@/lib/auth-client";
+import { ChangeEmailDialog } from "@/components/dashboard/settings/change-email-dialog";
+import { ChangePasswordDialog } from "@/components/dashboard/settings/change-password-dialog";
+import { DeleteAccountDialog } from "@/components/dashboard/settings/delete-account-dialog";
 
 export default function AccountSettingsPage() {
-  const [name, setName] = useState("Ibrahim Raimi");
-  const [email, setEmail] = useState("ibrahimraimi.tech@gmail.com");
+  const { data: session, isPending } = authClient.useSession();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [dataRegion, setDataRegion] = useState("US");
   const [loading, setLoading] = useState(false);
 
-  const accountId = "64687418-4b1e-4f88-9c2e-829c61569709";
+  // Dialog states
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  // Update state when session loads
+  useState(() => {
+    if (session?.user) {
+      setName(session.user.name || "");
+      setEmail(session.user.email || "");
+    }
+  });
 
   const handleSaveAccount = async () => {
     setLoading(true);
     try {
+      // TODO: Implement account update API endpoint
       await new Promise((resolve) => setTimeout(resolve, 1000));
       toast.success("Account settings saved!");
     } catch (error) {
@@ -38,6 +56,24 @@ export default function AccountSettingsPage() {
     navigator.clipboard.writeText(text);
     toast.success("Copied to clipboard!");
   };
+
+  if (isPending) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-muted-foreground">
+          Please sign in to view your account settings.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -59,7 +95,7 @@ export default function AccountSettingsPage() {
             <div className="relative">
               <Input
                 id="accountId"
-                value={accountId}
+                value={session.user.id}
                 readOnly
                 className="pr-10 font-mono text-xs h-9 bg-muted/20"
               />
@@ -67,7 +103,7 @@ export default function AccountSettingsPage() {
                 variant="ghost"
                 size="icon"
                 className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground hover:text-foreground"
-                onClick={() => copyToClipboard(accountId)}
+                onClick={() => copyToClipboard(session.user.id)}
               >
                 <Copy className="h-3 w-3" />
               </Button>
@@ -83,7 +119,7 @@ export default function AccountSettingsPage() {
             </Label>
             <Input
               id="name"
-              value={name}
+              value={name || session.user.name}
               onChange={(e) => setName(e.target.value)}
               className="text-xs h-9 bg-muted/20"
             />
@@ -99,7 +135,7 @@ export default function AccountSettingsPage() {
             <Input
               id="email"
               type="email"
-              value={email}
+              value={email || session.user.email}
               onChange={(e) => setEmail(e.target.value)}
               className="text-xs h-9 bg-muted/20"
             />
@@ -133,7 +169,7 @@ export default function AccountSettingsPage() {
             onClick={handleSaveAccount}
             disabled={loading}
             size="sm"
-            className="h-8 px-6 text-xs font-bold"
+            className="h-8 px-6 text-xs font-bold cursor-pointer"
           >
             {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : "Save"}
           </Button>
@@ -151,7 +187,8 @@ export default function AccountSettingsPage() {
           <Button
             variant="secondary"
             size="sm"
-            className="h-8 text-xs font-bold px-4"
+            className="h-8 text-xs font-bold px-4 cursor-pointer"
+            onClick={() => setPasswordDialogOpen(true)}
           >
             Change password
           </Button>
@@ -167,7 +204,8 @@ export default function AccountSettingsPage() {
           <Button
             variant="secondary"
             size="sm"
-            className="h-8 text-xs font-bold px-4"
+            className="h-8 text-xs font-bold px-4 cursor-pointer"
+            onClick={() => setEmailDialogOpen(true)}
           >
             Change email
           </Button>
@@ -183,12 +221,28 @@ export default function AccountSettingsPage() {
           <Button
             variant="destructive"
             size="sm"
-            className="h-8 text-xs font-bold px-4"
+            className="h-8 text-xs font-bold px-4 cursor-pointer"
+            onClick={() => setDeleteDialogOpen(true)}
           >
             Delete
           </Button>
         </div>
       </div>
+
+      {/* Dialogs */}
+      <ChangePasswordDialog
+        open={passwordDialogOpen}
+        onOpenChange={setPasswordDialogOpen}
+      />
+      <ChangeEmailDialog
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+        currentEmail={session.user.email}
+      />
+      <DeleteAccountDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+      />
     </div>
   );
 }
