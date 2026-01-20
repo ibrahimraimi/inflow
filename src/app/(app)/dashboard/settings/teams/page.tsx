@@ -32,6 +32,8 @@ import {
   getCurrentMemberRole,
   cancelInvitation,
 } from "@/server/teams";
+import { CreateOrganizationDialog } from "@/components/dashboard/teams/create-organization-dialog";
+
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 
@@ -195,12 +197,20 @@ export default function TeamsSettingsPage() {
               Manage your team members and their permissions
             </p>
           </div>
-          {canManageMembers && session?.session?.activeOrganizationId && (
+          {canManageMembers && session?.session?.activeOrganizationId ? (
             <Button onClick={() => setInviteDialogOpen(true)} className="gap-2">
               <UserPlus className="h-4 w-4" />
               Invite Member
             </Button>
-          )}
+          ) : !session?.session?.activeOrganizationId ? (
+            <Button
+              onClick={() => setCreateOrgDialogOpen(true)}
+              className="gap-2"
+            >
+              <Building2 className="h-4 w-4" />
+              Create Organization
+            </Button>
+          ) : null}
         </div>
       </div>
 
@@ -216,9 +226,18 @@ export default function TeamsSettingsPage() {
           {members.length === 0 ? (
             <div className="p-12 text-center">
               <Users className="h-10 w-10 mx-auto text-muted-foreground/50 mb-4" />
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground mb-4">
                 No team members yet
               </p>
+              {!session?.session?.activeOrganizationId && (
+                <Button
+                  onClick={() => setCreateOrgDialogOpen(true)}
+                  variant="outline"
+                  className="gap-2"
+                >
+                  Create Organization
+                </Button>
+              )}
             </div>
           ) : (
             members.map((member) => (
@@ -341,6 +360,12 @@ export default function TeamsSettingsPage() {
           onSuccess={fetchData}
         />
       )}
+
+      <CreateOrganizationDialog
+        open={createOrgDialogOpen}
+        onOpenChange={setCreateOrgDialogOpen}
+        onSuccess={fetchData}
+      />
 
       {selectedMember && (
         <>
