@@ -18,6 +18,10 @@ import {
   formatWithImage,
 } from "@/lib/helpers";
 import type { WebsiteWithAnalytics } from "@/configs/types";
+import {
+  websiteCreateSchema,
+  websiteQuerySchema,
+} from "@/lib/validations/website";
 
 export async function POST(req: NextRequest) {
   const session = await auth.api.getSession({
@@ -28,15 +32,25 @@ export async function POST(req: NextRequest) {
     return new Response("Unauthorized", { status: 401 });
   }
 
+  const body = await req.json();
+  const validation = websiteCreateSchema.safeParse(body);
+
+  if (!validation.success) {
+    return NextResponse.json(
+      { error: "Invalid request body", details: validation.error.format() },
+      { status: 400 },
+    );
+  }
+
   const { websiteId, websiteName, domain, timeZone, enableLocalhostTracking } =
-    await req.json();
+    validation.data;
 
   // Check if domain already exists
   const existingDomain = await db
     .select()
     .from(websites)
     .where(
-      and(eq(websites.domain, domain), eq(websites.userId, session.user.id))
+      and(eq(websites.domain, domain), eq(websites.userId, session.user.id)),
     );
 
   if (existingDomain.length > 0) {
@@ -71,10 +85,17 @@ export async function GET(req: NextRequest) {
   }
 
   const { searchParams } = req.nextUrl;
-  const websiteId = searchParams.get("websiteId");
-  const from = searchParams.get("from");
-  const to = searchParams.get("to");
-  const websiteOnly = searchParams.get("websiteOnly");
+  const params = Object.fromEntries(searchParams.entries());
+  const validation = websiteQuerySchema.safeParse(params);
+
+  if (!validation.success) {
+    return NextResponse.json(
+      { error: "Invalid query parameters", details: validation.error.format() },
+      { status: 400 },
+    );
+  }
+
+  const { websiteId, from, to, websiteOnly } = validation.data;
 
   const fromUnix = from
     ? Math.floor(new Date(`${from}T00:00:00`).getTime() / 1000)
@@ -98,8 +119,8 @@ export async function GET(req: NextRequest) {
         .where(
           and(
             eq(websites.userId, session.user.id),
-            eq(websites.websiteId, websiteId)
-          )
+            eq(websites.websiteId, websiteId),
+          ),
         );
       return NextResponse.json(specificSite[0]);
     }
@@ -116,9 +137,9 @@ export async function GET(req: NextRequest) {
       websiteId
         ? and(
             eq(websites.userId, session.user.id),
-            eq(websites.websiteId, websiteId)
+            eq(websites.websiteId, websiteId),
           )
-        : eq(websites.userId, session.user.id)
+        : eq(websites.userId, session.user.id),
     )
     .orderBy(desc(websites.id));
 
@@ -142,7 +163,7 @@ export async function GET(req: NextRequest) {
                     WHEN ${pageViews.entryTime} ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN extract(epoch from ${pageViews.entryTime}::timestamp)::bigint
                     ELSE 0
                   END)`,
-                  fromUnix
+                  fromUnix,
                 ),
                 lte(
                   sql`(CASE 
@@ -150,11 +171,11 @@ export async function GET(req: NextRequest) {
                     WHEN ${pageViews.entryTime} ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN extract(epoch from ${pageViews.entryTime}::timestamp)::bigint
                     ELSE 0
                   END)`,
-                  toUnix
+                  toUnix,
                 ),
               ]
-            : [])
-        )
+            : []),
+        ),
       );
 
     const parseEntryTime = (t: string | null) => {
@@ -316,7 +337,7 @@ export async function GET(req: NextRequest) {
     });
 
     const last24hUniqueVisitors = new Set(
-      last24hViews.map((v) => v.clientId).filter(Boolean)
+      last24hViews.map((v) => v.clientId).filter(Boolean),
     ).size;
 
     result.push({
