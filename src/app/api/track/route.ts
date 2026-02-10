@@ -4,9 +4,43 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { and, eq } from "drizzle-orm";
 import { UAParser } from "ua-parser-js";
+import { trackEventSchema } from "@/lib/validations/track";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0] ||
+    req.headers.get("x-real-ip") ||
+    "127.0.0.1";
+
+  const ratelimit = rateLimit(ip, 100, 60 * 1000, "track-api"); // 100 requests per minute
+
+  if (!ratelimit.success) {
+    return NextResponse.json(
+      { error: "Too many requests" },
+      {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": ratelimit.limit.toString(),
+          "X-RateLimit-Remaining": ratelimit.remaining.toString(),
+          "X-RateLimit-Reset": ratelimit.reset.toString(),
+        },
+      },
+    );
+  }
+
+  const bodyJson = await req.json();
+
+  const validation = trackEventSchema.safeParse(bodyJson);
+
+  if (!validation.success) {
+    return NextResponse.json(
+      { error: "Invalid request body", details: validation.error.format() },
+      { status: 400 },
+    );
+  }
+
+  const body = validation.data;
 
   // Fetch all required data from analytics.js
   const parser = new UAParser(req.headers.get("user-agent") || "");
@@ -64,8 +98,8 @@ export async function POST(req: NextRequest) {
       .where(
         and(
           eq(pageViews.clientId, body?.clientId),
-          eq(pageViews.websiteId, body?.websiteId)
-        )
+          eq(pageViews.websiteId, body?.websiteId),
+        ),
       )
       .returning();
   }
