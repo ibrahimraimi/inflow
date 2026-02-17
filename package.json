@@ -30,6 +30,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@react-email/components": "^1.0.3",
     "@remixicon/react": "^4.8.0",
+    "@upstash/redis": "^1.36.2",
     "axios": "^1.13.2",
     "better-auth": "^1.4.10",
     "class-variance-authority": "^0.7.1",

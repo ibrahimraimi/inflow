@@ -1,10 +1,8 @@
 "use server";
 
-import { eq, and } from "drizzle-orm";
-import { db } from "@/db/drizzle";
-import { member, organization, invitation, user } from "@/db/schema";
 import { getCurrentUser } from "./users";
 import { getActiveOrganization } from "./organizations";
+import { TeamService } from "./services/team-service";
 
 /**
  * Get all members of the current user's organization
@@ -18,12 +16,7 @@ export async function getTeamMembers() {
       return { success: false, error: "No active organization found" };
     }
 
-    const members = await db.query.member.findMany({
-      where: eq(member.organizationId, activeOrg.id),
-      with: {
-        user: true,
-      },
-    });
+    const members = await TeamService.getMembers(activeOrg.id);
 
     return { success: true, members };
   } catch (error) {
@@ -44,12 +37,7 @@ export async function getPendingInvitations() {
       return { success: false, error: "No active organization found" };
     }
 
-    const invitations = await db.query.invitation.findMany({
-      where: and(
-        eq(invitation.organizationId, activeOrg.id),
-        eq(invitation.status, "pending"),
-      ),
-    });
+    const invitations = await TeamService.getPendingInvitations(activeOrg.id);
 
     return { success: true, invitations };
   } catch (error) {
@@ -70,18 +58,13 @@ export async function getCurrentMemberRole() {
       return { success: false, error: "No active organization found" };
     }
 
-    const memberRecord = await db.query.member.findFirst({
-      where: and(
-        eq(member.organizationId, activeOrg.id),
-        eq(member.userId, currentUser.id),
-      ),
-    });
+    const role = await TeamService.getMemberRole(activeOrg.id, currentUser.id);
 
-    if (!memberRecord) {
+    if (!role) {
       return { success: false, error: "Member not found" };
     }
 
-    return { success: true, role: memberRecord.role };
+    return { success: true, role };
   } catch (error) {
     console.error("Error fetching member role:", error);
     return { success: false, error: "Failed to fetch member role" };
@@ -132,9 +115,7 @@ export async function removeMember(memberId: string) {
     }
 
     // Get the member to remove
-    const memberToRemove = await db.query.member.findFirst({
-      where: eq(member.id, memberId),
-    });
+    const memberToRemove = await TeamService.getMemberById(memberId);
 
     if (!memberToRemove) {
       return { success: false, error: "Member not found" };
@@ -142,14 +123,9 @@ export async function removeMember(memberId: string) {
 
     // Check if trying to remove the last owner
     if (memberToRemove.role === "owner") {
-      const owners = await db.query.member.findMany({
-        where: and(
-          eq(member.organizationId, activeOrg.id),
-          eq(member.role, "owner"),
-        ),
-      });
+      const ownersCount = await TeamService.countOwners(activeOrg.id);
 
-      if (owners.length <= 1) {
+      if (ownersCount <= 1) {
         return {
           success: false,
           error: "Cannot remove the last owner of the organization",
@@ -158,7 +134,7 @@ export async function removeMember(memberId: string) {
     }
 
     // Remove the member
-    await db.delete(member).where(eq(member.id, memberId));
+    await TeamService.removeMember(memberId);
 
     return { success: true };
   } catch (error) {
@@ -188,9 +164,7 @@ export async function updateMemberRole(
     }
 
     // Get the member to update
-    const memberToUpdate = await db.query.member.findFirst({
-      where: eq(member.id, memberId),
-    });
+    const memberToUpdate = await TeamService.getMemberById(memberId);
 
     if (!memberToUpdate) {
       return { success: false, error: "Member not found" };
@@ -198,14 +172,9 @@ export async function updateMemberRole(
 
     // Check if trying to change the last owner's role
     if (memberToUpdate.role === "owner" && newRole !== "owner") {
-      const owners = await db.query.member.findMany({
-        where: and(
-          eq(member.organizationId, activeOrg.id),
-          eq(member.role, "owner"),
-        ),
-      });
+      const ownersCount = await TeamService.countOwners(activeOrg.id);
 
-      if (owners.length <= 1) {
+      if (ownersCount <= 1) {
         return {
           success: false,
           error: "Cannot change the role of the last owner",
@@ -214,10 +183,7 @@ export async function updateMemberRole(
     }
 
     // Update the role
-    await db
-      .update(member)
-      .set({ role: newRole })
-      .where(eq(member.id, memberId));
+    await TeamService.updateMemberRole(memberId, newRole);
 
     return { success: true };
   } catch (error) {
@@ -236,7 +202,7 @@ export async function cancelInvitation(invitationId: string) {
       return { success: false, error: "Insufficient permissions" };
     }
 
-    await db.delete(invitation).where(eq(invitation.id, invitationId));
+    await TeamService.cancelInvitation(invitationId);
 
     return { success: true };
   } catch (error) {

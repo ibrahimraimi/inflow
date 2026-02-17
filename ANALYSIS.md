@@ -6,7 +6,7 @@ This report evaluates the current state of the architecture, code quality, and p
 
 - **Description**: Inflow is a modern, privacy-focused, self-hosted analytics platform designed as a lightweight alternative to Google Analytics. It emphasizes simplicity and developer experience.
 - **Technology Stack**:
-  - **Framework**: Next.js 15+ (App Router)
+  - **Framework**: Next.js 16+ (App Router)
   - **Runtime**: Bun
   - **Database**: Neon PostgreSQL with Drizzle ORM
   - **Authentication**: Better Auth
@@ -32,7 +32,6 @@ This report evaluates the current state of the architecture, code quality, and p
 - **Validation**: Strict validation of incoming tracking data using Zod.
 
 ### Areas Needing Improvement
-- **Next.js Versioning**: `package.json` lists `next: 16.1.1`. This version does not exist (Next.js is currently at 15.x). This is likely a placeholder or registry error that should be corrected to a stable 15.x release.
 - **Rate Limiting**: The current `rateLimit` implementation in `src/lib/rate-limit.ts` is strictly in-memory.
 - **Geolocation Latency**: The tracking API performs a synchronous `fetch` to an external geolocation API (`freeipapi.com`). This adds significant latency to every tracking request.
 
@@ -45,9 +44,8 @@ This report evaluates the current state of the architecture, code quality, and p
 ### High Priority
 - **Performance Optimizations**: 
   - Offload geolocation fetching to a background worker or use a local MaxMind database to avoid blocking the ingestion API.
-  - Correct the `next` dependency version in `package.json`.
 - **Architecture**: 
-  - Move rate limiting to a distributed store (e.g., Redis via Upstash) to support horizontal scaling.
+  - Move rate limiting to a distributed store (Use Redis via Upstash) to support horizontal scaling.
 - **Security**: 
   - Ensure the `.env.prod` is strictly managed and not committed (currently visible in workspace).
 
