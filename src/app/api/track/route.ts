@@ -47,13 +47,13 @@ export async function POST(req: NextRequest) {
   const deviceInfo = parser.getDevice()?.model || "Unknown Device";
   const osInfo = parser.getOS()?.name || "Unknown OS";
   const browserInfo = parser.getBrowser()?.name || "Unknown Browser";
-  const ip =
+  const visitorIp =
     req.headers.get("x-forwarded-for")?.split(",")[0] ||
     req.headers.get("x-real-ip") ||
     "";
 
   // Fetch geolocation data based on IP
-  const geoRes = await fetch(`https://free.freeipapi.com/api/json/${ip}`);
+  const geoRes = await fetch(`https://free.freeipapi.com/api/json/${visitorIp}`);
   const geoInfo = await geoRes.json();
 
   let result;
