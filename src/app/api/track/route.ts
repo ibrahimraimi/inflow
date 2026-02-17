@@ -7,13 +7,15 @@ import { UAParser } from "ua-parser-js";
 import { trackEventSchema } from "@/lib/validations/track";
 import { rateLimit } from "@/lib/rate-limit";
 
+export const runtime = "edge";
+
 export async function POST(req: NextRequest) {
   const ip =
     req.headers.get("x-forwarded-for")?.split(",")[0] ||
     req.headers.get("x-real-ip") ||
     "127.0.0.1";
 
-  const ratelimit = rateLimit(ip, 100, 60 * 1000, "track-api"); // 100 requests per minute
+  const ratelimit = await rateLimit(ip, 100, 60 * 1000, "track-api"); // 100 requests per minute
 
   if (!ratelimit.success) {
     return NextResponse.json(
@@ -30,7 +32,6 @@ export async function POST(req: NextRequest) {
   }
 
   const bodyJson = await req.json();
-
   const validation = trackEventSchema.safeParse(bodyJson);
 
   if (!validation.success) {
@@ -42,19 +43,33 @@ export async function POST(req: NextRequest) {
 
   const body = validation.data;
 
-  // Fetch all required data from analytics.js
+  // Fetch all required data from headers/UA
   const parser = new UAParser(req.headers.get("user-agent") || "");
   const deviceInfo = parser.getDevice()?.model || "Unknown Device";
   const osInfo = parser.getOS()?.name || "Unknown OS";
   const browserInfo = parser.getBrowser()?.name || "Unknown Browser";
-  const visitorIp =
-    req.headers.get("x-forwarded-for")?.split(",")[0] ||
-    req.headers.get("x-real-ip") ||
-    "";
 
-  // Fetch geolocation data based on IP
-  const geoRes = await fetch(`https://free.freeipapi.com/api/json/${visitorIp}`);
-  const geoInfo = await geoRes.json();
+  // Get geolocation from headers if available (Vercel specific)
+  const geoInfo = {
+    cityName: req.headers.get("x-vercel-ip-city") || "Unknown",
+    regionName: req.headers.get("x-vercel-ip-country-region") || "Unknown",
+    countryName: req.headers.get("x-vercel-ip-country") || "Unknown",
+    countryCode: req.headers.get("x-vercel-ip-country") || "Unknown",
+  };
+
+  const visitorIp = ip;
+
+  const getGeoData = async () => {
+    if (geoInfo.cityName !== "Unknown") return geoInfo;
+    try {
+      const geoRes = await fetch(`https://free.freeipapi.com/api/json/${visitorIp}`);
+      return await geoRes.json();
+    } catch (e) {
+      return geoInfo;
+    }
+  };
+
+  const finalGeo = await getGeoData();
 
   let result;
 
@@ -80,10 +95,10 @@ export async function POST(req: NextRequest) {
         device: deviceInfo,
         os: osInfo,
         browser: browserInfo,
-        city: geoInfo.cityName,
-        region: geoInfo.regionName,
-        country: geoInfo.countryName,
-        countryCode: geoInfo.countryCode,
+        city: finalGeo.cityName,
+        region: finalGeo.regionName,
+        country: finalGeo.countryName,
+        countryCode: finalGeo.countryCode,
         refParams: body.refParams,
       })
       .returning();

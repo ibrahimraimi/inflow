@@ -18,9 +18,40 @@ services:
     env_file:
       - .env
     restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+    networks:
+      - inflow-network
+
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=inflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - inflow-network
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
     networks:
       - inflow-network
 
 networks:
   inflow-network:
     driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
