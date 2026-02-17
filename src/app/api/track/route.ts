@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
   const osInfo = parser.getOS()?.name || "Unknown OS";
   const browserInfo = parser.getBrowser()?.name || "Unknown Browser";
 
-  // Get geolocation from headers if available (Vercel specific)
+  // Get geolocation from headers if available
   const geoInfo = {
     cityName: req.headers.get("x-vercel-ip-city") || "Unknown",
     regionName: req.headers.get("x-vercel-ip-country-region") || "Unknown",
