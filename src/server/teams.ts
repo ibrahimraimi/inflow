@@ -2,7 +2,7 @@
 
 import { getCurrentUser } from "./users";
 import { getActiveOrganization } from "./organizations";
-import { TeamService } from "./services/team-service";
+import { TeamService } from "./services/team.service";
 
 /**
  * Get all members of the current user's organization

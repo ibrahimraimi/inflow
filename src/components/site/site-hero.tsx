@@ -50,6 +50,7 @@ export function SiteHero({ className }: Hero8Props) {
                 height="2240"
                 src="/images/hero.png"
                 width="1376"
+                priority={true}
               />
             </div>
           </div>
