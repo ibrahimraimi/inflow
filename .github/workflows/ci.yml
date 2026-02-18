@@ -69,9 +69,9 @@ jobs:
         run: bun run build
         env:
           DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
-          NEXT_PUBLIC_APP_URL: https://inflow.studio21.studio
+          NEXT_PUBLIC_APP_URL: https://inflow.ibrahimraimi.com
           BETTER_AUTH_SECRET: placeholder-secret-for-build
-          BETTER_AUTH_URL: https://inflow.studio21.studio
+          BETTER_AUTH_URL: https://inflow.ibrahimraimi.com
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

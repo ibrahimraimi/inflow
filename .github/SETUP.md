@@ -36,7 +36,7 @@ Go to your repository Settings → Secrets and Variables → Actions and add:
 
 Go to Settings → Environments → Create "production" environment and add:
 
-- `APP_URL` - Your production app URL (e.g., https://inflow.studio21.studio)
+- `APP_URL` - Your production app URL (e.g., https://inflow.ibrahimraimi.com)
 
 ## Docker Setup
 
@@ -48,7 +48,7 @@ Go to Settings → Environments → Create "production" environment and add:
 docker compose up --build
 ```
 
-2. Access the app at https://inflow.studio21.studio
+2. Access the app at https://inflow.ibrahimraimi.com
 
 ### Docker Image from GitHub Container Registry
 

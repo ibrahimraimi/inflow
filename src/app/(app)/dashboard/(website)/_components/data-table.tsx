@@ -131,7 +131,7 @@ export function DataTable({
         <div className="flex items-center justify-between px-3 py-2 text-xs font-medium text-muted-foreground mb-1 shrink-0">
           <div className="flex-1">{getLabel()}</div>
           <div className="flex items-center gap-8 text-right">
-            <div className="w-16">Visitors</div>
+            <div className="w-16">Views</div>
             <div className="w-12">%</div>
           </div>
         </div>
@@ -183,11 +183,11 @@ export function DataTable({
           )}
         </div>
 
-        <div className="mt-auto text-center border-t pt-2">
+        {/* <div className="mt-auto text-center border-t pt-2">
           <button className="text-xs text-muted-foreground hover:text-foreground transition-colors p-2 w-full">
             View more
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -103,7 +103,7 @@ export default function WebsiteDetailPage() {
           </div>
 
           <div className="flex justify-between items-center gap-4">
-            <Link href={`/dashboard/${websiteId}/edit`}>
+            <Link href={`/dashboard/${websiteId}/share`}>
               <Button variant="outline" size="sm" className="cursor-pointer">
                 <Share2 className="h-4 w-4 mr-1.5" />
                 Share
@@ -132,6 +132,11 @@ export default function WebsiteDetailPage() {
         </Button>
 
         <div className="flex items-center gap-2">
+          {analyticsValidating && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground animate-pulse mr-2">
+              <Loader2 className="h-6 w-6 animate-spin" />
+            </div>
+          )}
           <Button variant="outline" size="icon" className="">
             <ChevronLeft className="h-3 w-3" />
           </Button>
@@ -162,12 +167,6 @@ export default function WebsiteDetailPage() {
 
       {/* Metrics */}
       <div className="relative">
-        {analyticsValidating && (
-          <div className="absolute -top-6 right-0 flex items-center gap-2 text-xs text-muted-foreground animate-pulse">
-            <Loader2 className="h-3 w-3 animate-spin" />
-            Updating...
-          </div>
-        )}
         <div className="grid grid-cols-5 gap-2 mb-6">
           {!analytics && analyticsLoading ? (
             Array.from({ length: 5 }).map((_, i) => (

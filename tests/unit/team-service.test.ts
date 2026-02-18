@@ -1,5 +1,5 @@
 import { describe, it, expect, jest, beforeEach } from "bun:test";
-import { TeamService } from "@/server/services/team-service";
+import { TeamService } from "@/server/services/team.service";
 import { db } from "@/db/drizzle";
 
 jest.mock("@/db/drizzle", () => ({

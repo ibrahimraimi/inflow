@@ -1,4 +1,4 @@
-<a href="https://inflow.studio21.studio">
+<a href="https://inflow.ibrahimraimi.com">
   <img alt="A modern, comprehensive analytics platform designed to help you collect, analyze, and understand your website data effortlessly." src="./public/images/banner.png">
 </a>
 
@@ -77,9 +77,9 @@ Fill in your environment variables in `.env`:
 DATABASE_URL="postgresql://username:password@host:port/database"
 
 # Authentication
-NEXT_PUBLIC_APP_URL="https://inflow.studio21.studio"
+NEXT_PUBLIC_APP_URL="https://inflow.ibrahimraimi.com"
 BETTER_AUTH_SECRET="your-secret-key"
-BETTER_AUTH_URL="https://inflow.studio21.studio"
+BETTER_AUTH_URL="https://inflow.ibrahimraimi.com"
 
 # Google OAuth (optional)
 GOOGLE_CLIENT_ID="your-google-client-id"
@@ -107,7 +107,7 @@ bun db:migrate
 bun dev
 ```
 
-Open [https://inflow.studio21.studio](https://inflow.studio21.studio) in your browser.
+Open [https://inflow.ibrahimraimi.com](https://inflow.ibrahimraimi.com) in your browser.
 
 ## Database Schema
 
@@ -157,7 +157,7 @@ docker compose up --build
 make docker-up
 ```
 
-The application will be available at [https://inflow.studio21.studio](https://inflow.studio21.studio).
+The application will be available at [https://inflow.ibrahimraimi.com](https://inflow.ibrahimraimi.com).
 
 ### CI/CD Pipeline
 

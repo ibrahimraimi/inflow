@@ -15,7 +15,7 @@ export function getBaseUrl(): string {
   }
 
   // Production
-  return process.env.NEXT_PUBLIC_APP_URL || "https://inflow.studio21.studio";
+  return process.env.NEXT_PUBLIC_APP_URL || "https://inflow.ibrahimraimi.com";
 }
 
 /**
