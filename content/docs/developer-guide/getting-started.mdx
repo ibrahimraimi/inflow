@@ -1,0 +1,79 @@
+---
+title: Local Setup
+description: How to set up Inflow on your local development machine.
+---
+
+Follow these steps to get a local instance of Inflow running.
+
+## Prerequisites
+
+Ensure you have the following installed:
+
+- **Node.js** (v20 or later)
+- **Bun** (Preferred package manager and runtime)
+- **Docker** (For local PostgreSQL and Redis)
+- **Git**
+
+## Installation
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/ibrahimraimi/inflow.git
+cd inflow
+bun install
+```
+
+## Environment Variables
+
+Copy the example environment file:
+
+```bash
+cp .env .env.local
+```
+
+Fill in the required variables in `.env.local`. Key variables include:
+
+- `DATABASE_URL`: Connection string for your PostgreSQL database.
+- `BETTER_AUTH_SECRET`: A secure random string for authentication.
+- `RESEND_API_KEY`: For sending verification and invitation emails.
+- `UPSTASH_REDIS_REST_URL` & `TOKEN`: For rate limiting.
+
+## Database Setup
+
+We use Docker to run a local PostgreSQL database.
+
+### 1. Start Docker Services
+```bash
+docker compose up -d
+```
+
+### 2. Push Schema
+Use Drizzle to create the tables in your local database:
+```bash
+bun run db:push
+```
+
+## Running the Development Server
+
+Start the Next.js development server:
+
+```bash
+bun run dev
+```
+
+The application will be live at `http://localhost:3000`.
+
+## Available Scripts
+
+- `bun run dev`: Starts the development server.
+- `bun run build`: Creates a production build.
+- `bun run lint`: Runs Biome for code quality checks.
+- `bun run format`: Automatically formats the codebase.
+- `bun run test`: Runs the Jest test suite.
+- `bun run db:generate`: Generates Drizzle migrations.
+- `bun run db:migrate`: Applies migrations to the database.
+
+---
+
+**Next:** [Project Structure](/docs/developer-guide/project-structure)

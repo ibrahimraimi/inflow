@@ -1,0 +1,58 @@
+---
+title: Testing
+description: How to write and run tests for Inflow.
+---
+
+Testing is essential for maintaining the reliability of Inflow, especially the ingestion and aggregation logic.
+
+## Testing Stack
+
+- **Framework**: [Jest](https://jestjs.io/)
+- **Runtime**: [Bun](https://bun.sh/test) (Experimental runner integration)
+- **Environment**: [JSDOM](https://github.com/jsdom/jsdom) for component testing.
+
+## Running Tests
+
+Execute the full test suite:
+```bash
+bun run test
+```
+
+Run tests for a specific file:
+```bash
+bun run test tests/integration/tracking.test.ts
+```
+
+## Test Structure
+
+- **`tests/unit/`**: Testing utility functions and isolated business logic.
+- **`tests/integration/`**: Testing API routes and database interactions.
+- **`tests/components/`**: Testing React components with Testing Library.
+
+## Guidelines
+
+1. **Isolation**: Use `beforeEach` to reset database state if necessary.
+2. **Mocking**: Mock external services like Resend or Upstash during tests.
+3. **Coverage**: Aim for high coverage on the `AnalyticsService` and `src/lib/validations`.
+
+## Example Integration Test Pattern
+
+```typescript
+import { app } from "@/app";
+import { describe, it, expect } from "bun:test";
+
+describe("Tracking API", () => {
+  it("should record a page view", async () => {
+    const res = await app.post("/api/track").json({
+      type: "entry",
+      websiteId: "test-id",
+      // ... payload
+    });
+    expect(res.status).toBe(200);
+  });
+});
+```
+
+---
+
+**Next:** [Contributing](/docs/developer-guide/contributing)

@@ -1,0 +1,30 @@
+---
+title: Changelog
+description: Version history and updates for Inflow.
+---
+
+All notable changes to this project will be documented in this file.
+
+## [0.1.0] - 2024-02-18
+
+### Added
+- **Tracking Engine**: Edge-optimized ingestion via `/api/track`.
+- **Analytics Dashboard**: Real-time visualization with Recharts.
+- **Organization Support**: Multi-tenant management with Better Auth.
+- **Documentation**: Comprehensive guides and API reference using Fumadocs.
+- **Deployment**: Support for Docker and Vercel.
+
+### Improved
+- **Geolocation**: Improved city/country detection using Vercel headers with a secondary fallback.
+- **Performance**: Migrated core ingestion paths to the Edge Runtime.
+- **UI/UX**: Refined dashboard layout with better mobile responsiveness.
+
+### Fixed
+- **Session Handling**: Fixed an issue where the active organization was lost on page refresh.
+- **Rate Limiting**: Addressed a race condition in Redis-backed limiting logic.
+
+---
+
+## [0.0.1] - 2024-01-20
+- Initial internal beta release.
+- Proof of concept for basic page view tracking.

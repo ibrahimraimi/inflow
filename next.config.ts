@@ -1,4 +1,9 @@
 import type { NextConfig } from "next";
+import { createMDX } from "fumadocs-mdx/next";
+
+const config = {
+  reactStrictMode: true,
+};
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -40,4 +45,8 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+const withMDX = createMDX({
+  // customise the config file path
+  // configPath: "source.config.ts"
+});
+export default withMDX(config);

@@ -73,22 +73,29 @@ cp .env .env
 Fill in your environment variables in `.env`:
 
 ```env
-# Database
-DATABASE_URL="postgresql://username:password@host:port/database"
+# APP
+BASE_URL="your-base-url"
+NEXT_PUBLIC_APP_URL="your-app-url"
 
-# Authentication
-NEXT_PUBLIC_APP_URL="https://inflow.ibrahimraimi.com"
-BETTER_AUTH_SECRET="your-secret-key"
-BETTER_AUTH_URL="https://inflow.ibrahimraimi.com"
+# BETTER AUTH
+BETTER_AUTH_SECRET="your-better-auth-secret"
+BETTER_AUTH_URL="your-better-auth-url"
 
-# Google OAuth (optional)
+# DATABASE
+DATABASE_URL="your-database-url"
+
+# RESEND EMAIL SERVICE
+RESEND_API_KEY="your-resend-api-key"
+EMAIL_SENDER_NAME="your-email-sender-name"
+EMAIL_SENDER_ADDRESS="onboarding@resend.dev"
+
+# GOOGLE OAUTH
 GOOGLE_CLIENT_ID="your-google-client-id"
 GOOGLE_CLIENT_SECRET="your-google-client-secret"
 
-# Email (Resend)
-RESEND_API_KEY="your-resend-api-key"
-EMAIL_SENDER_NAME="Inflow Analytics"
-EMAIL_SENDER_ADDRESS="noreply@yourdomain.com"
+# UPSTASH REDIS
+UPSTASH_REDIS_REST_URL="your-upstash-redis-rest-url"
+UPSTASH_REDIS_REST_TOKEN="your-upstash-redis-rest-token"
 ```
 
 4. Set up the database:
@@ -191,7 +198,7 @@ docker run -p 3000:3000 --env-file .env.prod ghcr.io/ibrahimraimi/inflow:latest
 
 ## License
 
-This project is private and proprietary.
+This project is free and open-source software licensed under the [MIT License](LICENSE).
 
 ## Support
 
