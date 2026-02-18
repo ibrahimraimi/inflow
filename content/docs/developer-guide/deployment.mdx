@@ -1,0 +1,48 @@
+---
+title: Deployment Guide
+description: How to deploy Inflow to production environments.
+---
+
+Inflow is a standard Next.js application and can be deployed in several ways.
+
+## Deployment Strategy
+
+### Vercel (Recommended)
+As Inflow uses Next.js and Edge functions, Vercel is the easiest and most performant platform for deployment.
+
+1. Connect your GitHub repository to Vercel.
+2. Add the environment variables listed in `.env.local`.
+3. Deploy!
+
+### Docker (Self-hosted)
+You can deploy Inflow to any cloud provider (AWS, Digital Ocean, etc.) using Docker.
+
+1. **Build the Image**:
+   ```bash
+   docker build -t inflow-analytics .
+   ```
+2. **Run the Container**:
+   Ensure you pass the required environment variables.
+
+```bash
+docker run -p 3000:3000 \
+  -e DATABASE_URL="..." \
+  -e BETTER_AUTH_SECRET="..." \
+  inflow-analytics
+```
+
+## Production Checklist
+
+- [ ] **SSL**: Ensure your site is served over HTTPS.
+- [ ] **Database**: Use a production-grade PostgreSQL instance (e.g., Neon Pro or AWS RDS).
+- [ ] **Redis**: Ensure your Upstash Redis instance is in the same region as your main deployment for minimal latency.
+- [ ] **Email**: Verify your domain in Resend to prevent emails from going to spam.
+
+## Monitoring & Logging
+
+- **Server Logs**: Available via your deployment platform (e.g., Vercel Logs).
+- **Analytics Ingestion**: Monitor the `/api/track` endpoint for successful 200 responses.
+
+---
+
+**Next:** [Debugging & Troubleshooting](/docs/developer-guide/troubleshooting-dev)

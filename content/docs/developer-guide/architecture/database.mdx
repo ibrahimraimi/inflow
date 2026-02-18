@@ -1,0 +1,59 @@
+---
+title: Database & Schema
+description: Overview of the PostgreSQL schema and data relationships in Inflow.
+---
+
+Inflow uses **PostgreSQL** as its primary data store, managed via **Drizzle ORM**.
+
+## Core Tables
+
+### `user`, `session`, `account`
+Standard tables managed by Better Auth for identity and session management.
+
+### `organization` & `member`
+Handles multi-tenant ownership and Role-Based Access Control (RBAC).
+
+### `websites`
+Stores the metadata for tracked sites.
+- `websiteId`: A unique public identifier.
+- `userId`: Link to the owner.
+- `timeZone`: Used for localized analytics.
+
+### `page_views`
+The primary event table. It stores every tracked interaction.
+- `clientId`: An anonymous hash for unique visitor tracking.
+- `url`, `referrer`: Path and source info.
+- `device`, `os`, `browser`: User-agent info.
+- `country`, `city`: Geolocation data.
+- `utm_*`: Campaign tracking parameters.
+
+## Database Workflow
+
+### 1. Define Schema
+Updates are made in `src/db/schema.ts`.
+
+### 2. Generate Migrations
+```bash
+bun run db:generate
+```
+This creates a new SQL file in `src/migrations/`.
+
+### 3. Apply Migrations
+```bash
+bun run db:migrate
+```
+
+### 4. Direct Push (Dev Only)
+For rapid prototyping, use:
+```bash
+bun run db:push
+```
+
+## Performance Optimization
+
+- **Indexing**: We have indexes on `website_id` and `timestamp` fields in the `page_views` table to ensure fast aggregations.
+- **Partitioning**: For extremely high traffic, we recommend table partitioning by `website_id` or date (Planned).
+
+---
+
+**Next:** [Authentication Implementation](/docs/developer-guide/architecture/authentication)

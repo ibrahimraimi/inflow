@@ -1,0 +1,32 @@
+---
+title: Performance
+description: How Inflow achieves low-latency tracking and fast dashboard updates.
+---
+
+Inflow is built for speed. We optimize every step of the data lifecycle to minimize impact on your website and provide a snappy dashboard.
+
+## Tracking Script Performance
+
+- **Size**: The `analytics.js` script is tiny (< 1KB), meaning it has virtually zero impact on your PageSpeed scores.
+- **Asynchronous**: The script uses the `defer` attribute and non-blocking network requests to ensure your page remains interactive while data is sent.
+- **Edge Ingestion**: By sending data to the closest Edge node, we reduce the network round-trip time significantly.
+
+## Backend Optimizations
+
+- **Edge Runtime**: Executing logic closer to the user reduces cold start times and latency.
+- **Neon HTTP**: Using HTTP-based database connections allows us to scale ingestion without the overhead of traditional connection pools.
+
+## Dashboard Responsiveness
+
+- **Optimized SQL**: We use advanced PostgreSQL features like indexing and efficient aggregations to query millions of records in milliseconds.
+- **Client Cache**: SWR caches your dashboard data, allowing you to switch between date ranges and report types instantly.
+
+## Scaling Up
+
+For sites with millions of monthly visitors, Inflow supports:
+- **Read Replicas**: Distribute query load across multiple database nodes.
+- **Job Queues**: Offload heavy background tasks like periodic report generation.
+
+---
+
+**Next:** [Developer Guide Introduction](/docs/developer-guide/introduction)

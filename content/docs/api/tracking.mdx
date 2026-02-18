@@ -1,0 +1,75 @@
+---
+title: Tracking API
+description: Learn how to send tracking events to Inflow.
+---
+
+The Inflow Tracking API is the core endpoint used by our JavaScript snippet to collect analytics. You can also use this API to send events from your backend or other platforms.
+
+## Endpoint
+
+```http
+POST https://your-inflow-instance.com/api/track
+```
+
+## Authentication
+
+The Tracking API is currently authenticated via the `websiteId` and the `domain` provided in the request body. Ensure the domain matches the one registered in your Inflow dashboard.
+
+## Request Headers
+
+- `Content-Type: application/json`
+- `User-Agent`: Used for device and OS detection.
+- `x-forwarded-for`: Used for geographic location detection (if provided by your reverse proxy).
+
+## Data Schema
+
+### Entry Event (Page View)
+
+Sent when a user lands on a page.
+
+```json
+{
+  "type": "entry",
+  "websiteId": "8f450c12-16aa-4470-8e2b-cf2620a1d7c8",
+  "domain": "example.com",
+  "url": "https://example.com/blog/hello-world",
+  "clientId": "a-unique-anonymous-id",
+  "referrer": "https://google.com",
+  "entryTime": "2024-02-18T12:00:00Z",
+  "utmSource": "twitter",
+  "utmMedium": "social"
+}
+```
+
+### Exit Event
+
+Sent when a user leaves the page or becomes inactive.
+
+```json
+{
+  "type": "exit",
+  "websiteId": "8f450c12-16aa-4470-8e2b-cf2620a1d7c8",
+  "clientId": "a-unique-anonymous-id",
+  "exitTime": "2024-02-18T12:05:00Z",
+  "totalActiveTime": 300,
+  "exitUrl": "https://example.com/next-page"
+}
+```
+
+## Response
+
+- **Status**: `200 OK`
+- **Body**:
+```json
+{
+  "message": "Data received successfully"
+}
+```
+
+## Rate Limiting
+
+By default, we allow **100 requests per minute** per IP address. If you exceed this, you will receive a `429 Too Many Requests` response.
+
+---
+
+**Next:** [Stats API](/docs/api/stats)

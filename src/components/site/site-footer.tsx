@@ -23,7 +23,7 @@ const links = [
 export function SiteFooter() {
   const pathname = usePathname();
   if (
-    ["/login", "/signup", "/dashboard"].some((url) => pathname.startsWith(url))
+    ["/login", "/signup", "/dashboard", "/docs"].some((url) => pathname.startsWith(url))
   ) {
     return null;
   }

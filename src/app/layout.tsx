@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { RootProvider } from "fumadocs-ui/provider/next";
 import { Geist, Geist_Mono, Figtree } from "next/font/google";
 
 import "@/styles/globals.css";
@@ -105,7 +106,7 @@ export default function RootLayout({
         >
           <SWRProvider>
             <SiteHeader />
-            {children}
+            <RootProvider>{children}</RootProvider>
             <SiteFooter />
             <Toaster />
           </SWRProvider>
