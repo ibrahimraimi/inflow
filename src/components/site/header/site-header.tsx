@@ -10,6 +10,7 @@ import { authClient } from "@/lib/auth-client";
 import { useScroll } from "@/hooks/use-scroll";
 import { UserNav } from "@/components/nav-user";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Layout } from "@/components/layout";
 
 export const navLinks = [
   {
@@ -43,13 +44,14 @@ export function SiteHeader() {
         }
       )}
     >
-      <nav className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between">
-        <div className="p-1 hover:border hover:border-dashed">
-          <Link
-            className="flex items-center space-x-2"
-            aria-label="home"
-            href="/"
-          >
+      <Layout className="lg:py-0 py-0 sm:py-0 md:py-0">
+        <nav className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between">
+          <div className="p-1 hover:border hover:border-dashed">
+            <Link
+              className="flex items-center space-x-2"
+              aria-label="home"
+              href="/"
+            >
             <LogoMarkDark
               className="text-foreground h-7 w-7 dark:hidden"
               aria-hidden={true}
@@ -93,6 +95,7 @@ export function SiteHeader() {
         </div>
         {!pathname.startsWith("/dashboard") && <MobileNav />}
       </nav>
+</Layout>
     </header>
   );
 }
