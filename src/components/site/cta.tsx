@@ -32,7 +32,7 @@ export function Cta({
             <h3 className="mb-4 text-3xl font-semibold md:text-5xl lg:mb-6 lg:text-6xl">
               {heading}
             </h3>
-            <div className="flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
+            <div className="flex flex-col justify-center items-center gap-2 sm:flex-row">
               {buttons.primary && (
                 <div className="bg-foreground/10 rounded-[calc(var(--radius-xl)+0.125rem)] border p-0.5">
                   <Button
