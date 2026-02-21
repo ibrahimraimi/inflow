@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { LogoMarkDark, LogoMarkLight } from "@/components/logo";
+import { Layout } from "../layout";
 
 const links = [
   {
@@ -23,12 +24,13 @@ const links = [
 export function SiteFooter() {
   const pathname = usePathname();
   if (
-    ["/login", "/signup", "/dashboard", "/docs"].some((url) => pathname.startsWith(url))
+    ["/login", "/signup", "/dashboard", "/docs", "/forgot-password"].some((url) => pathname.startsWith(url))
   ) {
     return null;
   }
   return (
-    <footer className="border-t py-10 mx-auto w-full max-w-7xl">
+    <Layout className="lg:py-0 py-0 sm:py-0 md:py-0">
+    <footer className="border-t py-10">
       <div className="mx-auto">
         <div className="flex flex-wrap justify-between gap-12">
           <div className="order-last flex items-center gap-3 md:order-first">
@@ -65,5 +67,6 @@ export function SiteFooter() {
         </div>
       </div>
     </footer>
+    </Layout>
   );
 }

@@ -198,7 +198,7 @@ docker run -p 3000:3000 --env-file .env.prod ghcr.io/ibrahimraimi/inflow:latest
 
 ## License
 
-This project is free and open-source software licensed under the [MIT License](LICENSE).
+AGPL-3.0-only
 
 ## Support
 

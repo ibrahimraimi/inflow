@@ -61,7 +61,7 @@ export default function WebsiteDetailPage() {
 
   if (!website) {
     return (
-      <div className="lg:mt-8 mt-20 w-full">
+      <div className="lg:mt-8 mt-10 w-full">
         <div className="text-center py-12">
           <p className="text-muted-foreground">Website not found</p>
           <Link href="/dashboard">
@@ -75,7 +75,7 @@ export default function WebsiteDetailPage() {
   }
 
   return (
-    <div className="lg:mt-8 mt-20">
+    <div className="lg:mt-8 mt-10">
       <div className="mb-8 border-b pb-6">
         <Link
           href="/dashboard"
@@ -85,33 +85,35 @@ export default function WebsiteDetailPage() {
           <span>Back to Websites</span>
         </Link>
 
-        <div className="flex items-center justify-between mt-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div
               className={cn(
-                "size-10 rounded flex items-center justify-center text-[10px] font-bold shadow-sm bg-primary/10 text-primary"
+                "size-12 sm:size-10 rounded-lg flex items-center justify-center text-[10px] font-bold shadow-sm bg-primary/10 text-primary border border-primary/20"
               )}
             >
-              <span className="text-2xl">
+              <span className="text-2xl sm:text-xl">
                 {website.websiteName.charAt(0).toUpperCase()}
               </span>
             </div>
             <div>
-              <h1 className="text-2xl font-bold">{website.websiteName}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
+                {website.websiteName}
+              </h1>
               <p className="text-sm text-muted-foreground">{website.domain}</p>
             </div>
           </div>
 
-          <div className="flex justify-between items-center gap-4">
-            <Link href={`/dashboard/${websiteId}/share`}>
-              <Button variant="outline" size="sm" className="cursor-pointer">
-                <Share2 className="h-4 w-4 mr-1.5" />
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link href={`/dashboard/${websiteId}/share`} className="flex-1 sm:flex-none">
+              <Button variant="outline" size="sm" className="w-full sm:w-auto cursor-pointer h-9 sm:h-8">
+                <Share2 className="h-3.5 w-3.5 mr-1.5" />
                 Share
               </Button>
             </Link>
-            <Link href={`/dashboard/${websiteId}/edit`}>
-              <Button variant="outline" size="sm" className="cursor-pointer">
-                <SquarePen className="w-4 h-4 mr-1.5" />
+            <Link href={`/dashboard/${websiteId}/edit`} className="flex-1 sm:flex-none">
+              <Button variant="outline" size="sm" className="w-full sm:w-auto cursor-pointer h-9 sm:h-8">
+                <SquarePen className="w-3.5 h-3.5 mr-1.5" />
                 Edit
               </Button>
             </Link>
@@ -120,31 +122,33 @@ export default function WebsiteDetailPage() {
       </div>
 
       {/* Controls */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pt-2">
         <Button
           variant="outline"
           size="sm"
           onClick={() => setFilterOpen(true)}
-          className="cursor-pointer"
+          className="cursor-pointer h-9 sm:h-8 w-full sm:w-auto justify-start sm:justify-center"
         >
-          <SlidersHorizontal className="h-4 w-4 mr-1.5" />
+          <SlidersHorizontal className="h-3.5 w-3.5 mr-2 sm:mr-1.5" />
           Filter
         </Button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 self-end sm:self-auto">
           {analyticsValidating && (
             <div className="flex items-center gap-2 text-xs text-muted-foreground animate-pulse mr-2">
-              <Loader2 className="h-6 w-6 animate-spin" />
+              <Loader2 className="h-5 w-5 animate-spin" />
             </div>
           )}
-          <Button variant="outline" size="icon" className="">
-            <ChevronLeft className="h-3 w-3" />
-          </Button>
-          <Button variant="outline" size="icon" className="">
-            <ChevronRight className="h-3 w-3" />
-          </Button>
+          <div className="flex items-center gap-1.5">
+            <Button variant="outline" size="icon" className="h-9 w-9 sm:h-8 sm:w-8">
+              <ChevronLeft className="h-4 w-4 sm:h-3 sm:w-3" />
+            </Button>
+            <Button variant="outline" size="icon" className="h-9 w-9 sm:h-8 sm:w-8">
+              <ChevronRight className="h-4 w-4 sm:h-3 sm:w-3" />
+            </Button>
+          </div>
           <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-45">
+            <SelectTrigger className="w-full sm:w-45 h-9 sm:h-8 text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -167,10 +171,10 @@ export default function WebsiteDetailPage() {
 
       {/* Metrics */}
       <div className="relative">
-        <div className="grid grid-cols-5 gap-2 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 lg:gap-2 mb-6">
           {!analytics && analyticsLoading ? (
             Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-24 w-full rounded-xl" />
+              <Skeleton key={i} className="h-24 sm:h-28 lg:h-24 w-full rounded-xl" />
             ))
           ) : (
             <>

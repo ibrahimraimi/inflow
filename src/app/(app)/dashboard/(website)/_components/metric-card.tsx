@@ -12,22 +12,25 @@ export function MetricCard({
   isNegative?: boolean;
 }) {
   return (
-    <div className="bg-card rounded-lg border p-4">
-      <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-2">
+    <div className="bg-card rounded-lg border  p-3 lg:p-4 shadow-sm">
+      <div className="text-[9px] lg:text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1 lg:mb-2">
         {title}
       </div>
-      <div className="text-2xl font-bold mb-1">{value}</div>
-      {change !== 0 && (
+      <div className="text-xl lg:text-2xl font-bold mb-0.5 lg:mb-1">{value}</div>
+      {change !== 0 ? (
         <div
           className={cn(
-            "text-xs",
+            "text-[10px] lg:text-xs font-medium",
             change > 0 ? "text-green-500" : "text-red-500"
           )}
         >
           {change > 0 ? "↑" : "↓"} {Math.abs(change)}%
         </div>
+      ) : (
+        <div className="text-[10px] lg:text-xs text-muted-foreground/60">
+          0%
+        </div>
       )}
-      {change === 0 && <div className="text-xs text-muted-foreground">0%</div>}
     </div>
   );
 }

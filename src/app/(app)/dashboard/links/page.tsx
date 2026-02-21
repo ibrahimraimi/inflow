@@ -43,7 +43,7 @@ export default function LinksPage() {
   };
 
   return (
-    <div className="lg:mt-8 mt-20 w-full">
+    <div className="lg:mt-8 mt-10 w-full">
       <div className="flex items-center justify-between mb-8 border-b pb-6">
         <h1 className="font-bold text-xl lg:text-4xl tracking-tight">Links</h1>
         <div className="bg-foreground/10 rounded-[calc(var(--radius-lg)+0.125rem)] border p-0.5">
@@ -72,7 +72,7 @@ export default function LinksPage() {
           </div>
 
           <div className="w-full">
-            <div className="flex items-center mb-4 px-2 text-xs font-bold text-muted-foreground tracking-wide uppercase">
+            <div className="hidden lg:flex items-center mb-4 px-2 text-xs font-bold text-muted-foreground tracking-wide uppercase">
               <div className="w-1/4 min-w-37.5">Name</div>
               <div className="w-1/4 min-w-37.5">Link</div>
               <div className="flex-1 min-w-50">Destination URL</div>
@@ -80,17 +80,30 @@ export default function LinksPage() {
               <div className="w-30 flex justify-end">Actions</div>
             </div>
 
-            <div className="divide-y divide-border/40 border-t border-border/40">
+            <div className="divide-y divide-border/40 lg:border-t border-border/40">
               {loading ? (
                 // biome-ignore lint/complexity/noUselessFragments: false positive
                 <>
                   {[...Array(5)].map((_, index) => (
-                    <div key={index} className="flex items-center px-2 py-4">
-                      <Skeleton className="h-4 w-1/4 min-w-37.7" />
-                      <Skeleton className="h-4 w-1/4 min-w-37.7" />
-                      <Skeleton className="h-4 flex-1 min-w-50" />
-                      <Skeleton className="h-4 w-30" />
-                      <Skeleton className="h-8 w-8 rounded ml-auto" />
+                    <div
+                      key={index}
+                      className="flex flex-col lg:flex-row lg:items-center px-2 py-4 gap-4 lg:gap-0"
+                    >
+                      <div className="lg:w-1/4 lg:min-w-37.7">
+                        <Skeleton className="h-4 w-24 lg:w-3/4" />
+                      </div>
+                      <div className="lg:w-1/4 lg:min-w-37.7">
+                        <Skeleton className="h-4 w-20 lg:w-1/2" />
+                      </div>
+                      <div className="flex-1 lg:min-w-50">
+                        <Skeleton className="h-4 w-full lg:w-3/4" />
+                      </div>
+                      <div className="lg:w-30">
+                        <Skeleton className="h-4 w-24" />
+                      </div>
+                      <div className="lg:w-30 flex lg:justify-end">
+                        <Skeleton className="h-8 w-8 rounded" />
+                      </div>
                     </div>
                   ))}
                 </>
@@ -106,62 +119,78 @@ export default function LinksPage() {
                   {filteredLinks.map((link) => (
                     <div
                       key={link.id}
-                      className="flex items-center px-2 py-4 hover:bg-muted/30 transition-colors group"
+                      className="flex flex-col lg:flex-row lg:items-center px-2 py-5 lg:py-4 hover:bg-muted/30 transition-colors group relative gap-4 lg:gap-0"
                     >
-                      <div className="w-1/4 min-w-37.5">
-                        <span className="font-medium text-sm text-foreground truncate block">
+                      <div className="lg:w-1/4 lg:min-w-37.5">
+                        <div className="lg:hidden text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                          Name
+                        </div>
+                        <span className="font-bold lg:font-medium text-sm lg:text-sm text-foreground truncate block">
                           {link.name}
                         </span>
                       </div>
 
-                      <div className="w-1/4 min-w-37.5 flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground font-mono truncate">
-                          /{link.shortCode}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() =>
-                            copyToClipboard(
-                              `${window.location.origin}/${link.shortCode}`
-                            )
-                          }
-                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <Copy className="h-3 w-3" />
-                        </Button>
+                      <div className="lg:w-1/4 lg:min-w-37.5 flex flex-col lg:flex-row lg:items-center gap-1 lg:gap-2">
+                        <div className="lg:hidden text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                          Link
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground font-mono truncate">
+                            /{link.shortCode}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() =>
+                              copyToClipboard(
+                                `${window.location.origin}/${link.shortCode}`
+                              )
+                            }
+                            className="h-4 w-4 lg:opacity-0 group-hover:lg:opacity-100 transition-opacity"
+                          >
+                            <Copy className="h-3 w-3" />
+                          </Button>
+                        </div>
                       </div>
 
-                      <div className="flex-1 min-w-50 flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground truncate">
-                          {link.destinationUrl}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() =>
-                            window.open(link.destinationUrl, "_blank")
-                          }
-                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <ExternalLink className="h-3 w-3" />
-                        </Button>
+                      <div className="flex-1 lg:min-w-50 flex flex-col lg:flex-row lg:items-center gap-1 lg:gap-2">
+                        <div className="lg:hidden text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                          Destination URL
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground truncate max-w-[200px] lg:max-w-none">
+                            {link.destinationUrl}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() =>
+                              window.open(link.destinationUrl, "_blank")
+                            }
+                            className="h-4 w-4 lg:opacity-0 group-hover:lg:opacity-100 transition-opacity"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                          </Button>
+                        </div>
                       </div>
 
-                      <div className="w-30">
-                        <span className="text-sm text-muted-foreground">
+                      <div className="lg:w-30 flex flex-col lg:flex-row lg:items-center gap-1">
+                        <div className="lg:hidden text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                          Created
+                        </div>
+                        <span className="text-xs lg:text-sm text-muted-foreground">
                           {formatDate(link.createdAt)}
                         </span>
                       </div>
 
-                      <div className="w-30 flex justify-end">
+                      <div className="absolute right-2 top-5 lg:relative lg:right-0 lg:top-0 lg:w-30 lg:flex lg:justify-end">
                         <Button
                           variant="ghost"
                           size="icon"
                           onClick={() => {
                             toast.info("Link actions coming soon!");
                           }}
-                          className="h-8 w-8 text-muted-foreground opacity-70 hover:opacity-100 hover:text-foreground hover:bg-muted"
+                          className="h-8 w-8 text-muted-foreground lg:opacity-70 hover:lg:opacity-100 hover:text-foreground hover:bg-muted"
                         >
                           <MoreVertical className="w-4 h-4" />
                         </Button>

@@ -1,3 +1,4 @@
+import { Layout } from "@/components/layout";
 import {
   RiFingerprintLine,
   RiLineChartFill,
@@ -62,7 +63,7 @@ const features = [
 
 export default function FeaturesPage() {
   return (
-    <div className="mx-auto w-full max-w-7xl py-20">
+    <Layout>
       <div className="mx-auto text-left pb-20">
         <h2 className="text-balance font-medium text-2xl md:text-4xl lg:text-5xl">
           A complete analytics solution with all the features you need.
@@ -90,6 +91,6 @@ export default function FeaturesPage() {
           </div>
         ))}
       </dl>
-    </div>
+    </Layout>
   );
 }

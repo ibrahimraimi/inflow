@@ -34,6 +34,9 @@ interface DashboardSidebarProps {
     email: string;
     image?: string | null;
   };
+  isOpen?: boolean;
+  onClose?: () => void;
+  className?: string;
 }
 
 const mainSidebarItems = [
@@ -107,7 +110,7 @@ const settingsSidebarItems = [
   },
 ];
 
-export function DashboardSidebar({ user }: DashboardSidebarProps) {
+export function DashboardSidebar({ user, isOpen, onClose, className }: DashboardSidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
 
@@ -118,10 +121,11 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
     <div
       className={cn(
         "flex h-full flex-col border-r bg-card py-6 text-card-foreground transition-all duration-300",
-        isCollapsed ? "w-15 px-2 items-center" : "w-62.5 px-2"
+        isCollapsed ? "w-15 px-2 items-center" : "w-62.5 px-2",
+        className
       )}
     >
-      <div className="flex h-14 items-center px-2 justify-between mb-4">
+      <div className="flex h-10 items-center px-2 justify-between mb-4">
         {isCollapsed ? (
           <Link
             className="flex items-center space-x-2"
@@ -129,11 +133,11 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
             href="/"
           >
             <LogoMarkDark
-              className="text-foreground h-7 w-7 dark:hidden"
+              className="text-foreground h-6 w-6 dark:hidden"
               aria-hidden={true}
             />
             <LogoMarkLight
-              className="text-foreground hidden h-7 w-7 dark:block"
+              className="text-foreground hidden h-6 w-6 dark:block"
               aria-hidden={true}
             />
           </Link>
@@ -144,26 +148,40 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
             href="/"
           >
             <LogoMarkDark
-              className="text-foreground h-7 w-7 dark:hidden"
+              className="text-foreground h-6 w-6 dark:hidden"
               aria-hidden={true}
             />
             <LogoMarkLight
-              className="text-foreground hidden h-7 w-7 dark:block"
+              className="text-foreground hidden h-6 w-6 dark:block"
               aria-hidden={true}
             />
-            <span className="text-xl">Inflow</span>
+            <span className="text-sm font-bold">Inflow</span>
           </Link>
         )}
-        {!isCollapsed && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => setIsCollapsed(true)}
-          >
-            <PanelLeft className="h-4 w-4" />
-          </Button>
-        )}
+        
+        {/* Toggle/Close button */}
+        <div className="flex items-center gap-1">
+          {onClose && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 lg:hidden rounded-xs"
+              onClick={onClose}
+            >
+              <PanelLeft className="h-4 w-4" />
+            </Button>
+          )}
+          {!isCollapsed && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 hidden lg:flex rounded-xs"
+              onClick={() => setIsCollapsed(true)}
+            >
+              <PanelLeft className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="flex flex-1 flex-col gap-2 overflow-y-auto no-scrollbar">
@@ -172,7 +190,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 mb-2 self-center"
+              className="h-8 w-8 mb-2 self-center rounded-xs"
               onClick={() => setIsCollapsed(false)}
             >
               <PanelRight className="h-4 w-4" />
@@ -203,7 +221,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-md py-2 text-sm font-medium transition-all hover:bg-muted/80",
+                  "flex items-center gap-3 rounded-xs py-2 text-sm font-medium transition-all hover:bg-muted/80",
                   isActive
                     ? "bg-primary/10 text-primary hover:bg-primary/15"
                     : "text-muted-foreground/80 hover:text-foreground",
@@ -219,7 +237,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 
         {isSettings && !isCollapsed && (
           <div className="mt-4 px-2 space-y-3">
-            <div className="rounded-lg border bg-muted/30 p-4 space-y-3 border-dashed">
+            <div className="rounded-sm border bg-muted/30 p-4 space-y-3 border-dashed">
               <div className="space-y-1">
                 <p className="text-xs font-semibold text-foreground">
                   Upgrade to Pro
