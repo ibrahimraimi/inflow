@@ -7,10 +7,7 @@
 <p align="center">
     A modern, comprehensive analytics platform
     <br />
-    <a href="#introduction"><strong>Introduction</strong></a> •
-    <a href="#tech-stack"><strong>Tech Stack</strong></a> •
-    <a href="#getting-started"><strong>Getting Started</strong></a> •
-    <a href="#docker--deployment"><strong>Docker & Deployment</strong></a>
+    Read the documentation <a href="https://inflow.ibrahimraimi.com/docs"><strong>here</strong></a>
 </p>
 
 <!-- <p align="center">
@@ -51,95 +48,13 @@ A modern, comprehensive open-source self-hosted analytics platform designed to h
 
 ### Installation
 
-1. Clone the repository:
-
-```bash
-git clone https://github.com/ibrahimraimi/inflow.git
-cd inflow
-```
-
-2. Install dependencies:
-
-```bash
-bun install
-```
-
-3. Set up environment variables:
-
-```bash
-cp .env .env
-```
-
-Fill in your environment variables in `.env`:
-
-```env
-# APP
-BASE_URL="your-base-url"
-NEXT_PUBLIC_APP_URL="your-app-url"
-
-# BETTER AUTH
-BETTER_AUTH_SECRET="your-better-auth-secret"
-BETTER_AUTH_URL="your-better-auth-url"
-
-# DATABASE
-DATABASE_URL="your-database-url"
-
-# RESEND EMAIL SERVICE
-RESEND_API_KEY="your-resend-api-key"
-EMAIL_SENDER_NAME="your-email-sender-name"
-EMAIL_SENDER_ADDRESS="onboarding@resend.dev"
-
-# GOOGLE OAUTH
-GOOGLE_CLIENT_ID="your-google-client-id"
-GOOGLE_CLIENT_SECRET="your-google-client-secret"
-
-# UPSTASH REDIS
-UPSTASH_REDIS_REST_URL="your-upstash-redis-rest-url"
-UPSTASH_REDIS_REST_TOKEN="your-upstash-redis-rest-token"
-```
-
-4. Set up the database:
-
-```bash
-bun db:generate
-```
-
-```bash
-bun db:migrate
-```
-
-5. Start the development server:
-
-```bash
-bun dev
-```
-
-Open [https://inflow.ibrahimraimi.com](https://inflow.ibrahimraimi.com) in your browser.
+Read the installation guide [here](https://inflow.ibrahimraimi.com/docs/developer-guide/getting-started).
 
 ## Database Schema
 
-The application uses a PostgreSQL database with the following main entities:
-
-- **Users**: User accounts with authentication
-- **Organizations**: Multi-user organizations with role-based access
-- **Members**: Organization members with roles (owner, admin, member)
-- **Websites**: Websites being tracked for analytics
-- **Sessions**: User authentication sessions
-- **Invitations**: Organization membership invitations
+The application uses a PostgreSQL database. Read the schema [here](https://inflow.ibrahimraimi.com/docs/developer-guide/architecture/database).
 
 ## Available Scripts
-
-- `bun dev` - Start development server
-- `bun build` - Build for production
-- `bun start` - Start production server
-- `bun lint` - Run Biome linter
-- `bun format` - Format code with Biome
-- `bun db:generate` - Generate database migrations
-- `bun db:migrate` - Run database migrations
-- `bun db:push` - Push schema changes to database
-- `bun db:pull` - Pull schema from database
-
-Or use the Makefile for common tasks:
 
 ```bash
 make help        # Show all available commands
@@ -164,37 +79,11 @@ docker compose up --build
 make docker-up
 ```
 
-The application will be available at [https://inflow.ibrahimraimi.com](https://inflow.ibrahimraimi.com).
+The application will be available at [http://localhost:3000](http://localhost:3000).
 
 ### CI/CD Pipeline
 
-This project includes a complete CI/CD pipeline with GitHub Actions:
-
-- **Continuous Integration**: Automated linting, type checking, and builds on every PR
-- **Docker Build**: Multi-platform Docker images published to GitHub Container Registry
-- **Deployment**: Automated deployment to production on merge to main
-
-#### Setup Instructions
-
-1. Configure GitHub Secrets (Settings → Secrets → Actions):
-   - `DEPLOY_HOST` - Production server hostname
-   - `DEPLOY_USER` - SSH username
-   - `DEPLOY_SSH_KEY` - Private SSH key
-   - `DEPLOY_PATH` - Application path on server
-
-2. Create a production environment with variable:
-   - `APP_URL` - Your production URL
-
-For detailed setup instructions, see [.github/SETUP.md](.github/SETUP.md).
-
-### Pulling from GitHub Container Registry
-
-After pushing to main, Docker images are available at:
-
-```bash
-docker pull ghcr.io/ibrahimraimi/inflow:latest
-docker run -p 3000:3000 --env-file .env.prod ghcr.io/ibrahimraimi/inflow:latest
-```
+This project includes a complete CI/CD pipeline with GitHub Actions. Read the documentation [here](https://inflow.ibrahimraimi.com/docs/developer-guide/deployment).
 
 ## License
 
@@ -202,4 +91,4 @@ AGPL-3.0-only
 
 ## Support
 
-For support or questions, please contact the development team.
+For support or questions, please contact the the developer @[ibrahimraimi_](https://x.com/ibrahimraimi).
