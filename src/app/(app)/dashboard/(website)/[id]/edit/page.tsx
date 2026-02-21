@@ -132,7 +132,7 @@ export default function EditWebsitePage() {
   }
 
   return (
-    <div className="lg:mt-8 mt-20">
+    <div className="lg:mt-8 mt-10">
       <div className="mb-8">
         <Link
           href="/dashboard"

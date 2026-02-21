@@ -6,7 +6,7 @@ import AddWebsiteForm from "../_components/add-website-form";
 
 export default function AddWebsite() {
   return (
-    <div className="lg:mt-8 mt-20 w-full">
+    <div className="lg:mt-8 mt-10 w-full">
       <div className="flex items-center justify-between mb-8 border-b pb-6">
         <h1 className="font-bold lg:text-4xl text-xl tracking-tight">
           Add a new website
