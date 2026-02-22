@@ -32,7 +32,7 @@ export const siteConfig = {
   ogImage: "/opengraph-image.png",
   twitterCard: "summary_large_image",
   contact: {
-    email: "contact@inflow.com",
+    email: "contact@inflowanalytics.com",
     phone: "+2348035431536",
     address: "Lagos, Nigeria",
   },

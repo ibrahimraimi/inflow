@@ -4,5 +4,21 @@ import { SiteHero } from "./site-hero";
 import { SiteFooter } from "./site-footer";
 import { Testimonial } from "./testimonial";
 import { SiteHeader } from "./header/site-header";
+import { StatsSection } from "./stats";
+import { Faq } from "./faq";
+import { GetStartedSteps } from "./get-started-steps";
 
-export { SiteHeader, SiteFooter, SiteHero, Cta, Testimonial, FeaturesSection };
+export {
+  SiteHeader,
+  SiteFooter,
+  SiteHero,
+  Cta,
+  Testimonial,
+  FeaturesSection,
+  StatsSection,
+  Faq,
+  GetStartedSteps,
+};
+
+
+

@@ -95,7 +95,7 @@ export default function RootLayout({
         ></script>
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
         suppressHydrationWarning
       >
         <ThemeProvider
@@ -106,7 +106,9 @@ export default function RootLayout({
         >
           <SWRProvider>
             <SiteHeader />
-            <RootProvider>{children}</RootProvider>
+            <main className="flex-1">
+              <RootProvider>{children}</RootProvider>
+            </main>
             <SiteFooter />
             <Toaster />
           </SWRProvider>

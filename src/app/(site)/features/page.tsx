@@ -79,9 +79,9 @@ export default function FeaturesPage() {
             key={item.name}
             className="col-span-full sm:col-span-2 lg:col-span-1"
           >
-            <div className="bg-foreground/10 w-fit rounded-[calc(var(--radius-lg)+0.125rem)] border p-px">
-              <div className="bg-background ring-border w-fit rounded-lg p-2">
-                <item.icon className="text-primary size-6" aria-hidden="true" />
+            <div className="w-fit">
+              <div className="mb-4 rounded-lg p-2 text-primary border">
+                <item.icon className="text-primary/50 size-5" aria-hidden="true" />
               </div>
             </div>
             <dt className="text-foreground mt-6 font-semibold">{item.name}</dt>
