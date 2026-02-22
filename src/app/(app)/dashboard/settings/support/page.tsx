@@ -30,9 +30,9 @@ export default function SupportSettingsPage() {
             variant="secondary"
             size="sm"
             className="h-8 text-xs font-bold px-4"
-            onClick={() => copyToClipboard("support@inflow.com")}
+            onClick={() => copyToClipboard("support@inflowanalytics.com")}
           >
-            support@inflow.com
+            support@inflowanalytics.com
           </Button>
         </div>
 

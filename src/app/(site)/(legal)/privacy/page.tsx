@@ -165,7 +165,7 @@ export default function PrivacyPage() {
         practices, please contact us at:
       </p>
       <ul className="mb-4 list-inside list-disc">
-        <li>hello@inflow.com</li>
+        <li>hello@inflowanalytics.com</li>
       </ul>
     </div>
   );

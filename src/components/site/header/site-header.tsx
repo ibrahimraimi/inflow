@@ -18,6 +18,10 @@ export const navLinks = [
     href: "/features",
   },
   {
+    label: "Pricing",
+    href: "/pricing",
+  },
+  {
     label: "Docs",
     href: "/docs",
   },

@@ -1,4 +1,11 @@
-import { Cta, FeaturesSection, SiteHero } from "@/components/site/index";
+import {
+  Cta,
+  Faq,
+  FeaturesSection,
+  GetStartedSteps,
+  SiteHero,
+  StatsSection,
+} from "@/components/site/index";
 import { PricingSection } from "@/components/site/pricing/pricing-section";
 
 export default function Home() {
@@ -6,8 +13,14 @@ export default function Home() {
     <div className="m-auto max-w-7xl px-6">
       <SiteHero />
       <FeaturesSection />
-      <PricingSection />
+      {/* <PricingSection /> */}
+      <StatsSection />
+      <Faq />
+      <GetStartedSteps />
       <Cta />
     </div>
   );
 }
+
+
+
