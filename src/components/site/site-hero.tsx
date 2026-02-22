@@ -10,9 +10,9 @@ interface Hero8Props {
 
 export function SiteHero({ className }: Hero8Props) {
   return (
-    <section className={cn("py-32", className)}>
+    <section className={cn("py-20 md:py-32", className)}>
       <div className="overflow-hidden border-muted">
-        <div className="container">
+        <div className="">
           <div className="mx-auto flex flex-col items-center">
             <div className="z-10 items-center text-center">
               <h1 className="mb-8 text-4xl font-semibold text-pretty lg:text-7xl lg:max-w-5xl">
@@ -38,14 +38,14 @@ export function SiteHero({ className }: Hero8Props) {
               </div>
             </div>
           </div>
-          <div className="relative mt-8 -mr-56 overflow-hidden sm:mt-12 sm:mr-0 md:mt-20">
+          <div className="relative mt-8 -mr-56 overflow-hidden sm:mt-12 mr-0 md:mt-20">
             <div
               className="to-background absolute inset-0 z-10 bg-linear-to-b from-transparent from-35%"
               aria-hidden
             />
             <div className="mx-auto max-w-5xl overflow-hidden">
               <Image
-                className="relative z-2 rounded-2xl"
+                className="relative z-2 md:rounded-2xl rounded-lg"
                 alt="Inflow Analytics Dashboard Interface"
                 height="2240"
                 src="/images/hero.png"
