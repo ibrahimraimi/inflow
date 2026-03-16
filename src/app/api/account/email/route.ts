@@ -51,11 +51,11 @@ export async function POST(request: NextRequest) {
       message:
         "Email change initiated. Please check your new email for verification.",
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Email change error:", error);
 
     // Handle specific error cases
-    if (error?.message?.includes("already exists")) {
+    if (error instanceof Error && error.message.includes("already exists")) {
       return NextResponse.json(
         { error: "This email is already in use" },
         { status: 400 },

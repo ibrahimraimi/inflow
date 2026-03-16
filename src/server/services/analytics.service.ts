@@ -1,5 +1,6 @@
 import { db } from "@/db/drizzle";
 import { and, eq, gte, lte, sql, count, desc } from "drizzle-orm";
+import type { PgColumn } from "drizzle-orm/pg-core";
 import { pageViews } from "@/db/schema";
 import type {
   AnalyticsData,
@@ -152,7 +153,7 @@ export class AnalyticsService {
     }));
 
     // 3. Breakdowns (Tables)
-    const getBreakdown = async (field: any) => {
+    const getBreakdown = async (field: PgColumn) => {
       return (await db
         .select({
           name: field,
@@ -325,7 +326,7 @@ export class AnalyticsService {
         regions: formatBreakdown(regions, visitors),
         cities: formatBreakdown(cities, visitors),
       },
-      map: mapDataResult as any,
+      map: mapDataResult as Array<{ code: string; name?: string; visitors: number; }>,
       traffic: trafficData,
     };
   }

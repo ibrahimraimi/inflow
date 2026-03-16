@@ -1,8 +1,9 @@
-import { describe, it, expect, jest, beforeEach } from "bun:test";
+/// <reference types="bun-types" />
+import { describe, it, expect, jest, beforeEach, mock } from "bun:test";
 import { TeamService } from "@/server/services/team.service";
 import { db } from "@/db/drizzle";
 
-jest.mock("@/db/drizzle", () => ({
+mock.module("@/db/drizzle", () => ({
   db: {
     query: {
       member: {
@@ -32,7 +33,7 @@ describe("TeamService", () => {
     (db.query.member.findMany as jest.Mock).mockResolvedValue(mockMembers);
 
     const result = await TeamService.getMembers("org-1");
-    expect(result).toEqual(mockMembers as any);
+    expect(result).toEqual(mockMembers as unknown as typeof result);
     expect(db.query.member.findMany).toHaveBeenCalled();
   });
 

@@ -65,9 +65,9 @@ export function UpdateRoleDialog({
       toast.success("Member role updated successfully");
       onOpenChange(false);
       onSuccess?.();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Role update error:", error);
-      toast.error(error.message || "Failed to update member role");
+      toast.error(error instanceof Error ? error.message : "Failed to update member role");
     } finally {
       setLoading(false);
     }
@@ -94,7 +94,7 @@ export function UpdateRoleDialog({
               <Label htmlFor="new-role">New Role</Label>
               <Select
                 value={role}
-                onValueChange={(value: any) => setRole(value)}
+                onValueChange={(value: "owner" | "admin" | "member") => setRole(value)}
                 disabled={loading}
               >
                 <SelectTrigger id="new-role">

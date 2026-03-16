@@ -121,3 +121,17 @@ export type LinkType = {
   destinationUrl: string;
   createdAt: string;
 };
+
+export type FunnelStep = {
+  type: "pageView" | "event";
+  value: string;
+  order: number;
+};
+
+export type FunnelEvaluationResult = {
+  step: number;
+  type: "pageView" | "event";
+  value: string;
+  count: number;
+};
+

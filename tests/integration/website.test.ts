@@ -31,7 +31,7 @@ jest.mock("@/lib/auth", () => ({
   },
 }));
 
-const mockGetSession = auth.api.getSession as jest.Mock;
+const mockGetSession = auth.api.getSession as unknown as jest.Mock;
 
 describe("POST /api/website", () => {
   it("should return 401 if not authenticated", async () => {

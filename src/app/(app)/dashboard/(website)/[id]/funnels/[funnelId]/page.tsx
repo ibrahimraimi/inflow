@@ -18,6 +18,7 @@ import {
 
 import { useWebsite } from "@/hooks/use-website";
 import { useFunnel } from "@/hooks/use-funnels";
+import type { FunnelEvaluationResult } from "@/configs/types";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -34,6 +35,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+
+type ChartDataEntry = {
+  name: string;
+  shortName: string;
+  count: number;
+  dropoff: number;
+  dropoffRate: string;
+  conversionRate: string;
+  type: string;
+  value: string;
+};
 
 export default function FunnelReportPage() {
   const params = useParams();
@@ -93,7 +105,7 @@ export default function FunnelReportPage() {
   // Calculate conversion rates
   const maxCount = evaluation?.[0]?.count || 0;
   
-  const chartData = evaluation?.map((step: any, idx: number) => {
+  const chartData = evaluation?.map((step: FunnelEvaluationResult, idx: number) => {
     const prevCount = idx === 0 ? step.count : evaluation[idx - 1].count;
     const dropoff = prevCount > 0 ? prevCount - step.count : 0;
     const dropoffRate = prevCount > 0 ? ((dropoff / prevCount) * 100).toFixed(1) : "0";
@@ -106,11 +118,12 @@ export default function FunnelReportPage() {
       dropoff,
       dropoffRate,
       conversionRate,
-      type: step.type
+      type: step.type,
+      value: step.value
     };
   }) || [];
 
-  const overallConversion = maxCount > 0 
+  const overallConversion = maxCount > 0 && evaluation && evaluation.length > 0
     ? ((evaluation[evaluation.length - 1].count / maxCount) * 100).toFixed(1) 
     : "0";
 
@@ -189,7 +202,7 @@ export default function FunnelReportPage() {
                   }}
                 />
                 <Bar dataKey="count" radius={[4, 4, 0, 0]} maxBarSize={60}>
-                   {chartData.map((entry: any, index: number) => (
+                   {chartData.map((entry: ChartDataEntry, index: number) => (
                     <Cell key={`cell-${index}`} fill="hsl(var(--primary))" fillOpacity={1 - (index * 0.15)} />
                   ))}
                 </Bar>
@@ -204,7 +217,7 @@ export default function FunnelReportPage() {
             <CardDescription>Detailed statistics per step.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {chartData.map((step: any, index: number) => (
+            {chartData.map((step: ChartDataEntry, index: number) => (
                <div key={index} className="space-y-2">
                  <div className="flex items-start justify-between">
                    <div>

@@ -33,7 +33,7 @@ global.fetch = jest.fn().mockResolvedValue({
     countryName: "Test Country",
     countryCode: "TC",
   }),
-});
+}) as unknown as typeof fetch;
 
 describe("POST /api/track", () => {
   it("should return 200 and save data on valid entry request", async () => {

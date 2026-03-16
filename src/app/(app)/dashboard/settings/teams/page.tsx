@@ -103,7 +103,7 @@ export default function TeamsSettingsPage() {
       if (session?.session?.activeOrganizationId) {
         const orgs = await authClient.organization.list();
         const activeOrg = orgs.data?.find(
-          (org: any) => org.id === session.session.activeOrganizationId,
+          (org: { id: string; name: string }) => org.id === session.session.activeOrganizationId,
         );
         if (activeOrg) {
           setOrganizationName(activeOrg.name);
@@ -132,8 +132,8 @@ export default function TeamsSettingsPage() {
 
       toast.success("Invitation canceled");
       fetchData();
-    } catch (error: any) {
-      toast.error(error.message || "Failed to cancel invitation");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to cancel invitation");
     } finally {
       setCancelingInvite(null);
     }

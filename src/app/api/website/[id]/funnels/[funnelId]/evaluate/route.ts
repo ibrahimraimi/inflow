@@ -7,6 +7,7 @@ import { and, eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { funnels, websites } from "@/db/schema";
 import { FunnelService } from "@/server/services/funnel.service";
+import type { FunnelStep } from "@/configs/types";
 
 export async function GET(
   req: NextRequest,
@@ -55,7 +56,7 @@ export async function GET(
     }
 
     const funnel = funnelRecords[0];
-    const steps = funnel.steps as any[];
+    const steps = funnel.steps as FunnelStep[];
 
     const result = await FunnelService.evaluateFunnel(
       id,
@@ -71,10 +72,10 @@ export async function GET(
       },
       evaluation: result,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Funnel Evaluation Error:", error);
     return NextResponse.json(
-      { error: "Internal Server Error", details: error.message },
+      { error: "Internal Server Error", details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 },
     );
   }

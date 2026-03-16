@@ -1,13 +1,33 @@
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
+import type { FunnelStep, FunnelEvaluationResult } from "@/configs/types";
+
+export type FunnelData = {
+  id: string;
+  name: string;
+  websiteId: string;
+  steps: FunnelStep[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+type CreateFunnelPayload = {
+  name: string;
+  steps: FunnelStep[];
+};
+
+type FunnelEvaluationResponse = {
+  funnel: FunnelData;
+  evaluation: FunnelEvaluationResult[];
+};
 
 export function useFunnels(websiteId: string) {
-  const { data, error, isLoading, mutate } = useSWR<any[]>(
+  const { data, error, isLoading, mutate } = useSWR<FunnelData[]>(
     websiteId ? `/api/website/${websiteId}/funnels` : null,
     fetcher
   );
 
-  const createFunnel = async (funnelData: any) => {
+  const createFunnel = async (funnelData: CreateFunnelPayload) => {
     try {
       const res = await fetch(`/api/website/${websiteId}/funnels`, {
         method: "POST",
@@ -60,7 +80,7 @@ export function useFunnel(websiteId: string, funnelId: string, from?: string, to
     ? `/api/website/${websiteId}/funnels/${funnelId}/evaluate${queryString ? `?${queryString}` : ''}`
     : null;
 
-  const { data, error, isLoading, mutate } = useSWR<any>(endpoint, fetcher);
+  const { data, error, isLoading, mutate } = useSWR<FunnelEvaluationResponse>(endpoint, fetcher);
 
   return {
     funnel: data?.funnel,
