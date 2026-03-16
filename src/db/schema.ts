@@ -7,6 +7,7 @@ import {
   timestamp,
   integer,
   varchar,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -187,7 +188,30 @@ export const pageViews = pgTable("page_views", {
   refParams: varchar("ref_params"),
   exitUrl: varchar("exit_url"),
 });
+export const events = pgTable("events", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  websiteId: varchar("website_id", { length: 255 })
+    .notNull()
+    .references(() => websites.websiteId, { onDelete: "cascade" }),
+  clientId: varchar("client_id", { length: 255 }).notNull(),
+  eventName: varchar("event_name", { length: 255 }).notNull(),
+  properties: jsonb("properties"),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
 
+export const funnels = pgTable("funnels", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  websiteId: varchar("website_id", { length: 255 })
+    .notNull()
+    .references(() => websites.websiteId, { onDelete: "cascade" }),
+  name: varchar("name", { length: 255 }).notNull(),
+  steps: jsonb("steps").notNull(),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
 export const schema = {
   user,
   session,
@@ -199,6 +223,8 @@ export const schema = {
   websites,
   links,
   pageViews,
+  events,
+  funnels,
   organizationRelations,
   memberRelations,
 };
