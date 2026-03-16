@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
+  FunnelIcon,
   Loader2,
   Share2,
   SlidersHorizontal,
@@ -123,7 +124,7 @@ export default function WebsiteDetailPage() {
 
       {/* Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pt-2">
-        <Button
+        {/* <Button
           variant="outline"
           size="sm"
           onClick={() => setFilterOpen(true)}
@@ -131,7 +132,18 @@ export default function WebsiteDetailPage() {
         >
           <SlidersHorizontal className="h-3.5 w-3.5 mr-2 sm:mr-1.5" />
           Filter
-        </Button>
+        </Button> */}
+
+        <Link href={`/dashboard/${websiteId}/funnels`} className="w-full sm:w-auto mt-2 sm:mt-0">
+          <Button
+            variant="outline"
+            size="sm"
+            className="cursor-pointer h-9 sm:h-8 w-full sm:w-auto justify-start sm:justify-center"
+          >
+            <FunnelIcon className="h-3.5 w-3.5 mr-2 sm:mr-1.5" />
+            Funnels
+          </Button>
+        </Link>
 
         <div className="flex items-center gap-2 self-end sm:self-auto">
           {analyticsValidating && (

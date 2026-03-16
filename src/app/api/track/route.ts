@@ -1,5 +1,5 @@
 import { db } from "@/db/drizzle";
-import { pageViews } from "@/db/schema";
+import { pageViews, events } from "@/db/schema";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { and, eq } from "drizzle-orm";
@@ -103,19 +103,37 @@ export async function POST(req: NextRequest) {
           refParams: body.refParams,
         })
         .returning();
+    } else if (body?.type === "event") {
+      result = await db
+        .insert(events)
+        .values({
+          clientId: body.clientId,
+          websiteId: body.websiteId,
+          eventName: body.eventName || "unknown",
+          properties: body.properties ? body.properties : undefined,
+        })
+        .returning();
     } else {
+      // type === "exit" or "ping"
+      const updateData: any = {
+        totalActiveTime: body.totalActiveTime,
+      };
+
+      if (body?.type === "exit") {
+        updateData.exitTime = body.exitTime || new Date().toISOString();
+        updateData.exitUrl = body.exitUrl;
+      }
+
       result = await db
         .update(pageViews)
-        .set({
-          exitTime: body.exitTime || new Date().toISOString(),
-          totalActiveTime: body.totalActiveTime,
-          exitUrl: body.exitUrl,
-        })
+        .set(updateData)
         .where(
-          and(
-            eq(pageViews.clientId, body?.clientId),
-            eq(pageViews.websiteId, body?.websiteId),
-          ),
+          body.pageViewId
+            ? eq(pageViews.id, body.pageViewId)
+            : and(
+                eq(pageViews.clientId, body?.clientId),
+                eq(pageViews.websiteId, body?.websiteId),
+              ),
         )
         .returning();
     }

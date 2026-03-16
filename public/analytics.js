@@ -18,6 +18,7 @@
   
   let clientId = null;
   let sessionTime = null;
+  let pageViewId = null;
 
   try {
     clientId = localStorage.getItem("inflow_client_id");
@@ -72,10 +73,60 @@
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
-  }).catch(() => {});
+  })
+    .then((res) => res.json())
+    .then((res) => {
+      if (res.data && res.data[0]) {
+        pageViewId = res.data[0].id;
+      }
+    })
+    .catch(() => {});
 
   // Active Time Tracking
   const startTime = Date.now();
+
+  // Heartbeat ping every 10 seconds
+  setInterval(() => {
+    if (!pageViewId) return;
+    const totalActiveTime = Math.floor((Date.now() - startTime) / 1000);
+    const pingData = JSON.stringify({
+      type: "ping",
+      websiteId,
+      domain,
+      clientId,
+      totalActiveTime,
+      pageViewId,
+    });
+    fetch(`${apiUrl}/api/track`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: pingData,
+    }).catch(() => {});
+  }, 10000);
+
+  // Custom Event Tracking API
+  window.inflow = {
+    track: function (eventName, properties = {}) {
+      const eventData = JSON.stringify({
+        type: "event",
+        websiteId,
+        domain,
+        clientId,
+        eventName,
+        properties,
+      });
+
+      fetch(`${apiUrl}/api/track`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: eventData,
+      }).catch(() => {});
+    },
+  };
 
   const handleExit = () => {
     const exitTime = new Date().toISOString();
@@ -88,6 +139,7 @@
       exitTime: exitTime,
       totalActiveTime: totalActiveTime,
       clientId: clientId,
+      pageViewId: pageViewId,
       exitUrl: window.location.href,
     });
 
