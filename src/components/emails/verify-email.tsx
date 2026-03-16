@@ -5,6 +5,7 @@ import {
   Head,
   Hr,
   Html,
+  Img,
   Section,
   Tailwind,
   Text,
@@ -24,6 +25,16 @@ const VerifyEmail = (props: VerifyEmailProps) => {
         <Body className="bg-gray-100 py-10 font-sans">
           <Container className="mx-auto max-w-[600px] rounded-xl bg-white p-8">
             <Section>
+              <Section className="mb-6 text-center">
+                <Img
+                  src={`${process.env.NEXT_PUBLIC_APP_URL}/assets/inflow-dark.svg`}
+                  alt="Inflow Analytics"
+                  width="160"
+                  height="48"
+                  className="mx-auto"
+                />
+              </Section>
+
               <Text className="mt-0 mb-4 font-bold text-[24px] text-gray-900">
                 Verify your email address
               </Text>
@@ -60,24 +71,20 @@ const VerifyEmail = (props: VerifyEmailProps) => {
               <Text className="m-0 text-[12px] text-gray-500 leading-4">
                 Best regards,
                 <br />
-                The Team
+                The Inflow Team
               </Text>
             </Section>
 
             <Section className="mt-8 border-gray-200 border-t pt-6">
               <Text className="m-0 text-center text-[12px] text-gray-400 leading-4">
-                Company Name
-                <br />
-                123 Business Street, Suite 100
-                <br />
-                City, State 12345
+                Inflow Analytics
               </Text>
 
               <Text className="m-0 mt-2 text-center text-[12px] text-gray-400 leading-4">
                 <a className="text-gray-400 underline" href="/">
                   Unsubscribe
                 </a>{" "}
-                | © 2024 Company Name. All rights reserved.
+                | © 2026 Inflow Analytics. All rights reserved.
               </Text>
             </Section>
           </Container>

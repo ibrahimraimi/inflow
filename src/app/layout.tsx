@@ -89,10 +89,10 @@ export default function RootLayout({
       <head>
         <script
           defer
-          data-website-id='214eaa65-7efd-4cee-be78-a76c8e9708a2'
-          data-domain='http://localhost:3000'
-          src="http://localhost:3000/analytics.js">
-        </script>
+          data-website-id="1c10e3af-ff81-4650-8fd6-4a795a9daf7a"
+          data-domain="http://localhost:3000"
+          src="http://localhost:3000/analytics.js"
+        ></script>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
