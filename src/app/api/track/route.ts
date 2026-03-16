@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
         .returning();
     } else {
       // type === "exit" or "ping"
-      const updateData: any = {
+      const updateData: Partial<typeof pageViews.$inferInsert> = {
         totalActiveTime: body.totalActiveTime,
       };
 

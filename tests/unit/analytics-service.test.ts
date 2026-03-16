@@ -1,8 +1,9 @@
-import { describe, it, expect, jest, beforeEach } from "bun:test";
+/// <reference types="bun-types" />
+import { describe, it, expect, jest, beforeEach, mock } from "bun:test";
 import { AnalyticsService } from "@/server/services/analytics.service";
 import { db } from "@/db/drizzle";
 
-jest.mock("@/db/drizzle", () => {
+mock.module("@/db/drizzle", () => {
   const mockDb = {
     select: jest.fn().mockReturnThis(),
     from: jest.fn().mockReturnThis(),

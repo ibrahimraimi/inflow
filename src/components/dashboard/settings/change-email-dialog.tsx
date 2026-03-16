@@ -72,8 +72,8 @@ export function ChangeEmailDialog({
       toast.success(data.message);
       setNewEmail("");
       onOpenChange(false);
-    } catch (error: any) {
-      toast.error(error.message || "Failed to change email");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to change email");
     } finally {
       setLoading(false);
     }

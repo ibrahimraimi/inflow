@@ -80,17 +80,19 @@ export function CreateOrganizationDialog({
 
       // Reload to update session with new organization
       window.location.reload();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Organization creation error:", error);
 
       // Handle specific errors
       if (
-        error.message?.includes("slug") ||
-        error.message?.includes("unique")
+        error instanceof Error && (
+        error.message.includes("slug") ||
+        error.message.includes("unique")
+        )
       ) {
         toast.error("This organization name/slug is already taken");
       } else {
-        toast.error(error.message || "Failed to create organization");
+        toast.error(error instanceof Error ? error.message : "Failed to create organization");
       }
     } finally {
       setLoading(false);

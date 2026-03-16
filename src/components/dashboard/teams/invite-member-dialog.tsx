@@ -68,9 +68,9 @@ export function InviteMemberDialog({
       setRole("member");
       onOpenChange(false);
       onSuccess?.();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Invitation error:", error);
-      toast.error(error.message || "Failed to send invitation");
+      toast.error(error instanceof Error ? error.message : "Failed to send invitation");
     } finally {
       setLoading(false);
     }
@@ -104,7 +104,7 @@ export function InviteMemberDialog({
               <Label htmlFor="role">Role</Label>
               <Select
                 value={role}
-                onValueChange={(value: any) => setRole(value)}
+                onValueChange={(value: "member" | "admin" | "owner") => setRole(value)}
                 disabled={loading}
               >
                 <SelectTrigger id="role">

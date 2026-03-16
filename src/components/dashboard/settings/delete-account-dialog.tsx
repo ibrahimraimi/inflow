@@ -59,8 +59,8 @@ export function DeleteAccountDialog({
       toast.success("Account deleted successfully");
       // Redirect to home page after successful deletion
       router.push("/");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to delete account");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to delete account");
       setLoading(false);
     }
   };

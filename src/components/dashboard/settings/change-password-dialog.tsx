@@ -72,8 +72,8 @@ export function ChangePasswordDialog({
       setNewPassword("");
       setConfirmPassword("");
       onOpenChange(false);
-    } catch (error: any) {
-      toast.error(error.message || "Failed to change password");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to change password");
     } finally {
       setLoading(false);
     }

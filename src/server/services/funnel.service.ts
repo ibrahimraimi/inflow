@@ -1,11 +1,6 @@
 import { db } from "@/db/drizzle";
 import { sql } from "drizzle-orm";
-
-type FunnelStep = {
-  type: "pageView" | "event";
-  value: string;
-  order: number;
-};
+import type { FunnelStep } from "@/configs/types";
 
 export class FunnelService {
   static async evaluateFunnel(
@@ -115,7 +110,7 @@ export class FunnelService {
     try {
       const result = await db.execute(sql.raw(finalQuery));
       // @ts-ignore
-      const row = (result.rows?.[0] || result[0] || {}) as any;
+      const row = (result.rows?.[0] || result[0] || {}) as Record<string, unknown>;
       
       return sortedSteps.map((step, index) => {
         const stepName = `step_${index + 1}`;
