@@ -12,6 +12,7 @@ import { ArrowLeft, Copy, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { WebsiteType } from "@/configs/types";
 import { Button } from "@/components/ui/button";
 import { useWebsite } from "@/hooks/use-website";
@@ -23,6 +24,7 @@ export default function EditWebsitePage() {
 
   const [name, setName] = useState("");
   const [domain, setDomain] = useState("");
+  const [isPublic, setIsPublic] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
 
   const { mutate: mutateGlobal } = useSWRConfig();
@@ -37,8 +39,13 @@ export default function EditWebsitePage() {
     if (website) {
       setName(website.websiteName);
       setDomain(website.domain);
+      setIsPublic(!!website.isPublic);
     }
   }, [website]);
+
+  const publicLink = website?.publicToken 
+    ? `${window.location.origin}/share/${website.publicToken}` 
+    : "";
 
   const trackingCode = website
     ? `<script defer data-website-id="${website.websiteId}" data-domain="${website.domain}" src="${window.location.origin}/analytics.js"></script>`
@@ -60,6 +67,7 @@ export default function EditWebsitePage() {
       await axios.put(`/api/website/${websiteId}`, {
         websiteName: name,
         domain: domain,
+        isPublic: isPublic,
       });
       mutate();
       toast.success("Website updated successfully!");
@@ -248,6 +256,55 @@ export default function EditWebsitePage() {
                 <Copy className="h-4 w-4" />
               </Button>
             </div>
+          </div>
+        </div>
+
+        {/* Public Share Card */}
+        <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-semibold">Public Share</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Allow anyone with the link to view this website's analytics dashboard.
+                </p>
+              </div>
+              <Switch
+                checked={isPublic}
+                onCheckedChange={setIsPublic}
+                disabled={saveLoading}
+              />
+            </div>
+            
+            {isPublic && publicLink && (
+              <div className="space-y-3 pt-2">
+                <Label className="text-sm font-medium">Public Link</Label>
+                <div className="relative">
+                  <Input
+                    value={publicLink}
+                    readOnly
+                    className="pr-10 font-mono text-sm bg-muted/50"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                    onClick={() => copyToClipboard(publicLink)}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Note: Remember to click "Save Changes" if you toggle public access.
+                </p>
+              </div>
+            )}
+            
+            {isPublic && !publicLink && (
+              <p className="text-xs text-muted-foreground pt-2">
+                Click "Save Changes" to generate a public link.
+              </p>
+            )}
           </div>
         </div>
 
