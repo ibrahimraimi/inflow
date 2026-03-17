@@ -22,6 +22,20 @@
       "when": 1773713370629,
       "tag": "0002_lethal_millenium_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1773758715482,
+      "tag": "0003_short_millenium_guard",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1773762894432,
+      "tag": "0004_pink_shatterstar",
+      "breakpoints": true
     }
   ]
 }
