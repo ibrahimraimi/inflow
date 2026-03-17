@@ -214,6 +214,34 @@ export const funnels = pgTable("funnels", {
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
+
+export const apiKeys = pgTable("api_keys", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  keyHash: text("key_hash").notNull(),
+  hint: varchar("hint", { length: 255 }).notNull(),
+  name: varchar("name", { length: 255 }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  scope: varchar("scope", { length: 50 }).default("all").notNull(),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+  lastUsedAt: timestamp("last_used_at"),
+});
+
+export const apiKeyUsageLogs = pgTable("api_key_usage_logs", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  apiKeyId: varchar("api_key_id", { length: 255 })
+    .notNull()
+    .references(() => apiKeys.id, { onDelete: "cascade" }),
+  endpoint: text("endpoint").notNull(),
+  method: varchar("method", { length: 10 }).notNull(),
+  status: integer("status").notNull(),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
 export const schema = {
   user,
   session,
@@ -227,6 +255,8 @@ export const schema = {
   pageViews,
   events,
   funnels,
+  apiKeys,
+  apiKeyUsageLogs,
   organizationRelations,
   memberRelations,
 };
