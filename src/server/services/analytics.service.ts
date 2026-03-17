@@ -180,6 +180,9 @@ export class AnalyticsService {
       countriesData,
       regions,
       cities,
+      utmCampaigns,
+      utmSources,
+      utmMediums,
     ] = await Promise.all([
       getBreakdown(pageViews.url),
       getBreakdown(pageViews.referrer),
@@ -200,6 +203,9 @@ export class AnalyticsService {
         .limit(10),
       getBreakdown(pageViews.region),
       getBreakdown(pageViews.city),
+      getBreakdown(pageViews.utmCampaign),
+      getBreakdown(pageViews.utmSource),
+      getBreakdown(pageViews.utmMedium),
     ]);
 
     const formatBreakdown = (
@@ -325,6 +331,9 @@ export class AnalyticsService {
         countries: formatBreakdown(countriesData, visitors, "country"),
         regions: formatBreakdown(regions, visitors),
         cities: formatBreakdown(cities, visitors),
+        utmCampaigns: formatBreakdown(utmCampaigns, visitors),
+        utmSources: formatBreakdown(utmSources, visitors, "source"),
+        utmMediums: formatBreakdown(utmMediums, visitors),
       },
       map: mapDataResult as Array<{ code: string; name?: string; visitors: number; }>,
       traffic: trafficData,

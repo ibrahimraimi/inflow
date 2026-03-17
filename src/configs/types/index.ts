@@ -56,6 +56,9 @@ export type AnalyticsData = {
     countries: MetricItem[];
     regions: MetricItem[];
     cities: MetricItem[];
+    utmCampaigns: MetricItem[];
+    utmSources: MetricItem[];
+    utmMediums: MetricItem[];
   };
   map: MapData[];
   traffic: TrafficData[];
