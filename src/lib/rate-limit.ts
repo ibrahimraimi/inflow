@@ -20,22 +20,26 @@ export async function rateLimit(
 ) {
   // Use Redis if available
   if (redis) {
-    const key = `ratelimit:${storeName}:${identifier}`;
-    const count = await redis.incr(key);
+    try {
+      const key = `ratelimit:${storeName}:${identifier}`;
+      const count = await redis.incr(key);
 
-    if (count === 1) {
-      await redis.pexpire(key, windowMs);
+      if (count === 1) {
+        await redis.pexpire(key, windowMs);
+      }
+
+      const ttl = await redis.pttl(key);
+      const now = Date.now();
+
+      return {
+        success: count <= limit,
+        limit,
+        remaining: Math.max(0, limit - count),
+        reset: now + (ttl > 0 ? ttl : windowMs),
+      };
+    } catch (error) {
+      console.warn("Redis rate limit failed, falling back to memory store:", error);
     }
-
-    const ttl = await redis.pttl(key);
-    const now = Date.now();
-
-    return {
-      success: count <= limit,
-      limit,
-      remaining: Math.max(0, limit - count),
-      reset: now + (ttl > 0 ? ttl : windowMs),
-    };
   }
 
   // Fallback to in-memory store
