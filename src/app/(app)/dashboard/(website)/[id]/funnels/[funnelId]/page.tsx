@@ -1,19 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { ArrowLeft, Loader2, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import {
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Cell
+  Cell,
+  Area,
+  AreaChart
 } from "recharts";
 
 import { useWebsite } from "@/hooks/use-website";
@@ -34,6 +34,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart";
 import { Badge } from "@/components/ui/badge";
 
 type ChartDataEntry = {
@@ -49,6 +55,13 @@ type ChartDataEntry = {
 
 export default function FunnelReportPage() {
   const params = useParams();
+  const chartConfig = {
+    count: {
+      label: "Completed",
+      color: "var(--chart-1)",
+    },
+  } satisfies ChartConfig;
+
   const websiteId = params.id as string;
   const funnelId = params.funnelId as string;
 
@@ -76,7 +89,9 @@ export default function FunnelReportPage() {
     return { from: from.toISOString(), to };
   };
 
-  const { from, to } = getDateRangeParams();
+  const { from, to } = useMemo(() => {
+    return getDateRangeParams();
+  }, [dateRange]);
 
   const { website, isLoading: websiteLoading } = useWebsite(websiteId);
   const { funnel, evaluation, isLoading: funnelLoading } = useFunnel(websiteId, funnelId, from, to);
@@ -128,7 +143,7 @@ export default function FunnelReportPage() {
     : "0";
 
   return (
-    <div className="lg:mt-8 mt-10 max-w-5xl mx-auto space-y-6 pb-24">
+    <div className="lg:mt-8 mt-10 space-y-6 pb-24">
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b pb-6">
         <div>
           <Link
@@ -160,59 +175,95 @@ export default function FunnelReportPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        <Card className="md:col-span-2">
-          <CardHeader>
+        <Card className="md:col-span-2 rounded-lg">
+          <CardHeader className="border-b">
             <CardTitle>Funnel Conversion</CardTitle>
             <CardDescription>Visual breakdown of users progressing through each step.</CardDescription>
           </CardHeader>
-          <CardContent className="h-[400px]">
-             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                <XAxis dataKey="shortName" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
-                <Tooltip 
-                  cursor={{fill: 'hsl(var(--muted))', opacity: 0.4}}
-                  content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      const data = payload[0].payload;
-                      return (
-                         <div className="bg-background border rounded-lg shadow-lg p-3 text-sm">
-                           <p className="font-semibold mb-2">{data.name}</p>
-                           <div className="space-y-1">
-                             <div className="flex justify-between gap-4">
-                               <span className="text-muted-foreground">Completed:</span>
-                               <span className="font-medium">{data.count} users</span>
-                             </div>
-                             <div className="flex justify-between gap-4">
-                               <span className="text-muted-foreground">Conv. Rate:</span>
-                               <span className="font-medium text-emerald-500">{data.conversionRate}%</span>
-                             </div>
-                             {data.shortName !== "S1" && (
-                               <div className="flex justify-between gap-4 pt-1 mt-1 border-t">
-                                 <span className="text-muted-foreground">Drop-off:</span>
-                                 <span className="font-medium text-destructive">{data.dropoffRate}% ({data.dropoff})</span>
-                               </div>
-                             )}
-                           </div>
-                         </div>
-                      )
-                    }
-                    return null;
-                  }}
+          <CardContent className="px-0 h-[400px]">
+             <ChartContainer
+                config={chartConfig}
+                className="aspect-auto h-full w-full"
+              >
+              <AreaChart 
+                accessibilityLayer
+                data={chartData} 
+                margin={{ top: 20, right: 30, left: 10, bottom: 20 }}
+              >
+                <defs>
+                  <linearGradient id="fillCount" x1="0" y1="0" x2="0" y2="1">
+                    <stop
+                      offset="5%"
+                      stopColor="var(--color-count)"
+                      stopOpacity={0.8}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor="var(--color-count)"
+                      stopOpacity={0.1}
+                    />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis 
+                  dataKey="shortName" 
+                  tickLine={false} 
+                  axisLine={false} 
+                  tickMargin={8}
                 />
-                <Bar dataKey="count" radius={[4, 4, 0, 0]} maxBarSize={60}>
-                   {chartData.map((entry: ChartDataEntry, index: number) => (
-                    <Cell key={`cell-${index}`} fill="hsl(var(--primary))" fillOpacity={1 - (index * 0.15)} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+                <YAxis 
+                  tickLine={false} 
+                  axisLine={false} 
+                  tickMargin={8}
+                  tickFormatter={(value) => `${value}`} 
+                />
+                <ChartTooltip 
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                      labelFormatter={(value, payload) => {
+                        return payload?.[0]?.payload?.name || value;
+                      }}
+                      indicator="dot"
+                      formatter={(value, name, item) => (
+                        <>
+                          <div className="flex items-center gap-2">
+                            <div className="h-2 w-2 rounded-full bg-[--color-count]" />
+                            <span className="text-muted-foreground">{chartConfig.count.label}</span>
+                          </div>
+                          <span className="font-mono font-medium">{Number(value).toLocaleString()}</span>
+                          
+                          <div className="flex items-center gap-2 mt-1.5 pt-1.5 border-t w-full justify-between">
+                            <span className="text-muted-foreground text-[10px] uppercase">Conv. Rate</span>
+                            <span className="font-bold text-emerald-500">{item.payload.conversionRate}%</span>
+                          </div>
+                          {item.payload.shortName !== "S1" && (
+                            <div className="flex items-center gap-2 w-full justify-between">
+                              <span className="text-muted-foreground text-[10px] uppercase">Drop-off</span>
+                              <span className="font-bold text-destructive">-{item.payload.dropoffRate}%</span>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    />
+                  }
+                />
+                <Area 
+                  dataKey="count" 
+                  type="natural"
+                  fill="url(#fillCount)"
+                  fillOpacity={0.4}
+                  stroke="var(--color-count)"
+                  stackId="a"
+                  animationDuration={1500}
+                />
+              </AreaChart>
+            </ChartContainer>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="border-b">
             <CardTitle>Step Breakdown</CardTitle>
             <CardDescription>Detailed statistics per step.</CardDescription>
           </CardHeader>

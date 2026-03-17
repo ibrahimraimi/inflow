@@ -17,7 +17,10 @@ type CreateFunnelPayload = {
 };
 
 type FunnelEvaluationResponse = {
-  funnel: FunnelData;
+  funnel: {
+    id: string;
+    name: string;
+  };
   evaluation: FunnelEvaluationResult[];
 };
 
