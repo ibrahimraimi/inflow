@@ -7,16 +7,13 @@ import {
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
-  Target,
-  FunnelIcon,
   Loader2,
-  SlidersHorizontal,
   SquarePen,
+  LayoutDashboard,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import type { WebsiteType } from "@/configs/types";
 import {
   Select,
   SelectContent,
@@ -24,32 +21,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
-import { MetricCard } from "../_components/metric-card";
-import { ChartAreaInteractive } from "../_components/chart";
-import { DataTable } from "../_components/data-table";
-import { DataMap } from "../_components/data-map";
 import { useWebsite } from "@/hooks/use-website";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAnalytics } from "@/hooks/use-analytics";
-import type { AnalyticsData } from "@/configs/types";
+import { DataTable } from "../../_components/data-table";
+import { ChartAreaInteractive } from "../../_components/chart";
 
-export default function WebsiteDetailPage() {
+export default function CampaignInsightsPage() {
   const params = useParams();
   const websiteId = params.id as string;
 
-  const [dateRange, setDateRange] = useState("today");
-  const [filterOpen, setFilterOpen] = useState(false);
+  const [dateRange, setDateRange] = useState("last_30_days");
 
   const {
     website,
     isLoading: websiteLoading,
-    isError: websiteError,
   } = useWebsite(websiteId);
+  
   const {
     analytics,
     isLoading: analyticsLoading,
     isValidating: analyticsValidating,
-    isError: analyticsError,
   } = useAnalytics(websiteId, dateRange);
 
   if (websiteLoading) {
@@ -79,11 +71,11 @@ export default function WebsiteDetailPage() {
     <div className="lg:mt-8 mt-10">
       <div className="mb-8 border-b pb-6">
         <Link
-          href="/dashboard"
+          href={`/dashboard/${websiteId}`}
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span>Back to Websites</span>
+          <span>Back to Dashboard</span>
         </Link>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -99,13 +91,19 @@ export default function WebsiteDetailPage() {
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
-                {website.websiteName}
+                {website.websiteName} Campaigns
               </h1>
               <p className="text-sm text-muted-foreground">{website.domain}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
+            <Link href={`/dashboard/${websiteId}`} className="flex-1 sm:flex-none">
+              <Button variant="outline" size="sm" className="w-full sm:w-auto cursor-pointer h-9 sm:h-8">
+                <LayoutDashboard className="h-3.5 w-3.5 mr-1.5" />
+                Overview
+              </Button>
+            </Link>
             <Link href={`/dashboard/${websiteId}/edit`} className="flex-1 sm:flex-none">
               <Button variant="outline" size="sm" className="w-full sm:w-auto cursor-pointer h-9 sm:h-8">
                 <SquarePen className="w-3.5 h-3.5 mr-1.5" />
@@ -117,40 +115,7 @@ export default function WebsiteDetailPage() {
       </div>
 
       {/* Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pt-2">
-        {/* <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setFilterOpen(true)}
-          className="cursor-pointer h-9 sm:h-8 w-full sm:w-auto justify-start sm:justify-center"
-        >
-          <SlidersHorizontal className="h-3.5 w-3.5 mr-2 sm:mr-1.5" />
-          Filter
-        </Button> */}
-
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto mt-2 sm:mt-0">
-          <Link href={`/dashboard/${websiteId}/funnels`} className="w-full sm:w-auto">
-            <Button
-              variant="outline"
-              size="sm"
-              className="cursor-pointer h-9 sm:h-8 w-full sm:w-auto justify-start sm:justify-center"
-            >
-              <FunnelIcon className="h-3.5 w-3.5 mr-2 sm:mr-1.5" />
-              Funnels
-            </Button>
-          </Link>
-          <Link href={`/dashboard/${websiteId}/campaigns`} className="w-full sm:w-auto">
-            <Button
-              variant="outline"
-              size="sm"
-              className="cursor-pointer h-9 sm:h-8 w-full sm:w-auto justify-start sm:justify-center"
-            >
-              <Target className="h-3.5 w-3.5 mr-2 sm:mr-1.5" />
-              Campaigns
-            </Button>
-          </Link>
-        </div>
-
+      <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4 mb-6 pt-2">
         <div className="flex items-center gap-2 self-end sm:self-auto">
           {analyticsValidating && (
             <div className="flex items-center gap-2 text-xs text-muted-foreground animate-pulse mr-2">
@@ -187,112 +152,52 @@ export default function WebsiteDetailPage() {
         </div>
       </div>
 
-      {/* Metrics */}
-      <div className="relative">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 lg:gap-2 mb-6">
-          {!analytics && analyticsLoading ? (
-            Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-24 sm:h-28 lg:h-24 w-full rounded-xl" />
-            ))
-          ) : (
-            <>
-              <MetricCard
-                title="Visitors"
-                value={analytics?.metrics?.visitors.toLocaleString() || "0"}
-                change={0}
-              />
-              <MetricCard
-                title="Visits"
-                value={analytics?.metrics?.visits.toLocaleString() || "0"}
-                change={0}
-              />
-              <MetricCard
-                title="Views"
-                value={analytics?.metrics?.views.toLocaleString() || "0"}
-                change={0}
-              />
-              <MetricCard
-                title="Bounce rate"
-                value={`${Number(analytics?.metrics?.bounceRate || 0).toFixed(0)}%`}
-                change={0}
-                isNegative
-              />
-              <MetricCard
-                title="Visit duration"
-                value={`${Number(analytics?.metrics?.duration || 0).toFixed(0)}s`}
-                change={0}
-              />
-            </>
-          )}
-        </div>
-      </div>
-
-      <div className="space-y-6">
+      <div className="space-y-6 min-h-screen">
         {!analytics && analyticsLoading ? (
           <Skeleton className="h-[300px] w-full rounded-xl" />
         ) : (
           <ChartAreaInteractive data={analytics?.chart} />
         )}
-      </div>
 
-      <div className="space-y-6 min-h-screen pt-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-          {!analytics && analyticsLoading ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-[300px] w-full rounded-xl" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 pt-6">
+          {(!analytics && analyticsLoading) ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-[400px] w-full rounded-xl" />
             ))
           ) : (
             <>
-              <DataTable
-                title="Pages"
-                tabs={["Path", "Entry", "Exit"]}
-                data={{
-                  Path: analytics?.tables.pages || [],
-                  Entry: [],
-                  Exit: [],
-                }}
-                type="path"
-              />
+              <div className="lg:col-span-2">
+                <DataTable
+                  title="Campaigns"
+                  tabs={["UTM Campaign"]}
+                  data={{
+                    "UTM Campaign": analytics?.tables.utmCampaigns || [],
+                  }}
+                  type="item"
+                  emptyMessage="No campaigns recorded in this period"
+                />
+              </div>
               <DataTable
                 title="Sources"
-                tabs={["Referrers", "Channels"]}
+                tabs={["UTM Source"]}
                 data={{
-                  Referrers: analytics?.tables.sources || [],
-                  Channels: [],
+                  "UTM Source": analytics?.tables.utmSources || [],
                 }}
                 type="source"
+                emptyMessage="No sources recorded in this period"
               />
               <DataTable
-                title="Environment"
-                tabs={["Browsers", "OS", "Devices"]}
+                title="Mediums"
+                tabs={["UTM Medium"]}
                 data={{
-                  Browsers: analytics?.tables.browsers || [],
-                  OS: analytics?.tables.os || [],
-                  Devices: analytics?.tables.devices || [],
+                  "UTM Medium": analytics?.tables.utmMediums || [],
                 }}
-                type="browser"
-              />
-              <DataTable
-                title="Location"
-                tabs={["Countries", "Regions", "Cities"]}
-                data={{
-                  Countries: analytics?.tables.countries || [],
-                  Regions: analytics?.tables.regions || [],
-                  Cities: analytics?.tables.cities || [],
-                }}
-                type="country"
+                type="item"
+                emptyMessage="No mediums recorded in this period"
               />
             </>
           )}
         </div>
-        {!analytics && analyticsLoading ? (
-          <Skeleton className="h-[400px] w-full rounded-xl" />
-        ) : (
-          <DataMap
-            mapData={analytics?.map || []}
-            trafficData={analytics?.traffic || []}
-          />
-        )}
       </div>
     </div>
   );
