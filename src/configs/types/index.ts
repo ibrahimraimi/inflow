@@ -5,6 +5,8 @@ export type WebsiteType = {
   domain: string;
   timeZone: string;
   enableLocalhostTracking: boolean | null;
+  isPublic: boolean | null;
+  publicToken: string | null;
   userId: string;
 };
 

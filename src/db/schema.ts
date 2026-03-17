@@ -140,6 +140,8 @@ export const websites = pgTable("websites", {
   domain: varchar({ length: 255 }).notNull().unique(),
   timeZone: varchar({ length: 100 }).notNull(),
   enableLocalhostTracking: boolean().default(false),
+  isPublic: boolean("is_public").default(false),
+  publicToken: varchar("public_token", { length: 255 }).unique(),
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),

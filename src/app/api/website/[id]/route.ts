@@ -48,7 +48,7 @@ export async function PUT(
   }
 
   const { id } = await params;
-  const { websiteName, domain, timeZone, enableLocalhostTracking } =
+  const { websiteName, domain, timeZone, enableLocalhostTracking, isPublic } =
     await req.json();
 
   // Check if website exists and belongs to user
@@ -80,6 +80,11 @@ export async function PUT(
     }
   }
 
+  let publicTokenToSave = existingWebsite[0].publicToken;
+  if (isPublic === true && !publicTokenToSave) {
+    publicTokenToSave = crypto.randomUUID();
+  }
+
   const result = await db
     .update(websites)
     .set({
@@ -90,6 +95,8 @@ export async function PUT(
         enableLocalhostTracking !== undefined
           ? enableLocalhostTracking
           : existingWebsite[0].enableLocalhostTracking,
+      isPublic: isPublic !== undefined ? isPublic : existingWebsite[0].isPublic,
+      publicToken: publicTokenToSave,
     })
     .where(
       and(eq(websites.websiteId, id), eq(websites.userId, session.user.id))
