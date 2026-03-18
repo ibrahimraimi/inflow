@@ -12,6 +12,7 @@ import {
   Loader2,
   SlidersHorizontal,
   SquarePen,
+  Activity,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -149,6 +150,16 @@ export default function WebsiteDetailPage() {
               Campaigns
             </Button>
           </Link>
+          {/* <Link href={`/dashboard/${websiteId}/flow`} className="w-full sm:w-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              className="cursor-pointer h-9 sm:h-8 w-full sm:w-auto justify-start sm:justify-center"
+            >
+              <Activity className="h-3.5 w-3.5 mr-2 sm:mr-1.5" />
+              Flow
+            </Button>
+          </Link> */}
         </div>
 
         <div className="flex items-center gap-2 self-end sm:self-auto">

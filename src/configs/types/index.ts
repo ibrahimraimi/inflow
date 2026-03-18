@@ -140,3 +140,22 @@ export type FunnelEvaluationResult = {
   count: number;
 };
 
+export type FlowNode = {
+  id: string;
+  name: string;
+  step: number;
+  type?: "page" | "event";
+};
+
+export type FlowLink = {
+  source: string;
+  target: string;
+  value: number;
+  type?: "page" | "event";
+};
+
+export type FlowData = {
+  nodes: FlowNode[];
+  links: FlowLink[];
+};
+
