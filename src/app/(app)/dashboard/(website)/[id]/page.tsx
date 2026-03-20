@@ -32,8 +32,10 @@ import { DataTable } from "../_components/data-table";
 import { DataMap } from "../_components/data-map";
 import { useWebsite } from "@/hooks/use-website";
 import { useAnalytics } from "@/hooks/use-analytics";
+import { useRageClicks } from "@/hooks/use-rage-clicks";
 import type { AnalyticsData } from "@/configs/types";
 import { RenderIf } from "@/lib/render-if";
+import { RageClicksTable } from "../_components/rage-clicks-table";
 
 export default function WebsiteDetailPage() {
   const params = useParams();
@@ -53,6 +55,8 @@ export default function WebsiteDetailPage() {
     isValidating: analyticsValidating,
     isError: analyticsError,
   } = useAnalytics(websiteId, dateRange);
+
+  const { rageClicks, isLoading: rageClicksLoading } = useRageClicks(websiteId, dateRange);
 
   if (websiteLoading) {
     return (
@@ -325,6 +329,7 @@ export default function WebsiteDetailPage() {
                 }}
                 type="country"
               />
+              <RageClicksTable data={rageClicks} isLoading={rageClicksLoading} />
             </>
           )}
         </div>
