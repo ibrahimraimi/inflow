@@ -36,11 +36,14 @@ import { useRageClicks } from "@/hooks/use-rage-clicks";
 import type { AnalyticsData } from "@/configs/types";
 import { RenderIf } from "@/lib/render-if";
 import { RageClicksTable } from "../_components/rage-clicks-table";
+import { authClient } from "@/lib/auth-client";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 
 export default function WebsiteDetailPage() {
   const params = useParams();
   const websiteId = params.id as string;
 
+  const { data: session } = authClient.useSession();
   const [dateRange, setDateRange] = useState("today");
   const [filterOpen, setFilterOpen] = useState(false);
 
@@ -170,7 +173,7 @@ export default function WebsiteDetailPage() {
               Campaigns
             </Button>
           </Link>
-          <RenderIf condition={false}>
+          {isFeatureEnabled("flow", session?.user) && (
             <Link
               href={`/dashboard/${websiteId}/flow`}
               className="w-full sm:w-auto"
@@ -184,7 +187,7 @@ export default function WebsiteDetailPage() {
                 Flow
               </Button>
             </Link>
-          </RenderIf>
+          )}
         </div>
 
         <div className="flex items-center gap-2 self-end sm:self-auto">

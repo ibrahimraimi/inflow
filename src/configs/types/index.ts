@@ -59,6 +59,7 @@ export type AnalyticsData = {
     utmCampaigns: MetricItem[];
     utmSources: MetricItem[];
     utmMediums: MetricItem[];
+    domains: MetricItem[];
   };
   map: MapData[];
   traffic: TrafficData[];
