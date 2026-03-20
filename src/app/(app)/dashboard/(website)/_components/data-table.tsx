@@ -10,6 +10,7 @@ import {
   MousePointer2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { RenderIf } from "@/lib/render-if";
 
 interface DataItem {
   name?: string;
@@ -117,7 +118,7 @@ export function DataTable({
                 "pb-2 border-b-2 transition-colors whitespace-nowrap",
                 activeTab === tab
                   ? "border-primary text-foreground font-medium"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground",
               )}
             >
               {tab}
@@ -183,11 +184,13 @@ export function DataTable({
           )}
         </div>
 
-        {/* <div className="mt-auto text-center border-t pt-2">
-          <button className="text-xs text-muted-foreground hover:text-foreground transition-colors p-2 w-full">
-            View more
-          </button>
-        </div> */}
+        <RenderIf condition={false}>
+          <div className="mt-auto text-center border-t pt-2">
+            <button className="text-xs text-muted-foreground hover:text-foreground transition-colors p-2 w-full">
+              View more
+            </button>
+          </div>
+        </RenderIf>
       </div>
     </div>
   );

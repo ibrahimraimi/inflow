@@ -1,9 +1,7 @@
 "use client";
 
 import { Check, Clipboard, Terminal } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
 import { Layout } from "../layout";
 
 const steps = [
