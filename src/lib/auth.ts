@@ -1,4 +1,3 @@
-import { Resend } from "resend";
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -11,19 +10,19 @@ import VerifyEmail from "@/components/emails/verify-email";
 import { OrganizationService } from "@/server/services/organization.service";
 import ForgotPasswordEmail from "@/components/emails/reset-password";
 import OrganizationInvitationEmail from "@/components/emails/organization-invitation";
+import { MailerService } from "@/server/services/mailer.service";
 import { getBaseUrl } from "@/lib/url";
 
-const resend = new Resend(process.env.RESEND_API_KEY as string);
 
 export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET || "fallback_secret_for_build",
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
-      await resend.emails.send({
-        from: `${process.env.EMAIL_SENDER_NAME} <${process.env.EMAIL_SENDER_ADDRESS}>`,
+      await MailerService.sendEmail({
         to: user.email,
+        toName: user.name,
         subject: "Verify your email",
-        react: VerifyEmail({ username: user.name, verifyUrl: url }),
+        template: VerifyEmail({ username: user.name, verifyUrl: url }),
       });
     },
     sendOnSignUp: true,
@@ -37,11 +36,11 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     sendResetPassword: async ({ user, url }) => {
-      await resend.emails.send({
-        from: `${process.env.EMAIL_SENDER_NAME} <${process.env.EMAIL_SENDER_ADDRESS}>`,
+      await MailerService.sendEmail({
         to: user.email,
+        toName: user.name,
         subject: "Reset your password",
-        react: ForgotPasswordEmail({
+        template: ForgotPasswordEmail({
           username: user.name,
           resetUrl: url,
           userEmail: user.email,
@@ -49,6 +48,9 @@ export const auth = betterAuth({
       });
     },
     requireEmailVerification: true,
+    changeEmail: {
+      enabled: true,
+    },
   },
   databaseHooks: {
     session: {
@@ -74,20 +76,32 @@ export const auth = betterAuth({
   plugins: [
     organization({
       sendInvitationEmail: async (data) => {
-        const inviteLink = `${getBaseUrl()}/api/accept-invitation/${data.id}`;
+        try {
+          console.log("Sending invitation email with data:", JSON.stringify(data, null, 2));
+          const inviteLink = `${getBaseUrl()}/api/accept-invitation/${data.id}`;
 
-        await resend.emails.send({
-          from: `${process.env.EMAIL_SENDER_NAME} <${process.env.EMAIL_SENDER_ADDRESS}>`,
-          to: data.email,
-          subject: "You've been invited to join our organization",
-          react: OrganizationInvitationEmail({
-            email: data.email,
-            invitedByUsername: data.inviter.user.name,
-            invitedByEmail: data.inviter.user.email,
-            teamName: data.organization.name,
-            inviteLink,
-          }),
-        });
+          // Safety checks as Better Auth might not always populate inviter.user in the hook
+          const invitedByUsername = data.inviter?.user?.name || "A team member";
+          const invitedByEmail = data.inviter?.user?.email || "";
+          const teamName = data.organization?.name || "their organization";
+
+          await MailerService.sendEmail({
+            to: data.email,
+            toName: "Valued Member", // Better Auth Invitation doesn't always have a name for the invitee
+            subject: `You've been invited to join ${teamName}`,
+            template: OrganizationInvitationEmail({
+              email: data.email,
+              invitedByUsername,
+              invitedByEmail,
+              teamName,
+              inviteLink,
+            }),
+          });
+          console.log("Invitation email sent successfully to:", data.email);
+        } catch (error) {
+          console.error("Failed to send invitation email:");
+          console.error(error);
+        }
       },
       roles: {
         owner,

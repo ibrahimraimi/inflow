@@ -5,16 +5,16 @@ description: External services used by Inflow.
 
 Inflow relies on a few key external services to handle critical tasks like email delivery and rate limiting.
 
-## Resend (Email)
+## MailerSend (Email)
 
-We use [Resend](https://resend.com/) for all transactional emails.
+We use [MailerSend](https://mailersend.com/) for all transactional emails.
 
 - **Primary use cases**:
   - Email verification during signup.
   - Password reset links.
   - Organization invitations.
-- **Configuration**: Set `RESEND_API_KEY` in your environment variables.
-- **Templates**: Standard email templates are built using **React Email** and located in `src/components/emails`.
+- **Configuration**: Set `MAILERSEND_API_TOKEN`, `MAILERSEND_SENDER_EMAIL`, and `MAILERSEND_SENDER_NAME` in your environment variables.
+- **Templates**: Standard email templates are built using **React Email** (located in `src/components/emails`) and rendered to HTML before sending.
 
 ## Upstash (Redis)
 

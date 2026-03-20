@@ -33,7 +33,7 @@ A modern, comprehensive open-source self-hosted analytics platform designed to h
 - [Neon PostgreSQL](https://neon.com/) - Database
 - [Better Auth](https://www.better-auth.com) - Authentication
 - [Tailwind](https://tailwindcss.com) - Styling
-- [Resend](https://resend.com) - Email
+- [MailerSend](https://mailersend.com) - Email
 - [Biome](https://biomejs.dev) - Linting & Formatting
 - [Vercel](https://vercel.com) - Deployment
 
@@ -43,7 +43,7 @@ A modern, comprehensive open-source self-hosted analytics platform designed to h
 
 - Node.js 18+
 - PostgreSQL database (we recommend Neon for easy setup)
-- Resend account for email functionality
+- MailerSend account for email functionality
 - Google OAuth credentials (optional, for Google login)
 
 ### Installation
