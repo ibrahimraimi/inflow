@@ -1,7 +1,7 @@
 import { db } from "@/db/drizzle";
-import { and, eq, gte, lte, sql, count, desc } from "drizzle-orm";
+import { and, eq, gte, inArray, lte, sql, count, desc } from "drizzle-orm";
 import type { PgColumn } from "drizzle-orm/pg-core";
-import { pageViews } from "@/db/schema";
+import { pageViews, websites } from "@/db/schema";
 import type {
   AnalyticsData,
   ChartData,
@@ -10,7 +10,7 @@ import type {
 } from "@/configs/types";
 
 export class AnalyticsService {
-  static async getData(websiteId: string, range: string, from?: string, to?: string): Promise<AnalyticsData> {
+  static async getData(websiteIdOrAll: string, range: string, from?: string, to?: string, userId?: string): Promise<AnalyticsData> {
     // Calculate Date Range
     const now = new Date();
     let startDate = new Date();
@@ -76,8 +76,12 @@ export class AnalyticsService {
       ELSE NULL
     END)`;
 
+    const baseWhere = websiteIdOrAll === "all" && userId
+      ? inArray(pageViews.websiteId, db.select({ id: websites.websiteId }).from(websites).where(eq(websites.userId, userId)))
+      : eq(pageViews.websiteId, websiteIdOrAll);
+
     const whereClause = and(
-      eq(pageViews.websiteId, websiteId),
+      baseWhere,
       gte(entryTimeAsTimestamp, startDate),
       lte(entryTimeAsTimestamp, endDate)
     );
@@ -125,7 +129,11 @@ export class AnalyticsService {
         count(*) as views,
         count(distinct "client_id") as visitors
       FROM ${pageViews}
-      WHERE ${pageViews.websiteId} = ${websiteId}
+      WHERE ${
+        websiteIdOrAll === "all" && userId
+          ? sql`${pageViews.websiteId} IN (SELECT "website_id" FROM ${websites} WHERE ${websites.userId} = ${userId})`
+          : sql`${pageViews.websiteId} = ${websiteIdOrAll}`
+      }
       AND (CASE 
           WHEN "entry_time" ~ '^[0-9]+$' THEN to_timestamp("entry_time"::bigint)
           WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp
@@ -183,6 +191,7 @@ export class AnalyticsService {
       utmCampaigns,
       utmSources,
       utmMediums,
+      domains,
     ] = await Promise.all([
       getBreakdown(pageViews.url),
       getBreakdown(pageViews.referrer),
@@ -206,6 +215,7 @@ export class AnalyticsService {
       getBreakdown(pageViews.utmCampaign),
       getBreakdown(pageViews.utmSource),
       getBreakdown(pageViews.utmMedium),
+      getBreakdown(pageViews.domain),
     ]);
 
     const formatBreakdown = (
@@ -287,7 +297,11 @@ export class AnalyticsService {
         END)) as hour,
         count(distinct "client_id") as visitors
       FROM ${pageViews}
-      WHERE ${pageViews.websiteId} = ${websiteId}
+      WHERE ${
+        websiteIdOrAll === "all" && userId
+          ? sql`${pageViews.websiteId} IN (SELECT "website_id" FROM ${websites} WHERE ${websites.userId} = ${userId})`
+          : sql`${pageViews.websiteId} = ${websiteIdOrAll}`
+      }
       AND (CASE 
           WHEN "entry_time" ~ '^[0-9]+$' THEN to_timestamp("entry_time"::bigint)
           WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp
@@ -334,6 +348,7 @@ export class AnalyticsService {
         utmCampaigns: formatBreakdown(utmCampaigns, visitors),
         utmSources: formatBreakdown(utmSources, visitors, "source"),
         utmMediums: formatBreakdown(utmMediums, visitors),
+        domains: formatBreakdown(domains, visitors, "domain"),
       },
       map: mapDataResult as Array<{ code: string; name?: string; visitors: number; }>,
       traffic: trafficData,

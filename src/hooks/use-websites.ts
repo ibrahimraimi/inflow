@@ -1,15 +1,12 @@
 "use client";
 
 import useSWR from "swr";
-import { format } from "date-fns-tz";
-
 import { fetcherWithParams } from "@/lib/fetcher";
 import type { WebsiteWithAnalytics } from "@/configs/types";
 
-export function useWebsites() {
-  const today = format(new Date(), "yyyy-MM-dd");
+export function useWebsites(range = "today", from?: string, to?: string) {
   const { data, error, isLoading, mutate } = useSWR<WebsiteWithAnalytics[]>(
-    [`/api/website?from=${today}&to=${today}`, { websiteOnly: "false" }],
+    [`/api/website`, { range, from, to, websiteOnly: "false" }],
     fetcherWithParams
   );
 
