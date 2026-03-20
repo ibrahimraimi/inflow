@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
@@ -6,6 +7,7 @@ import { and, eq } from "drizzle-orm";
 
 import { auth } from "@/lib/auth";
 import { links } from "@/db/schema";
+import { linkCreateSchema } from "@/lib/validations/link";
 
 export async function POST(req: NextRequest) {
   const session = await auth.api.getSession({
@@ -16,7 +18,19 @@ export async function POST(req: NextRequest) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const { linkId, name, shortCode, destinationUrl } = await req.json();
+  const body = await req.json();
+  const validation = linkCreateSchema.safeParse(body);
+
+  if (!validation.success) {
+    return NextResponse.json(
+      { error: "Invalid request body", details: validation.error.format() },
+      { status: 400 },
+    );
+  }
+
+  const { linkId, name, shortCode, destinationUrl } = validation.data;
+
+  const finalLinkId = linkId || crypto.randomUUID();
 
   // Check if shortCode already exists
   const existingLink = await db
@@ -36,7 +50,7 @@ export async function POST(req: NextRequest) {
   const result = await db
     .insert(links)
     .values({
-      linkId: linkId,
+      linkId: finalLinkId,
       name: name,
       shortCode: shortCode,
       destinationUrl: destinationUrl,

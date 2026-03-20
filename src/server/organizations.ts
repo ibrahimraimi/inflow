@@ -5,6 +5,7 @@ import { eq, inArray } from "drizzle-orm";
 import { db } from "@/db/drizzle";
 import { getCurrentUser } from "./users";
 import { member, organization } from "@/db/schema";
+import { OrganizationService } from "./services/organization.service";
 
 export async function getOrganizations() {
   const { currentUser } = await getCurrentUser();
@@ -24,33 +25,30 @@ export async function getOrganizations() {
 }
 
 export async function getActiveOrganization(userId: string) {
-  const memberUser = await db.query.member.findFirst({
-    where: eq(member.userId, userId),
-  });
+  const { currentUser } = await getCurrentUser();
 
-  if (!memberUser) {
+  if (userId !== currentUser.id) {
     return null;
   }
 
-  const activeOrganization = await db.query.organization.findFirst({
-    where: eq(organization.id, memberUser.organizationId),
-  });
-
-  return activeOrganization;
+  return await OrganizationService.getActiveOrganization(userId);
 }
 
 export async function getOrganizationBySlug(slug: string) {
   try {
-    const organizationBySlug = await db.query.organization.findFirst({
-      where: eq(organization.slug, slug),
-      with: {
-        members: {
-          with: {
-            user: true,
-          },
-        },
-      },
-    });
+    const { currentUser } = await getCurrentUser();
+
+    const organizationBySlug = await OrganizationService.getOrganizationBySlug(slug);
+
+    if (!organizationBySlug) {
+      return null;
+    }
+
+    // Verify membership
+    const isMember = organizationBySlug.members.some(m => m.userId === currentUser.id);
+    if (!isMember) {
+      return null;
+    }
 
     return organizationBySlug;
   } catch (error) {

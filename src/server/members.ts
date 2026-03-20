@@ -1,6 +1,7 @@
 "use server";
 
 import { eq } from "drizzle-orm";
+import { headers } from "next/headers";
 
 import { db } from "@/db/drizzle";
 import { auth } from "@/lib/auth";
@@ -13,6 +14,28 @@ export const addMember = async (
   role: Role
 ) => {
   try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session?.user) {
+      throw new Error("Unauthorized");
+    }
+
+    // Check if current user is admin/owner of the organization
+    const { success: hasPermission } = await auth.api.hasPermission({
+      headers: await headers(),
+      body: {
+        permissions: {
+          organization: ["update"],
+        },
+      },
+    });
+
+    if (!hasPermission) {
+      throw new Error("Forbidden: You don't have permission to add members.");
+    }
+
     await auth.api.addMember({
       body: {
         userId,

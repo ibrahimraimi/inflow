@@ -1,6 +1,6 @@
 "use server";
 
-import { eq, inArray, not } from "drizzle-orm";
+import { and, eq, inArray, not } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -84,6 +84,20 @@ export const signUp = async (
 
 export const getUsers = async (organizationId: string) => {
   try {
+    const { currentUser } = await getCurrentUser();
+
+    // Verify user belongs to the organization
+    const isMember = await db.query.member.findFirst({
+      where: and(
+        eq(member.userId, currentUser.id),
+        eq(member.organizationId, organizationId)
+      ),
+    });
+
+    if (!isMember) {
+      throw new Error("Unauthorized: You are not a member of this organization.");
+    }
+
     const members = await db.query.member.findMany({
       where: eq(member.organizationId, organizationId),
     });

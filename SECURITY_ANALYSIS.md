@@ -8,10 +8,13 @@ This document outlines the findings of a comprehensive security audit conducted 
 | Severity | Vulnerability / Finding | Component Affected |
 |----------|-----------------------|--------------------|
 | **High** | Insecure Direct Object Reference (IDOR) on Page View Exits | `/api/track/route.ts` |
+| **High** | Unauthorized Data Access in Server Actions | `src/server/*.ts` |
 | **Medium** | Server-Side Request Forgery (SSRF) / Injection via X-Forwarded-For | `/api/track/route.ts` |
 | **Medium** | Missing CORS Configuration on Public Ingestion Tunnel | `/api/track/route.ts` |
+| **Medium** | Missing Input Validation in Management API Routes | `src/app/api/*` |
 | **Low** | Ineffective Rate Limit Fallback in Serverless Deployments | `src/lib/rate-limit.ts` |
 | **Low** | Permissive Content Security Policy (CSP) Directives | `next.config.ts` |
+| **Low** | Potential CSS Injection in Chart Component | `src/components/ui/chart.tsx` |
 
 ---
 
@@ -72,4 +75,35 @@ The global security definitions inside `next.config.ts` define an excellent base
 **Implementation Plan (Enhancement):**
 1. Perform a script audit to determine whether UI/UX functionality strictly breaks without `'unsafe-eval'`. 
 2. If feasible, remove `'unsafe-eval'` and move towards strict hash-based or nonce-based inline constraints globally.
+
+### 6. High Severity: Unauthorized Data Access in Server Actions
+**Description:**
+Several Server Actions lack proper session or permission guards, allowing anyone who can invoke a server action (even unauthenticated users depending on the environment) to access or modify sensitive data.
+- `src/server/users.ts:getUsers(organizationId)`: Returns all users NOT in the organization without checking the caller's session.
+- `src/server/organizations.ts:getOrganizationBySlug(slug)`: Returns full organization data and ALL its members (including user objects) without authentication.
+- `src/server/organizations.ts:getActiveOrganization(userId)`: Allows any caller to find out which organization any `userId` belongs to.
+- `src/server/members.ts:addMember()`: Lacks any session or permission checks before modifying organization membership.
+
+**Implementation Plan (Fix):**
+1. Ensure all Server Actions that are not explicitly public (like `signIn`/`signUp`) call `getCurrentUser()` at the start.
+2. For sensitive actions like `addMember` or `getUsers`, verify that the `currentUser` has the necessary permissions (e.g., is an admin/owner of the target organization).
+
+### 7. Medium Severity: Missing Input Validation in Management API Routes
+**Description:**
+Multiple API routes use `req.json()` and destructure data without performing Zod validation. This allows for malformed data, excessively large payloads, or injection of unexpected fields into database queries via `set()` blocks.
+- `src/app/api/website/[id]/route.ts` (`PUT`)
+- `src/app/api/links/route.ts` (`POST`)
+- `src/app/api/account/keys/route.ts` (`POST`)
+
+**Implementation Plan (Fix):**
+1. Define Zod schemas for all management API payloads.
+2. Use `safeParse()` in each endpoint and return `400 Bad Request` on failure.
+
+### 8. Low Severity: Potential CSS Injection in Chart Component
+**Description:**
+The `ChartStyle` component in `src/components/ui/chart.tsx` uses `dangerouslySetInnerHTML` to inject dynamic CSS variables based on the `config` prop. If keys or colors in this config are ever influenced by user-controlled data (e.g., custom website branding), it could lead to CSS injection.
+
+**Implementation Plan (Enhancement):**
+1. Sanitize keys and values used in the CSS generation or use a more restricted styling approach if user-input is anticipated.
+
 

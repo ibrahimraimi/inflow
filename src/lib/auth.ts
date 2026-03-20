@@ -8,7 +8,7 @@ import { db } from "@/db/drizzle";
 import { schema } from "@/db/schema";
 import { admin, member, owner } from "./auth/permissions";
 import VerifyEmail from "@/components/emails/verify-email";
-import { getActiveOrganization } from "@/server/organizations";
+import { OrganizationService } from "@/server/services/organization.service";
 import ForgotPasswordEmail from "@/components/emails/reset-password";
 import OrganizationInvitationEmail from "@/components/emails/organization-invitation";
 import { getBaseUrl } from "@/lib/url";
@@ -54,7 +54,7 @@ export const auth = betterAuth({
     session: {
       create: {
         before: async (session) => {
-          const activeOrganization = await getActiveOrganization(
+          const activeOrganization = await OrganizationService.getActiveOrganization(
             session.userId,
           );
           return {

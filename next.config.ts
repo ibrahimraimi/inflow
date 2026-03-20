@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
           {
             key: "Content-Security-Policy",
             value:
-              "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://flagsapi.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://flagsapi.com https://api.iconify.design; font-src 'self'; connect-src 'self' https://free.freeipapi.com https://cdn.jsdelivr.net;",
+              "default-src 'self'; script-src 'self' 'unsafe-inline' https://flagsapi.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://flagsapi.com https://api.iconify.design; font-src 'self'; connect-src 'self' https://free.freeipapi.com https://cdn.jsdelivr.net;",
           },
           {
             key: "X-Frame-Options",

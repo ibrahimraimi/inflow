@@ -9,6 +9,16 @@ import { rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "edge";
 
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 200, headers: CORS_HEADERS });
+}
+
 export async function POST(req: NextRequest) {
   try {
     const ip =
@@ -24,6 +34,7 @@ export async function POST(req: NextRequest) {
         {
           status: 429,
           headers: {
+            ...CORS_HEADERS,
             "X-RateLimit-Limit": ratelimit.limit.toString(),
             "X-RateLimit-Remaining": ratelimit.remaining.toString(),
             "X-RateLimit-Reset": ratelimit.reset.toString(),
@@ -38,7 +49,7 @@ export async function POST(req: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(
         { error: "Invalid request body", details: validation.error.format() },
-        { status: 400 },
+        { status: 400, headers: CORS_HEADERS },
       );
     }
 
@@ -58,10 +69,13 @@ export async function POST(req: NextRequest) {
       countryCode: req.headers.get("x-vercel-ip-country-code") || "Unknown",
     };
 
-    const visitorIp = ip;
+    const visitorIp = ip.trim();
+    // Validate IP string format against malicious SSRF inputs
+    const isIpValid = /^([0-9]{1,3}\.){3}[0-9]{1,3}$|^[a-fA-F0-9:]+$/.test(visitorIp);
 
     const getGeoData = async () => {
       if (geoInfo.cityName !== "Unknown") return geoInfo;
+      if (!isIpValid) return geoInfo;
       try {
         const geoRes = await fetch(`https://free.freeipapi.com/api/json/${visitorIp}`);
         return await geoRes.json();
@@ -129,7 +143,11 @@ export async function POST(req: NextRequest) {
         .set(updateData)
         .where(
           body.pageViewId
-            ? eq(pageViews.id, body.pageViewId)
+            ? and(
+                eq(pageViews.id, body.pageViewId),
+                eq(pageViews.clientId, body.clientId!),
+                eq(pageViews.websiteId, body.websiteId!)
+              )
             : and(
                 eq(pageViews.clientId, body?.clientId),
                 eq(pageViews.websiteId, body?.websiteId),
@@ -141,7 +159,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       message: "Data received successfully",
       data: result,
-    });
+    }, { headers: CORS_HEADERS });
   } catch (error) {
     console.error("Tracking API Error:", error);
     return NextResponse.json(
@@ -149,7 +167,7 @@ export async function POST(req: NextRequest) {
         error: "Internal Server Error", 
         message: error instanceof Error ? error.message : String(error) 
       },
-      { status: 500 },
+      { status: 500, headers: CORS_HEADERS },
     );
   }
 }

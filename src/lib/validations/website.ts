@@ -29,3 +29,7 @@ export const websiteQuerySchema = z.object({
     .optional(),
   websiteOnly: z.enum(["true", "false"]).optional(),
 });
+export const websiteUpdateSchema = websiteCreateSchema.partial().extend({
+  websiteId: z.string().uuid().optional(),
+  isPublic: z.boolean().optional(),
+});
