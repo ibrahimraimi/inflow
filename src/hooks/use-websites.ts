@@ -2,8 +2,9 @@
 
 import useSWR from "swr";
 import { format } from "date-fns-tz";
-import type { WebsiteWithAnalytics } from "@/configs/types";
+
 import { fetcherWithParams } from "@/lib/fetcher";
+import type { WebsiteWithAnalytics } from "@/configs/types";
 
 export function useWebsites() {
   const today = format(new Date(), "yyyy-MM-dd");

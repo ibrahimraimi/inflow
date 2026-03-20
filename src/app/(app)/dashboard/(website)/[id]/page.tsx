@@ -32,7 +32,10 @@ import { DataTable } from "../_components/data-table";
 import { DataMap } from "../_components/data-map";
 import { useWebsite } from "@/hooks/use-website";
 import { useAnalytics } from "@/hooks/use-analytics";
+import { useRageClicks } from "@/hooks/use-rage-clicks";
 import type { AnalyticsData } from "@/configs/types";
+import { RenderIf } from "@/lib/render-if";
+import { RageClicksTable } from "../_components/rage-clicks-table";
 
 export default function WebsiteDetailPage() {
   const params = useParams();
@@ -52,6 +55,8 @@ export default function WebsiteDetailPage() {
     isValidating: analyticsValidating,
     isError: analyticsError,
   } = useAnalytics(websiteId, dateRange);
+
+  const { rageClicks, isLoading: rageClicksLoading } = useRageClicks(websiteId, dateRange);
 
   if (websiteLoading) {
     return (
@@ -91,7 +96,7 @@ export default function WebsiteDetailPage() {
           <div className="flex items-center gap-3">
             <div
               className={cn(
-                "size-12 sm:size-10 rounded-lg flex items-center justify-center text-[10px] font-bold shadow-sm bg-primary/10 text-primary border border-primary/20"
+                "size-12 sm:size-10 rounded-lg flex items-center justify-center text-[10px] font-bold shadow-sm bg-primary/10 text-primary border border-primary/20",
               )}
             >
               <span className="text-2xl sm:text-xl">
@@ -107,8 +112,15 @@ export default function WebsiteDetailPage() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <Link href={`/dashboard/${websiteId}/edit`} className="flex-1 sm:flex-none">
-              <Button variant="outline" size="sm" className="w-full sm:w-auto cursor-pointer h-9 sm:h-8">
+            <Link
+              href={`/dashboard/${websiteId}/edit`}
+              className="flex-1 sm:flex-none"
+            >
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full sm:w-auto cursor-pointer h-9 sm:h-8"
+              >
                 <SquarePen className="w-3.5 h-3.5 mr-1.5" />
                 Edit
               </Button>
@@ -119,18 +131,23 @@ export default function WebsiteDetailPage() {
 
       {/* Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pt-2">
-        {/* <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setFilterOpen(true)}
-          className="cursor-pointer h-9 sm:h-8 w-full sm:w-auto justify-start sm:justify-center"
-        >
-          <SlidersHorizontal className="h-3.5 w-3.5 mr-2 sm:mr-1.5" />
-          Filter
-        </Button> */}
-
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto mt-2 sm:mt-0">
-          <Link href={`/dashboard/${websiteId}/funnels`} className="w-full sm:w-auto">
+          <RenderIf condition={false}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setFilterOpen(true)}
+              className="cursor-pointer h-9 sm:h-8 w-full sm:w-auto justify-start sm:justify-center"
+            >
+              <SlidersHorizontal className="h-3.5 w-3.5 mr-2 sm:mr-1.5" />
+              Filter
+            </Button>
+          </RenderIf>
+
+          <Link
+            href={`/dashboard/${websiteId}/funnels`}
+            className="w-full sm:w-auto"
+          >
             <Button
               variant="outline"
               size="sm"
@@ -140,7 +157,10 @@ export default function WebsiteDetailPage() {
               Funnels
             </Button>
           </Link>
-          <Link href={`/dashboard/${websiteId}/campaigns`} className="w-full sm:w-auto">
+          <Link
+            href={`/dashboard/${websiteId}/campaigns`}
+            className="w-full sm:w-auto"
+          >
             <Button
               variant="outline"
               size="sm"
@@ -150,16 +170,21 @@ export default function WebsiteDetailPage() {
               Campaigns
             </Button>
           </Link>
-          {/* <Link href={`/dashboard/${websiteId}/flow`} className="w-full sm:w-auto">
-            <Button
-              variant="outline"
-              size="sm"
-              className="cursor-pointer h-9 sm:h-8 w-full sm:w-auto justify-start sm:justify-center"
+          <RenderIf condition={false}>
+            <Link
+              href={`/dashboard/${websiteId}/flow`}
+              className="w-full sm:w-auto"
             >
-              <Activity className="h-3.5 w-3.5 mr-2 sm:mr-1.5" />
-              Flow
-            </Button>
-          </Link> */}
+              <Button
+                variant="outline"
+                size="sm"
+                className="cursor-pointer h-9 sm:h-8 w-full sm:w-auto justify-start sm:justify-center"
+              >
+                <Activity className="h-3.5 w-3.5 mr-2 sm:mr-1.5" />
+                Flow
+              </Button>
+            </Link>
+          </RenderIf>
         </div>
 
         <div className="flex items-center gap-2 self-end sm:self-auto">
@@ -169,10 +194,18 @@ export default function WebsiteDetailPage() {
             </div>
           )}
           <div className="flex items-center gap-1.5">
-            <Button variant="outline" size="icon" className="h-9 w-9 sm:h-8 sm:w-8">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-9 w-9 sm:h-8 sm:w-8"
+            >
               <ChevronLeft className="h-4 w-4 sm:h-3 sm:w-3" />
             </Button>
-            <Button variant="outline" size="icon" className="h-9 w-9 sm:h-8 sm:w-8">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-9 w-9 sm:h-8 sm:w-8"
+            >
               <ChevronRight className="h-4 w-4 sm:h-3 sm:w-3" />
             </Button>
           </div>
@@ -203,7 +236,10 @@ export default function WebsiteDetailPage() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 lg:gap-2 mb-6">
           {!analytics && analyticsLoading ? (
             Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-24 sm:h-28 lg:h-24 w-full rounded-xl" />
+              <Skeleton
+                key={i}
+                className="h-24 sm:h-28 lg:h-24 w-full rounded-xl"
+              />
             ))
           ) : (
             <>
@@ -293,6 +329,7 @@ export default function WebsiteDetailPage() {
                 }}
                 type="country"
               />
+              <RageClicksTable data={rageClicks} isLoading={rageClicksLoading} />
             </>
           )}
         </div>

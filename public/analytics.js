@@ -128,6 +128,78 @@
     },
   };
 
+  // Rage Click Tracking
+  let clickHistory = [];
+  const RAGE_CLICK_THRESHOLD = 3;
+  const RAGE_CLICK_TIMEFRAME = 2000; // ms
+  const RAGE_CLICK_RADIUS = 30; // px
+  // Keep track of recently reported elements to debounce over 3 seconds
+  const reportedRageClicks = new Map();
+
+  const getElementPath = (el) => {
+    if (!el || el.nodeType !== 1) return "";
+    let path = [];
+    while (el && el.nodeType === 1) {
+      let selector = el.nodeName.toLowerCase();
+      if (el.id) {
+        selector += "#" + el.id;
+        path.unshift(selector);
+        break; // Stop climbing if we hit an ID
+      } else {
+        let sibling = el, nth = 1;
+        while ((sibling = sibling.previousElementSibling)) {
+          if (sibling.nodeName.toLowerCase() === selector) nth++;
+        }
+        if (nth !== 1) selector += ":nth-of-type(" + nth + ")";
+      }
+      path.unshift(selector);
+      el = el.parentNode;
+    }
+    return path.join(" > ");
+  };
+
+  document.addEventListener("click", (e) => {
+    const now = Date.now();
+    const x = e.clientX;
+    const y = e.clientY;
+    
+    // Clean old clicks
+    clickHistory = clickHistory.filter(c => now - c.time < RAGE_CLICK_TIMEFRAME);
+
+    // Add new click
+    const target = e.target;
+    clickHistory.push({ time: now, x, y, target });
+
+    if (clickHistory.length >= RAGE_CLICK_THRESHOLD) {
+      const recentClicks = clickHistory.slice(-RAGE_CLICK_THRESHOLD);
+      const isRageClick = recentClicks.every(c => {
+        const dx = c.x - x;
+        const dy = c.y - y;
+        return (dx * dx + dy * dy) <= (RAGE_CLICK_RADIUS * RAGE_CLICK_RADIUS);
+      });
+
+      if (isRageClick) {
+        const elementPath = getElementPath(target);
+        const lastReported = reportedRageClicks.get(elementPath) || 0;
+        
+        // Debounce: don't report the same element more than once per 3000ms
+        if (now - lastReported > 3000) {
+          reportedRageClicks.set(elementPath, now);
+          
+          window.inflow.track("rage_click", {
+            element: elementPath,
+            text: (target.innerText || "").substring(0, 50).trim() || target.nodeName.toLowerCase(),
+            url: window.location.pathname + window.location.search,
+            clickCount: clickHistory.length
+          });
+          
+          // Clear history to start fresh for this UI area
+          clickHistory = [];
+        }
+      }
+    }
+  });
+
   const handleExit = () => {
     const exitTime = new Date().toISOString();
     const totalActiveTime = Math.floor((Date.now() - startTime) / 1000);
