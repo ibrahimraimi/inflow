@@ -6,6 +6,7 @@ import { and, eq } from "drizzle-orm";
 
 import { auth } from "@/lib/auth";
 import { pageViews, websites } from "@/db/schema";
+import { websiteUpdateSchema } from "@/lib/validations/website";
 
 export async function GET(
   req: NextRequest,
@@ -48,8 +49,18 @@ export async function PUT(
   }
 
   const { id } = await params;
+  const body = await req.json();
+  const validation = websiteUpdateSchema.safeParse(body);
+
+  if (!validation.success) {
+    return NextResponse.json(
+      { error: "Invalid request body", details: validation.error.format() },
+      { status: 400 },
+    );
+  }
+
   const { websiteName, domain, timeZone, enableLocalhostTracking, isPublic } =
-    await req.json();
+    validation.data;
 
   // Check if website exists and belongs to user
   const existingWebsite = await db

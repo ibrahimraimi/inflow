@@ -6,6 +6,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db/drizzle";
 import { apiKeys } from "@/db/schema";
+import { apiKeyCreateSchema } from "@/lib/validations/api-key";
 
 export async function GET(req: NextRequest) {
   const session = await auth.api.getSession({
@@ -42,9 +43,17 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const body = await req.json().catch(() => ({}));
-    const name = body.name || "API Key";
-    const scope = body.scope || "all";
+    const rawBody = await req.json().catch(() => ({}));
+    const validation = apiKeyCreateSchema.safeParse(rawBody);
+
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: "Invalid request body", details: validation.error.format() },
+        { status: 400 },
+      );
+    }
+
+    const { name, scope } = validation.data;
 
     // 1. Generate the raw key ("inflow_xxxxxxxxxxxxxxxxxx")
     const rawSecret = crypto.randomBytes(32).toString("hex");

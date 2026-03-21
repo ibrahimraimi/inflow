@@ -17,6 +17,7 @@ export async function rateLimit(
   limit: number,
   windowMs: number,
   storeName = "default",
+  failClosedOnRedisFailure = false
 ) {
   // Use Redis if available
   if (redis) {
@@ -39,6 +40,14 @@ export async function rateLimit(
       };
     } catch (error) {
       console.warn("Redis rate limit failed, falling back to memory store:", error);
+      if (failClosedOnRedisFailure) {
+        return {
+          success: false,
+          limit,
+          remaining: 0,
+          reset: Date.now() + windowMs,
+        };
+      }
     }
   }
 
