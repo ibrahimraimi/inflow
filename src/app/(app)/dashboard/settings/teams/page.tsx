@@ -33,6 +33,8 @@ import {
   cancelInvitation,
 } from "@/server/teams";
 import { CreateOrganizationDialog } from "@/components/dashboard/teams/create-organization-dialog";
+import { DeleteOrganizationDialog } from "@/components/dashboard/teams/delete-organization-dialog";
+import { Trash2 } from "lucide-react";
 
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
@@ -70,6 +72,7 @@ export default function TeamsSettingsPage() {
   const [updateRoleDialogOpen, setUpdateRoleDialogOpen] = useState(false);
   const [removeMemberDialogOpen, setRemoveMemberDialogOpen] = useState(false);
   const [createOrgDialogOpen, setCreateOrgDialogOpen] = useState(false);
+  const [deleteOrgDialogOpen, setDeleteOrgDialogOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [cancelingInvite, setCancelingInvite] = useState<string | null>(null);
   const [organizationName, setOrganizationName] = useState<string>("");
@@ -78,8 +81,8 @@ export default function TeamsSettingsPage() {
   const canChangeRoles = currentRole === "owner";
   const hasOrganization = session?.session?.activeOrganizationId;
 
-  const fetchData = async () => {
-    setLoading(true);
+  const fetchData = async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const [membersResult, invitationsResult, roleResult] = await Promise.all([
         getTeamMembers(),
@@ -131,7 +134,7 @@ export default function TeamsSettingsPage() {
       }
 
       toast.success("Invitation canceled");
-      fetchData();
+      fetchData(true);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to cancel invitation");
     } finally {
@@ -243,7 +246,7 @@ export default function TeamsSettingsPage() {
             members.map((member) => (
               <div
                 key={member.id}
-                className="p-4 flex items-center justify-between hover:bg-muted/50"
+                className="p-4 flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
                   <Avatar>
@@ -263,6 +266,7 @@ export default function TeamsSettingsPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   {getRoleBadge(member.role)}
+                  {/* Dropdown for OTHER members */}
                   {session?.user?.id !== member.user.id && canManageMembers && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -292,6 +296,25 @@ export default function TeamsSettingsPage() {
                           }}
                         >
                           Remove Member
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                  {/* Dropdown for CURRENT USER if owner (Delete Organization) */}
+                  {session?.user?.id === member.user.id && member.role === "owner" && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          className="text-destructive font-semibold"
+                          onClick={() => setDeleteOrgDialogOpen(true)}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete Organization
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -357,14 +380,14 @@ export default function TeamsSettingsPage() {
           open={inviteDialogOpen}
           onOpenChange={setInviteDialogOpen}
           organizationId={session.session.activeOrganizationId}
-          onSuccess={fetchData}
+          onSuccess={() => fetchData(true)}
         />
       )}
 
       <CreateOrganizationDialog
         open={createOrgDialogOpen}
         onOpenChange={setCreateOrgDialogOpen}
-        onSuccess={fetchData}
+        onSuccess={() => fetchData(true)}
       />
 
       {selectedMember && (
@@ -373,15 +396,23 @@ export default function TeamsSettingsPage() {
             open={updateRoleDialogOpen}
             onOpenChange={setUpdateRoleDialogOpen}
             member={selectedMember}
-            onSuccess={fetchData}
+            onSuccess={() => fetchData(true)}
           />
           <RemoveMemberDialog
             open={removeMemberDialogOpen}
             onOpenChange={setRemoveMemberDialogOpen}
             member={selectedMember}
-            onSuccess={fetchData}
+            onSuccess={() => fetchData(true)}
           />
         </>
+      )}
+      {session?.session?.activeOrganizationId && (
+        <DeleteOrganizationDialog
+          open={deleteOrgDialogOpen}
+          onOpenChange={setDeleteOrgDialogOpen}
+          organizationId={session.session.activeOrganizationId}
+          organizationName={organizationName}
+        />
       )}
     </div>
   );

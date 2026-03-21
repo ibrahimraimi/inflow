@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Loader2, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -30,6 +31,7 @@ export function CreateOrganizationDialog({
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   // Auto-generate slug from name
   const handleNameChange = (value: string) => {
@@ -78,8 +80,8 @@ export function CreateOrganizationDialog({
       onOpenChange(false);
       onSuccess?.();
 
-      // Reload to update session with new organization
-      window.location.reload();
+      // Refresh to update session with new organization
+      router.refresh();
     } catch (error) {
       console.error("Organization creation error:", error);
 

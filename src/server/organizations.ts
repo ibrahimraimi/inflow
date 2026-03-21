@@ -6,6 +6,9 @@ import { db } from "@/db/drizzle";
 import { getCurrentUser } from "./users";
 import { member, organization } from "@/db/schema";
 import { OrganizationService } from "./services/organization.service";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { and } from "drizzle-orm";
 
 export async function getOrganizations() {
   const { currentUser } = await getCurrentUser();
@@ -54,5 +57,37 @@ export async function getOrganizationBySlug(slug: string) {
   } catch (error) {
     console.error(error);
     return null;
+  }
+}
+
+export async function deleteOrganization(organizationId: string) {
+  try {
+    const { currentUser } = await getCurrentUser();
+
+    // Verify membership and role (Only owners can delete)
+    const membership = await db.query.member.findFirst({
+      where: and(
+        eq(member.organizationId, organizationId),
+        eq(member.userId, currentUser.id)
+      ),
+    });
+
+    if (!membership || membership.role !== "owner") {
+      return { success: false, error: "Only organization owners can delete the organization" };
+    }
+
+    // Use Better Auth's internal API to delete the organization
+    // This ensures that active sessions and other plugin states are also cleaned up.
+    await auth.api.deleteOrganization({
+      headers: await headers(),
+      body: {
+        organizationId,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting organization:", error);
+    return { success: false, error: "Failed to delete organization" };
   }
 }

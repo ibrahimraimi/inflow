@@ -31,4 +31,8 @@ export class OrganizationService {
       },
     });
   }
+
+  static async deleteOrganization(organizationId: string) {
+    return await db.delete(organization).where(eq(organization.id, organizationId));
+  }
 }
