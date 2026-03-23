@@ -36,6 +36,13 @@
       "when": 1773762894432,
       "tag": "0004_pink_shatterstar",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1774218046499,
+      "tag": "0005_boring_reavers",
+      "breakpoints": true
     }
   ]
 }
