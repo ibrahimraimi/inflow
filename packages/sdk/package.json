@@ -1,0 +1,68 @@
+{
+  "name": "@inflow/sdk",
+  "version": "1.0.0",
+  "description": "JavaScript SDK for Inflow Analytics",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts src/react/index.tsx src/vue/index.ts src/svelte/index.ts --format cjs,esm --clean --minify && tsup src/index.ts --format iife --global-name inflow --minify --out-dir dist/cdn && mv dist/cdn/index.global.js dist/cdn/inflow.js",
+    "dev": "tsup src/index.ts src/react/index.tsx src/vue/index.ts src/svelte/index.ts --format cjs,esm --watch",
+    "lint": "biome check src"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./react": {
+      "import": "./dist/react/index.mjs",
+      "require": "./dist/react/index.js",
+      "types": "./dist/react/index.d.ts"
+    },
+    "./vue": {
+      "import": "./dist/vue/index.mjs",
+      "require": "./dist/vue/index.js",
+      "types": "./dist/vue/index.d.ts"
+    },
+    "./svelte": {
+      "import": "./dist/svelte/index.mjs",
+      "require": "./dist/svelte/index.js",
+      "types": "./dist/svelte/index.d.ts"
+    }
+  },
+  "keywords": [
+    "analytics",
+    "inflow",
+    "tracking"
+  ],
+  "author": "Inflow",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "",
+    "vue": "",
+    "svelte": ""
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
+    },
+    "svelte": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.2.0",
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "tsup": "^8.4.0",
+    "typescript": "^5.9.3"
+  }
+}
