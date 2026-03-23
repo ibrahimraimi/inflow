@@ -16,6 +16,7 @@ import { Switch } from "@/components/ui/switch";
 import { WebsiteType } from "@/configs/types";
 import { Button } from "@/components/ui/button";
 import { useWebsite } from "@/hooks/use-website";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 
 export default function EditWebsitePage() {
   const params = useParams();
@@ -26,6 +27,12 @@ export default function EditWebsitePage() {
   const [domain, setDomain] = useState("");
   const [isPublic, setIsPublic] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
+
+  // Dialog states
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [isResetLoading, setIsResetLoading] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
   const { mutate: mutateGlobal } = useSWRConfig();
   const {
@@ -83,34 +90,23 @@ export default function EditWebsitePage() {
     }
   };
 
-  const handleReset = async () => {
-    if (
-      !confirm(
-        "Are you sure you want to reset all statistics for this website? This action cannot be undone."
-      )
-    ) {
-      return;
-    }
-
+  const onConfirmReset = async () => {
+    setIsResetLoading(true);
     try {
       await axios.post(`/api/website/${websiteId}/reset`);
       mutate();
       toast.success("Website statistics reset successfully!");
+      setShowResetDialog(false);
     } catch (error) {
       toast.error("Failed to reset website");
       console.error("Error resetting website:", error);
+    } finally {
+      setIsResetLoading(false);
     }
   };
 
-  const handleDelete = async () => {
-    if (
-      !confirm(
-        "Are you sure you want to delete this website? All data will be permanently deleted. This action cannot be undone."
-      )
-    ) {
-      return;
-    }
-
+  const onConfirmDelete = async () => {
+    setIsDeleteLoading(true);
     try {
       await axios.delete(`/api/website/${websiteId}`);
       mutateGlobal(
@@ -124,6 +120,8 @@ export default function EditWebsitePage() {
     } catch (error) {
       toast.error("Failed to delete website");
       console.error("Error deleting website:", error);
+    } finally {
+      setIsDeleteLoading(false);
     }
   };
 
@@ -322,7 +320,7 @@ export default function EditWebsitePage() {
                   settings will remain intact.
                 </p>
               </div>
-              <Button variant="outline" onClick={handleReset}>
+              <Button variant="outline" onClick={() => setShowResetDialog(true)}>
                 Reset
               </Button>
             </div>
@@ -335,13 +333,34 @@ export default function EditWebsitePage() {
                   cannot be undone.
                 </p>
               </div>
-              <Button variant="destructive" onClick={handleDelete}>
+              <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
                 Delete
               </Button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Confirmation Dialogs */}
+      <ConfirmDialog
+        open={showResetDialog}
+        onOpenChange={setShowResetDialog}
+        title="Reset Website Statistics"
+        description="Are you sure you want to reset all statistics for this website? All data will be wiped, but settings will be preserved. This action cannot be undone."
+        confirmText="Reset Statistics"
+        onConfirm={onConfirmReset}
+        isLoading={isResetLoading}
+      />
+
+      <ConfirmDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        title="Delete Website"
+        description="Are you sure you want to delete this website? This will permanently remove all data, tracking logs, and recorded sessions. This action is irreversible."
+        confirmText="Permanently Delete"
+        onConfirm={onConfirmDelete}
+        isLoading={isDeleteLoading}
+      />
     </div>
   );
 }

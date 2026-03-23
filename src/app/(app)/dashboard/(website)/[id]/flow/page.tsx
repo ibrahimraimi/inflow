@@ -100,7 +100,7 @@ export default function FlowPage() {
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground opacity-20" />
         </div>
       ) : (
-        <FlowDiagram data={flow!} />
+        <FlowDiagram data={flow!} websiteId={websiteId} />
       )}
     </div>
   );
