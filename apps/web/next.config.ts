@@ -6,6 +6,18 @@ const config: NextConfig = {
   reactCompiler: true,
   output: "standalone",
   transpilePackages: ["@inflow/core", "@inflow/db", "@inflow/types"],
+  async rewrites() {
+    return [
+      {
+        source: "/api/auth/:path*",
+        destination: "http://localhost:3001/api/auth/:path*",
+      },
+      {
+        source: "/api/:path*",
+        destination: "http://localhost:3001/api/:path*",
+      },
+    ];
+  },
   async headers() {
     return [
       {
