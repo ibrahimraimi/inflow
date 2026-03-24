@@ -13,12 +13,22 @@
 # testing
 /coverage
 
-# next.js
-/.next/
-/out/
+# build and dist
+/build
+dist/
+.next/
+out/
+*.tsbuildinfo
+
+# workspace specifics
+apps/**/.next/
+apps/**/out/
+packages/**/dist/
+node_modules/
+.turbo/
 
 # production
-/build
+# /build - moved to # build and dist
 
 # misc
 .DS_Store
@@ -45,7 +55,7 @@ yarn-error.log*
 .vercel
 
 # typescript
-*.tsbuildinfo
+# *.tsbuildinfo - moved to # build and dist
 next-env.d.ts
 
 FEATURES.md

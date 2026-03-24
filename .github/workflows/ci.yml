@@ -46,7 +46,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Type check
-        run: bunx tsc --noEmit
+        run: bun turbo lint:types
 
   build:
     name: Build Application
@@ -73,9 +73,16 @@ jobs:
           BETTER_AUTH_SECRET: placeholder-secret-for-build
           BETTER_AUTH_URL: https://inflow.ibrahimraimi.com
 
-      - name: Upload build artifacts
+      - name: Upload web build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts
-          path: .next/
+          name: web-build-artifacts
+          path: apps/web/.next/
+          retention-days: 7
+
+      - name: Upload api build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-build-artifacts
+          path: apps/api/.next/
           retention-days: 7
