@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const trackEventSchema = z.object({
   clientId: z.string().min(1),
-  websiteId: z.string().uuid(),
+  websiteId: z.string().min(1),
   domain: z.string().min(1),
   url: z.string().url().optional().or(z.string().startsWith("/")),
   type: z.enum(["entry", "exit", "ping", "event"]),

@@ -50,3 +50,7 @@ next-env.d.ts
 
 FEATURES.md
 FEATURE.md
+# sdk
+/packages/sdk/dist
+/packages/sdk/node_modules
+/packages/sdk/bun.lock

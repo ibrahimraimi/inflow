@@ -2,6 +2,7 @@ import { InflowConfig, InflowEvent, TrackOptions } from "./types";
 
 class Inflow {
   private apiKey: string = "";
+  private websiteId: string = "";
   private endpoint: string = "https://inflowanalytics.com/api/track"; // Default endpoint
   private debug: boolean = false;
   private clientId: string = "";
@@ -18,12 +19,18 @@ class Inflow {
   public init(config: InflowConfig): void {
     if (this.initialized) return;
 
-    if (!config.apiKey || !config.apiKey.startsWith("inf_")) {
-      this.error("Invalid API key format. API key must start with 'inf_'.");
+    if (!config.apiKey || (!config.apiKey.startsWith("inflow_") && !config.apiKey.startsWith("inf_"))) {
+      this.error("Invalid API key format. API key must start with 'inflow_'.");
+      return;
+    }
+
+    if (!config.websiteId) {
+      this.error("Website ID is required.");
       return;
     }
 
     this.apiKey = config.apiKey;
+    this.websiteId = config.websiteId;
     if (config.endpoint) this.endpoint = config.endpoint;
     this.debug = !!config.debug;
     this.initialized = true;
@@ -44,6 +51,7 @@ class Inflow {
 
     const event: InflowEvent = {
       type: "event",
+      websiteId: this.websiteId,
       eventName,
       clientId: this.clientId,
       url: window.location.href,
@@ -63,6 +71,7 @@ class Inflow {
   private trackPageView(): void {
     const event: InflowEvent = {
       type: "entry",
+      websiteId: this.websiteId,
       clientId: this.clientId,
       url: window.location.href,
       domain: window.location.hostname,

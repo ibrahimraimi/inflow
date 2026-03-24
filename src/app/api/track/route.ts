@@ -1,5 +1,6 @@
+import crypto from "crypto";
 import { db } from "@/db/drizzle";
-import { pageViews, events } from "@/db/schema";
+import { pageViews, events, apiKeys, websites, apiKeyUsageLogs } from "@/db/schema";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { and, eq } from "drizzle-orm";
@@ -21,6 +22,61 @@ export async function OPTIONS() {
 
 export async function POST(req: NextRequest) {
   try {
+    const authHeader = req.headers.get("authorization");
+    const apiKey = authHeader?.startsWith("Bearer ")
+      ? authHeader.split(" ")[1]
+      : null;
+
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: "Missing or invalid API key. Use Authorization: Bearer <apiKey>" },
+        { status: 401, headers: CORS_HEADERS },
+      );
+    }
+
+    const bodyJson = await req.json().catch(() => ({}));
+
+    // 1. Validate API key
+    const keyHash = crypto.createHash("sha256").update(apiKey).digest("hex");
+    const keyRecord = await db.query.apiKeys.findFirst({
+      where: eq(apiKeys.keyHash, keyHash),
+    });
+
+    if (!keyRecord) {
+      return NextResponse.json(
+        { error: "Invalid API key" },
+        { status: 401, headers: CORS_HEADERS },
+      );
+    }
+
+    // 2. Log usage
+    try {
+      await db.insert(apiKeyUsageLogs).values({
+        id: crypto.randomUUID(),
+        apiKeyId: keyRecord.id,
+        endpoint: "/api/track",
+        method: "POST",
+        status: 200,
+      });
+    } catch (e) {
+      console.error("Failed to log API key usage:", e);
+    }
+
+    // 3. Verify website ownership
+    const website = await db.query.websites.findFirst({
+      where: and(
+        eq(websites.websiteId, bodyJson.websiteId),
+        eq(websites.userId, keyRecord.userId)
+      ),
+    });
+
+    if (!website) {
+      return NextResponse.json(
+        { error: "Website not found or unauthorized" },
+        { status: 403, headers: CORS_HEADERS },
+      );
+    }
+
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0] ||
       req.headers.get("x-real-ip") ||
@@ -43,7 +99,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const bodyJson = await req.json();
     const validation = trackEventSchema.safeParse(bodyJson);
 
     if (!validation.success) {

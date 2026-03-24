@@ -145,6 +145,7 @@ export const websites = pgTable("websites", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  apiKey: varchar("api_key", { length: 255 }).unique(),
 });
 
 export const links = pgTable("links", {

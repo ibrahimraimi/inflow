@@ -1,5 +1,6 @@
 export interface InflowConfig {
   apiKey: string;
+  websiteId: string;
   endpoint?: string;
   debug?: boolean;
   autoTrack?: boolean;
@@ -11,6 +12,7 @@ export interface TrackOptions {
 
 export interface InflowEvent {
   type: "entry" | "exit" | "ping" | "event";
+  websiteId: string;
   eventName?: string;
   clientId: string;
   url: string;
