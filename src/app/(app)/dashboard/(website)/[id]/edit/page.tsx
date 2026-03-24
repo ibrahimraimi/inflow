@@ -16,6 +16,7 @@ import { Switch } from "@/components/ui/switch";
 import { WebsiteType } from "@/configs/types";
 import { Button } from "@/components/ui/button";
 import { useWebsite } from "@/hooks/use-website";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 
 export default function EditWebsitePage() {
   const params = useParams();
@@ -26,6 +27,10 @@ export default function EditWebsitePage() {
   const [domain, setDomain] = useState("");
   const [isPublic, setIsPublic] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [isResetOpen, setIsResetOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const { mutate: mutateGlobal } = useSWRConfig();
   const {
@@ -145,33 +150,22 @@ inflow.init({
   };
 
   const handleReset = async () => {
-    if (
-      !confirm(
-        "Are you sure you want to reset all statistics for this website? This action cannot be undone.",
-      )
-    ) {
-      return;
-    }
-
+    setResetLoading(true);
     try {
       await axios.post(`/api/website/${websiteId}/reset`);
       mutate();
       toast.success("Website statistics reset successfully!");
+      setIsResetOpen(false);
     } catch (error) {
       toast.error("Failed to reset website");
       console.error("Error resetting website:", error);
+    } finally {
+      setResetLoading(false);
     }
   };
 
   const handleDelete = async () => {
-    if (
-      !confirm(
-        "Are you sure you want to delete this website? All data will be permanently deleted. This action cannot be undone.",
-      )
-    ) {
-      return;
-    }
-
+    setDeleteLoading(true);
     try {
       await axios.delete(`/api/website/${websiteId}`);
       mutateGlobal(
@@ -185,6 +179,8 @@ inflow.init({
     } catch (error) {
       toast.error("Failed to delete website");
       console.error("Error deleting website:", error);
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -309,7 +305,7 @@ inflow.init({
                 <h4 className="text-sm font-semibold">Account API Key Required</h4>
               </div>
               <p className="text-xs text-blue-600/80 dark:text-blue-400/80 leading-relaxed">
-                We've moved to account-wide API keys. Please use a key from your{" "}
+                Create an API key from the {" "}
                 <Link
                   href="/dashboard/settings/keys"
                   className="font-bold underline hover:text-blue-800 dark:hover:text-blue-300"
@@ -321,25 +317,6 @@ inflow.init({
             </div>
 
             <div className="space-y-4 pt-2">
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Website ID</Label>
-                <div className="relative">
-                  <Input
-                    value={website.websiteId}
-                    readOnly
-                    className="pr-10 font-mono text-sm bg-muted/50"
-                  />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
-                    onClick={() => copyToClipboard(website.websiteId)}
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Script Tag (CDN)</Label>
                 <CodeBlock code={sdkTrackingCode} lang="html" />
@@ -418,7 +395,11 @@ inflow.init({
                   settings will remain intact.
                 </p>
               </div>
-              <Button variant="outline" onClick={handleReset}>
+              <Button
+                variant="outline"
+                onClick={() => setIsResetOpen(true)}
+                disabled={resetLoading}
+              >
                 Reset
               </Button>
             </div>
@@ -431,12 +412,38 @@ inflow.init({
                   cannot be undone.
                 </p>
               </div>
-              <Button variant="destructive" onClick={handleDelete}>
+              <Button
+                variant="destructive"
+                onClick={() => setIsDeleteOpen(true)}
+                disabled={deleteLoading}
+              >
                 Delete
               </Button>
             </div>
           </div>
         </div>
+
+        <ConfirmDialog
+          open={isResetOpen}
+          onOpenChange={setIsResetOpen}
+          title="Reset website statistics?"
+          description="Are you sure you want to reset all statistics for this website? All historical data will be permanently deleted. This action cannot be undone."
+          confirmText="Yes, reset statistics"
+          onConfirm={handleReset}
+          isLoading={resetLoading}
+          variant="destructive"
+        />
+
+        <ConfirmDialog
+          open={isDeleteOpen}
+          onOpenChange={setIsDeleteOpen}
+          title="Delete website?"
+          description="Are you sure you want to delete this website? All data, including statistics and configurations, will be permanently deleted. This action cannot be undone."
+          confirmText="Yes, delete website"
+          onConfirm={handleDelete}
+          isLoading={deleteLoading}
+          variant="destructive"
+        />
       </div>
     </div>
   );
