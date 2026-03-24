@@ -8,6 +8,7 @@ export type WebsiteType = {
   isPublic: boolean | null;
   publicToken: string | null;
   userId: string;
+  apiKey: string | null;
 };
 
 export type MetricItem = {

@@ -7,7 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { useSWRConfig } from "swr";
 import { toast } from "sonner";
-import { ArrowLeft, Copy, Loader2 } from "lucide-react";
+import { ArrowLeft, Copy, Loader2, ShieldCheck } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,6 @@ import { Switch } from "@/components/ui/switch";
 import { WebsiteType } from "@/configs/types";
 import { Button } from "@/components/ui/button";
 import { useWebsite } from "@/hooks/use-website";
-import { ConfirmDialog } from "@/components/confirm-dialog";
 
 export default function EditWebsitePage() {
   const params = useParams();
@@ -27,12 +26,6 @@ export default function EditWebsitePage() {
   const [domain, setDomain] = useState("");
   const [isPublic, setIsPublic] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
-
-  // Dialog states
-  const [showResetDialog, setShowResetDialog] = useState(false);
-  const [isResetLoading, setIsResetLoading] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
   const { mutate: mutateGlobal } = useSWRConfig();
   const {
@@ -50,13 +43,74 @@ export default function EditWebsitePage() {
     }
   }, [website]);
 
-  const publicLink = website?.publicToken 
-    ? `${window.location.origin}/share/${website.publicToken}` 
+  const publicLink = website?.publicToken
+    ? `${window.location.origin}/share/${website.publicToken}`
     : "";
 
-  const trackingCode = website
-    ? `<script defer data-website-id="${website.websiteId}" data-domain="${website.domain}" src="${window.location.origin}/analytics.js"></script>`
+  const sdkTrackingCode = website
+    ? `<script defer src="${window.location.origin}/cdn/inflow.js"></script>
+<script>
+  window.addEventListener('load', () => {
+    inflow.init({ 
+      apiKey: 'YOUR_API_KEY', // Get your key from Settings -> Keys
+      websiteId: '${website.websiteId}',
+      endpoint: '${window.location.origin}/api/track'
+    });
+  });
+</script>`
     : "";
+
+  const npmTrackingCode = website
+    ? `import inflow from '@inflow/sdk';
+    
+inflow.init({ 
+  apiKey: 'YOUR_API_KEY', // Get your key from Settings -> Keys
+  websiteId: '${website.websiteId}',
+  endpoint: '${window.location.origin}/api/track'
+});`
+    : "";
+
+  const highlightCode = (code: string, lang: "html" | "js") => {
+    let highlighted = code
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"(.*?)"/g, '<span class="text-emerald-600">"$1"</span>')
+      .replace(/'(.*?)'/g, '<span class="text-emerald-600">\'$1\'</span>');
+
+    if (lang === "js") {
+      highlighted = highlighted
+        .replace(/\b(import|from|window|inflow|apiKey|websiteId|endpoint)\b/g, '<span class="text-blue-600 font-semibold">$1</span>')
+        .replace(/\b(inflow\.init)\b/g, '<span class="text-purple-500">$1</span>')
+        .replace(/\b(\w+):(?!\/\/)/g, '<span class="text-orange-600">$1</span>:');
+    } else {
+      highlighted = highlighted
+        .replace(/&lt;script(.*?)&gt;/g, '&lt;<span class="text-blue-600 font-semibold">script</span>$1&gt;')
+        .replace(/&lt;\/script&gt;/g, '&lt;/<span class="text-blue-600 font-semibold">script</span>&gt;')
+        .replace(/\b(src|defer|apiKey|websiteId|endpoint)\b=/g, '<span class="text-orange-600">$1</span>=')
+        .replace(/window\.addEventListener/g, '<span class="text-blue-500 font-semibold">window.addEventListener</span>')
+        .replace(/inflow\.init/g, '<span class="text-purple-500">inflow.init</span>');
+    }
+
+    return highlighted;
+  };
+
+  const CodeBlock = ({ code, lang }: { code: string; lang: "html" | "js" }) => (
+    <div className="relative group">
+      <pre
+        className="p-4 rounded-xl bg-muted/30 text-xs font-mono overflow-x-auto border"
+        dangerouslySetInnerHTML={{ __html: highlightCode(code, lang) }}
+      />
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute right-2 top-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+        onClick={() => copyToClipboard(code)}
+      >
+        <Copy className="h-3.5 w-3.5" />
+      </Button>
+    </div>
+  );
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -90,38 +144,47 @@ export default function EditWebsitePage() {
     }
   };
 
-  const onConfirmReset = async () => {
-    setIsResetLoading(true);
+  const handleReset = async () => {
+    if (
+      !confirm(
+        "Are you sure you want to reset all statistics for this website? This action cannot be undone.",
+      )
+    ) {
+      return;
+    }
+
     try {
       await axios.post(`/api/website/${websiteId}/reset`);
       mutate();
       toast.success("Website statistics reset successfully!");
-      setShowResetDialog(false);
     } catch (error) {
       toast.error("Failed to reset website");
       console.error("Error resetting website:", error);
-    } finally {
-      setIsResetLoading(false);
     }
   };
 
-  const onConfirmDelete = async () => {
-    setIsDeleteLoading(true);
+  const handleDelete = async () => {
+    if (
+      !confirm(
+        "Are you sure you want to delete this website? All data will be permanently deleted. This action cannot be undone.",
+      )
+    ) {
+      return;
+    }
+
     try {
       await axios.delete(`/api/website/${websiteId}`);
       mutateGlobal(
         (key: unknown) =>
           Array.isArray(key) &&
           typeof key[0] === "string" &&
-          key[0].startsWith("/api/website")
+          key[0].startsWith("/api/website"),
       );
       toast.success("Website deleted successfully!");
       router.push("/dashboard");
     } catch (error) {
       toast.error("Failed to delete website");
       console.error("Error deleting website:", error);
-    } finally {
-      setIsDeleteLoading(false);
     }
   };
 
@@ -151,7 +214,7 @@ export default function EditWebsitePage() {
         <div className="flex items-center gap-3 mt-4">
           <div
             className={cn(
-              "size-10 rounded flex items-center justify-center text-[10px] font-bold shadow-sm bg-primary/10 text-primary"
+              "size-10 rounded flex items-center justify-center text-[10px] font-bold shadow-sm bg-primary/10 text-primary",
             )}
           >
             <span className="text-2xl">
@@ -199,7 +262,9 @@ export default function EditWebsitePage() {
               <Input
                 id="name"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setName(e.target.value)
+                }
                 placeholder="My Website"
               />
             </div>
@@ -211,7 +276,9 @@ export default function EditWebsitePage() {
               <Input
                 id="domain"
                 value={domain}
-                onChange={(e) => setDomain(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setDomain(e.target.value)
+                }
                 placeholder="https://example.com"
               />
             </div>
@@ -231,28 +298,57 @@ export default function EditWebsitePage() {
           </div>
         </div>
 
-        {/* Tracking Code Card */}
+        {/* SDK Integration Card */}
         <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6">
-          <div className="space-y-3">
-            <h3 className="text-base font-semibold">Tracking Code</h3>
-            <p className="text-sm text-muted-foreground">
-              To track stats for this website, place the following code in the
-              &lt;head&gt; section of your HTML.
-            </p>
-            <div className="relative">
-              <Input
-                value={trackingCode}
-                readOnly
-                className="pr-10 font-mono text-xs bg-muted/50"
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
-                onClick={() => copyToClipboard(trackingCode)}
-              >
-                <Copy className="h-4 w-4" />
-              </Button>
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">SDK Integration</h3>
+
+            <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/20 space-y-2">
+              <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400">
+                <ShieldCheck className="w-4 h-4" />
+                <h4 className="text-sm font-semibold">Account API Key Required</h4>
+              </div>
+              <p className="text-xs text-blue-600/80 dark:text-blue-400/80 leading-relaxed">
+                We've moved to account-wide API keys. Please use a key from your{" "}
+                <Link
+                  href="/dashboard/settings/keys"
+                  className="font-bold underline hover:text-blue-800 dark:hover:text-blue-300"
+                >
+                  API Settings
+                </Link>{" "}
+                to initialize the SDK.
+              </p>
+            </div>
+
+            <div className="space-y-4 pt-2">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Website ID</Label>
+                <div className="relative">
+                  <Input
+                    value={website.websiteId}
+                    readOnly
+                    className="pr-10 font-mono text-sm bg-muted/50"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                    onClick={() => copyToClipboard(website.websiteId)}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Script Tag (CDN)</Label>
+                <CodeBlock code={sdkTrackingCode} lang="html" />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">NPM / ES Modules</Label>
+                <CodeBlock code={npmTrackingCode} lang="js" />
+              </div>
             </div>
           </div>
         </div>
@@ -264,7 +360,8 @@ export default function EditWebsitePage() {
               <div>
                 <h3 className="text-base font-semibold">Public Share</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Allow anyone with the link to view this website's analytics dashboard.
+                  Allow anyone with the link to view this website's analytics
+                  dashboard.
                 </p>
               </div>
               <Switch
@@ -273,7 +370,7 @@ export default function EditWebsitePage() {
                 disabled={saveLoading}
               />
             </div>
-            
+
             {isPublic && publicLink && (
               <div className="space-y-3 pt-2">
                 <Label className="text-sm font-medium">Public Link</Label>
@@ -293,11 +390,12 @@ export default function EditWebsitePage() {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Note: Remember to click "Save Changes" if you toggle public access.
+                  Note: Remember to click "Save Changes" if you toggle public
+                  access.
                 </p>
               </div>
             )}
-            
+
             {isPublic && !publicLink && (
               <p className="text-xs text-muted-foreground pt-2">
                 Click "Save Changes" to generate a public link.
@@ -320,7 +418,7 @@ export default function EditWebsitePage() {
                   settings will remain intact.
                 </p>
               </div>
-              <Button variant="outline" onClick={() => setShowResetDialog(true)}>
+              <Button variant="outline" onClick={handleReset}>
                 Reset
               </Button>
             </div>
@@ -333,34 +431,13 @@ export default function EditWebsitePage() {
                   cannot be undone.
                 </p>
               </div>
-              <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
+              <Button variant="destructive" onClick={handleDelete}>
                 Delete
               </Button>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Confirmation Dialogs */}
-      <ConfirmDialog
-        open={showResetDialog}
-        onOpenChange={setShowResetDialog}
-        title="Reset Website Statistics"
-        description="Are you sure you want to reset all statistics for this website? All data will be wiped, but settings will be preserved. This action cannot be undone."
-        confirmText="Reset Statistics"
-        onConfirm={onConfirmReset}
-        isLoading={isResetLoading}
-      />
-
-      <ConfirmDialog
-        open={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
-        title="Delete Website"
-        description="Are you sure you want to delete this website? This will permanently remove all data, tracking logs, and recorded sessions. This action is irreversible."
-        confirmText="Permanently Delete"
-        onConfirm={onConfirmDelete}
-        isLoading={isDeleteLoading}
-      />
     </div>
   );
 }

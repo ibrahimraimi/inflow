@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 

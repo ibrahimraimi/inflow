@@ -1,5 +1,5 @@
 {
-  "id": "e97c4cba-3028-42cb-a4b7-ae645cbf59a6",
+  "id": "b99980f8-cc18-45fb-9e90-2e3a4b59cfb3",
   "prevId": "7a45852d-57d2-4847-8a6e-70f7f3e5aea3",
   "version": "7",
   "dialect": "postgresql",
@@ -974,66 +974,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.session_replays": {
-      "name": "session_replays",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "identity": {
-            "type": "always",
-            "name": "session_replays_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "2147483647",
-            "cache": "1",
-            "cycle": false
-          }
-        },
-        "website_id": {
-          "name": "website_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "client_id": {
-          "name": "client_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "session_id": {
-          "name": "session_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "events": {
-          "name": "events",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.user": {
       "name": "user",
       "schema": "",
@@ -1216,6 +1156,12 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "api_key": {
+          "name": "api_key",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
@@ -1255,6 +1201,13 @@
           "nullsNotDistinct": false,
           "columns": [
             "public_token"
+          ]
+        },
+        "websites_api_key_unique": {
+          "name": "websites_api_key_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "api_key"
           ]
         }
       },
