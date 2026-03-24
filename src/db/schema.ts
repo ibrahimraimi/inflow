@@ -243,6 +243,18 @@ export const apiKeyUsageLogs = pgTable("api_key_usage_logs", {
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
+export const sessionReplays = pgTable("session_replays", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  websiteId: varchar("website_id", { length: 255 })
+    .notNull(),
+  clientId: varchar("client_id", { length: 255 }).notNull(),
+  sessionId: varchar("session_id", { length: 255 }).notNull(),
+  events: jsonb("events").notNull(),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+
 export const schema = {
   user,
   session,
@@ -258,6 +270,7 @@ export const schema = {
   funnels,
   apiKeys,
   apiKeyUsageLogs,
+  sessionReplays,
   organizationRelations,
   memberRelations,
 };

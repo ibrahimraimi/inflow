@@ -26,6 +26,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAnalytics } from "@/hooks/use-analytics";
 import { DataTable } from "../../_components/data-table";
 import { ChartAreaInteractive } from "../../_components/chart";
+import { RenderIf } from "@/lib/render-if";
 
 export default function CampaignInsightsPage() {
   const params = useParams();
@@ -156,7 +157,9 @@ export default function CampaignInsightsPage() {
         {!analytics && analyticsLoading ? (
           <Skeleton className="h-[300px] w-full rounded-xl" />
         ) : (
-          <ChartAreaInteractive data={analytics?.chart} />
+          <RenderIf condition={false}>
+            <ChartAreaInteractive data={analytics?.chart} />
+          </RenderIf>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 pt-6">

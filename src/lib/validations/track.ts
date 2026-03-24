@@ -22,3 +22,19 @@ export const trackEventSchema = z.object({
   refParams: z.string().optional(),
   exitUrl: z.string().optional(),
 });
+
+export const trackReplaySchema = z.object({
+  websiteId: z.string().uuid(),
+  clientId: z.string().min(1),
+  sessionId: z.string().min(1),
+  events: z.array(z.object({
+    type: z.enum(["click", "scroll", "nav", "input"]),
+    timestamp: z.number(),
+    url: z.string().optional(),
+    x: z.number().optional(),
+    y: z.number().optional(),
+    target: z.string().optional(),
+    path: z.string().optional(),
+    value: z.string().optional(),
+  })),
+});
