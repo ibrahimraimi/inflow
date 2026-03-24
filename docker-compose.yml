@@ -1,10 +1,32 @@
 services:
-  app:
+  web:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - APP_NAME=web
     ports:
       - "3000:3000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+    env_file:
+      - .env
+    restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+    networks:
+      - inflow-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - APP_NAME=api
+    ports:
+      - "3001:3001"
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
@@ -15,6 +37,7 @@ services:
       - RESEND_API_KEY=${RESEND_API_KEY}
       - EMAIL_SENDER_NAME=${EMAIL_SENDER_NAME}
       - EMAIL_SENDER_ADDRESS=${EMAIL_SENDER_ADDRESS}
+      - PORT=3001
     env_file:
       - .env
     restart: unless-stopped

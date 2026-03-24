@@ -1,5 +1,5 @@
 <a href="https://inflow.ibrahimraimi.com">
-  <img alt="A modern, comprehensive analytics platform designed to help you collect, analyze, and understand your website data effortlessly." src="./public/images/banner.png">
+  <img alt="A modern, comprehensive analytics platform designed to help you collect, analyze, and understand your website data effortlessly." src="./apps/web/public/images/banner.png">
 </a>
 
 <h3 align="center">Inflow Analytics</h3>
@@ -23,11 +23,13 @@
 
 ## Introduction
 
-A modern, comprehensive open-source self-hosted analytics platform designed to help you collect, analyze, and understand your website data effortlessly.
+A modern, comprehensive open-source self-hosted analytics platform designed to help you collect, analyze, and understand your website data effortlessly. Now built as a high-performance monorepo for better scalability and developer experience.
 
 ## Tech Stack
 
 - [Next.js](nextjs.org) - Framework
+- [Turborepo](https://turbo.build) - Monorepo Management
+- [Bun](https://bun.sh) - Runtime & Package Manager
 - [TypeScript](typescriptlang.org) - Language
 - [Drizzle ORM](https://orm.drizzle.team) - ORM
 - [Neon PostgreSQL](https://neon.com/) - Database
@@ -37,53 +39,70 @@ A modern, comprehensive open-source self-hosted analytics platform designed to h
 - [Biome](https://biomejs.dev) - Linting & Formatting
 - [Vercel](https://vercel.com) - Deployment
 
+## Repository Structure
+
+```text
+.
+├── apps/
+│   ├── web/             # Next.js Frontend Dashboard (Port 3000)
+│   └── api/             # Next.js Backend API (Port 3001)
+├── packages/
+│   ├── core/            # Shared server logic, services, and components
+│   ├── db/              # Database schemas and Drizzle client
+│   ├── types/           # Global TypeScript definitions
+│   ├── sdk/             # Client-side tracking SDK
+│   ├── config-typescript/ # Shared TS configurations
+│   └── config-biome/    # Shared Biome configurations
+└── turbo.json           # Turborepo configuration
+```
+
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+
+- Bun v1.1+ (Standardized for this workspace)
 - PostgreSQL database (we recommend Neon for easy setup)
 - MailerSend account for email functionality
 - Google OAuth credentials (optional, for Google login)
 
 ### Installation
 
-Read the installation guide [here](https://inflow.ibrahimraimi.com/docs/developer-guide/getting-started).
+1. Clone the repository and install dependencies:
+```bash
+git clone https://github.com/ibrahimraimi/inflow.git
+cd inflow
+bun install
+```
 
-## Database Schema
+2. Copy the environment file and fill in required variables:
+```bash
+cp .env.example .env
+```
 
-The application uses a PostgreSQL database. Read the schema [here](https://inflow.ibrahimraimi.com/docs/developer-guide/architecture/database).
+3. Initialize the database:
+```bash
+make db-push
+```
+
+4. Start development server:
+```bash
+make dev
+```
+
+The applications will be available at:
+- Dashboard: [http://localhost:3000](http://localhost:3000)
+- API: [http://localhost:3001](http://localhost:3001)
 
 ## Available Scripts
 
 ```bash
 make help        # Show all available commands
-make dev         # Start development server
+make dev         # Start all applications in development mode
+make build       # Build all applications and packages
+make lint        # Run linter across the workspace
 make ci          # Run CI checks locally (lint, type-check, build)
-make docker-up   # Start with Docker
+make docker-up   # Start with Docker Compose
 ```
-
-## Docker & Deployment
-
-### Running with Docker
-
-1. Build and run with Docker Compose:
-
-```bash
-docker compose up --build
-```
-
-2. Or use the Makefile:
-
-```bash
-make docker-up
-```
-
-The application will be available at [http://localhost:3000](http://localhost:3000).
-
-### CI/CD Pipeline
-
-This project includes a complete CI/CD pipeline with GitHub Actions. Read the documentation [here](https://inflow.ibrahimraimi.com/docs/developer-guide/deployment).
 
 ## License
 
@@ -91,4 +110,4 @@ AGPL-3.0-only
 
 ## Support
 
-For support or questions, please contact the the developer @[ibrahimraimi_](https://x.com/ibrahimraimi).
+For support or questions, please contact the developer @[ibrahimraimi_](https://x.com/ibrahimraimi).

@@ -1,60 +1,48 @@
-# Build stage
-FROM oven/bun:1-slim AS builder
-
+# Base stage for oven/bun
+FROM oven/bun:1-slim AS base
 WORKDIR /app
 
-# Copy package files
-COPY package.json bun.lock ./
+# Build stage
+FROM base AS builder
+ARG APP_NAME
+ENV APP_NAME=$APP_NAME
+
+# Set dummy variables for build time
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+
+# Copy all files for build
+COPY . .
 
 # Install dependencies
 RUN bun install --frozen-lockfile
 
-# Copy application code
-COPY . .
-
 # Generate database types
-RUN bun db:generate
+RUN bun --filter @inflow/db db:generate
 
-# Set dummy variables for build time to prevent crashes during static analysis
-ARG DATABASE_URL="postgresql://user:password@localhost/placeholder"
-ARG BETTER_AUTH_SECRET="placeholder_secret_at_least_32_characters_long"
-ARG BETTER_AUTH_URL="https://placeholder.example.com"
-ARG NEXT_PUBLIC_APP_URL="https://placeholder.example.com"
-ARG RESEND_API_KEY="re_placeholder"
-ARG GOOGLE_CLIENT_ID="placeholder_id"
-ARG GOOGLE_CLIENT_SECRET="placeholder_secret"
-ARG EMAIL_SENDER_NAME="PlaceholderName"
-ARG EMAIL_SENDER_ADDRESS="noreply@placeholder.example.com"
-
-ENV DATABASE_URL=$DATABASE_URL
-ENV BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET
-ENV BETTER_AUTH_URL=$BETTER_AUTH_URL
-ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
-ENV RESEND_API_KEY=$RESEND_API_KEY
-ENV GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
-ENV GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
-ENV EMAIL_SENDER_NAME=$EMAIL_SENDER_NAME
-ENV EMAIL_SENDER_ADDRESS=$EMAIL_SENDER_ADDRESS
-ENV NEXT_TELEMETRY_DISABLED=1
-
-RUN bun run build
+# Build the specific app
+RUN bun x turbo build --filter=$APP_NAME...
 
 # Production stage
-FROM oven/bun:1-slim AS runner
-
+FROM base AS runner
+ARG APP_NAME
+ENV APP_NAME=$APP_NAME
 WORKDIR /app
 
 # Set environment to production
 ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
 # Create a non-root user
 RUN groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 --gid nodejs --create-home --shell /bin/false nextjs
 
 # Copy necessary files from builder
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# Next.js standalone output in monorepo includes all necessary files
+COPY --from=builder --chown=nextjs:nodejs /app/apps/${APP_NAME}/public ./apps/${APP_NAME}/public
+COPY --from=builder --chown=nextjs:nodejs /app/apps/${APP_NAME}/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/apps/${APP_NAME}/.next/static ./apps/${APP_NAME}/.next/static
 
 # Switch to non-root user
 USER nextjs
@@ -62,8 +50,6 @@ USER nextjs
 # Expose the application port
 EXPOSE 3000
 
-ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
-
 # Start the application
-CMD ["bun", "server.js"]
+# Use the APP_NAME to find the server.js
+CMD ["sh", "-c", "bun apps/${APP_NAME}/server.js"]
