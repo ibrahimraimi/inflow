@@ -10,8 +10,8 @@ This document outlines the performance characteristics of the Inflow Analytics p
 - **API Bottleneck**: Each tracking request performs a DB query for API Key validation and website ownership.
 
 ### Optimization Opportunities
-- [ ] **Event Batching**: Implement a small delay (e.g., 500ms-1s) in the SDK to batch multiple events (nav, click, scroll) into a single POST request to reduce HTTP overhead.
-- [ ] **Redis Caching**: Cache valid API Keys and Website Ownership lookups in Redis (Upstash) to avoid DB hits on every single tracking event.
+- [x] **Event Batching**: Implement a small delay (e.g., 500ms-1s) in the SDK to batch multiple events (nav, click, scroll) into a single POST request to reduce HTTP overhead.
+- [x] **In-Memory Caching**: Cache valid API Keys and Website Ownership lookups using an LRU memory cache to avoid DB hits on every single tracking event.
 - [ ] **Zstandard Compression**: Use Brotli/Gzip for SDK payload delivery.
 
 ## 2. Analytics Aggregation (apps/api/src/app/api/website)

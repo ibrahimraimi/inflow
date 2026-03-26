@@ -1,16 +1,21 @@
 import crypto from "crypto";
-import { db } from "@inflow/db";
-import { pageViews, events, apiKeys, websites, apiKeyUsageLogs } from "@inflow/db";
+import { LRUCache } from "lru-cache";
+import { and, eq } from "drizzle-orm";
+import { headers } from "next/headers";
+import { UAParser } from "ua-parser-js";
 import { type NextRequest, NextResponse } from "next/server";
 
-import { and, eq } from "drizzle-orm";
-import { UAParser } from "ua-parser-js";
-import { trackEventSchema } from "@inflow/core/lib/validations/track";
-import { rateLimit } from "@inflow/core/lib/rate-limit";
+import { db } from "@inflow/db";
 import { auth } from "@inflow/core/lib/auth";
-import { headers } from "next/headers";
+import { rateLimit } from "@inflow/core/lib/rate-limit";
+import { trackEventSchema } from "@inflow/core/lib/validations/track";
+import { pageViews, events, apiKeys, websites, apiKeyUsageLogs } from "@inflow/db";
 
-// export const runtime = "edge";
+// Global cache to persist across requests in the same isolate
+const cache = new LRUCache<string, any>({
+  max: 500, // max 500 items
+  ttl: 1000 * 60 * 5, // 5 minutes cache
+});
 
 const CORS_HEADERS = (req: NextRequest) => {
   const origin = req.headers.get("origin") || "*";
@@ -87,40 +92,48 @@ export async function POST(req: NextRequest) {
 
     let userId: string | null = null;
     let apiKeyId: string | null = null;
+    let session: any = null;
 
-    // 1. Validate API key
-    if (apiKey) {
-      const keyHash = crypto.createHash("sha256").update(apiKey).digest("hex");
-      const keyRecord = await db.query.apiKeys.findFirst({
-        where: eq(apiKeys.keyHash, keyHash),
+    if (!apiKey) {
+      session = await auth.api.getSession({
+        headers: await headers(),
       });
+    }
 
-      if (keyRecord) {
-        userId = keyRecord.userId;
-        apiKeyId = keyRecord.id;
+    // 1. Validate API key or session caching
+    let cacheKey = apiKey ? `apikey:${apiKey}` : `session:${session?.user?.id}`;
+    let cachedAuth = cacheKey !== "session:undefined" ? cache.get(cacheKey) : null;
 
-        // Log usage if it's an API key
-        try {
-          await db.insert(apiKeyUsageLogs).values({
+    if (cachedAuth) {
+      userId = cachedAuth.userId;
+      apiKeyId = cachedAuth.apiKeyId;
+    } else {
+      if (apiKey) {
+        const keyHash = crypto.createHash("sha256").update(apiKey).digest("hex");
+        const keyRecord = await db.query.apiKeys.findFirst({
+          where: eq(apiKeys.keyHash, keyHash),
+        });
+
+        if (keyRecord) {
+          userId = keyRecord.userId;
+          apiKeyId = keyRecord.id;
+          cache.set(cacheKey, { userId, apiKeyId });
+
+          // Log usage if it's an API key (don't await to avoid blocking)
+          db.insert(apiKeyUsageLogs).values({
             id: crypto.randomUUID(),
             apiKeyId: keyRecord.id,
             endpoint: "/api/track",
             method: "POST",
             status: 200,
-          });
-        } catch (e) {
-          console.error("Failed to log API key usage:", e);
+          }).catch((e) => console.error("Failed to log API key usage:", e));
         }
       }
-    }
 
-    // 2. Fallback to Session
-    if (!userId) {
-      const session = await auth.api.getSession({
-        headers: await headers(),
-      });
-      if (session) {
+      // 2. Fallback to Session
+      if (!userId && session?.user?.id) {
         userId = session.user.id;
+        cache.set(cacheKey, { userId, apiKeyId: null });
       }
     }
 
@@ -131,21 +144,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3. Verify website ownership
-    const website = await db.query.websites.findFirst({
-      where: and(
-        eq(websites.websiteId, bodyJson.websiteId),
-        eq(websites.userId, userId)
-      ),
-    });
+    const payloadArray = Array.isArray(bodyJson) ? bodyJson : [bodyJson];
+    const results = [];
 
-    if (!website) {
-      return NextResponse.json(
-        { error: "Website not found or unauthorized" },
-        { status: 403, headers: cors },
-      );
-    }
-
+    // Check rate limit 
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0] ||
       req.headers.get("x-real-ip") ||
@@ -168,24 +170,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const validation = trackEventSchema.safeParse(bodyJson);
-
-    if (!validation.success) {
-      return NextResponse.json(
-        { error: "Invalid request body", details: validation.error.format() },
-        { status: 400, headers: cors },
-      );
-    }
-
-    const body = validation.data;
-
-    // Fetch all required data from headers/UA
     const parser = new UAParser(req.headers.get("user-agent") || "");
     const deviceInfo = parser.getDevice()?.model || "Unknown Device";
     const osInfo = parser.getOS()?.name || "Unknown OS";
     const browserInfo = parser.getBrowser()?.name || "Unknown Browser";
 
-    // Get geolocation from headers if available
     const geoInfo = {
       cityName: req.headers.get("x-vercel-ip-city") || "Unknown",
       regionName: req.headers.get("x-vercel-ip-country-region") || "Unknown",
@@ -194,7 +183,6 @@ export async function POST(req: NextRequest) {
     };
 
     const visitorIp = ip.trim();
-    // Validate IP string format against malicious SSRF inputs
     const isIpValid = /^([0-9]{1,3}\.){3}[0-9]{1,3}$|^[a-fA-F0-9:]+$/.test(visitorIp);
 
     const getGeoData = async () => {
@@ -210,79 +198,113 @@ export async function POST(req: NextRequest) {
 
     const finalGeo = await getGeoData();
 
-    let result;
+    // Process each event in the potentially batched payload
+    for (const bodyItem of payloadArray) {
+      const websiteId = bodyItem.websiteId;
+      if (!websiteId) continue;
 
-    if (body?.type === "entry") {
-      result = await db
-        .insert(pageViews)
-        .values({
-          clientId: body.clientId,
-          websiteId: body.websiteId,
-          domain: body.domain,
-          url: body.url,
-          type: body.type,
-          referrer: body.referrer,
-          entryTime: body.entryTime ? new Date(body.entryTime) : new Date(),
-          exitTime: body.exitTime,
-          totalActiveTime: body.totalActiveTime,
-          urlParams: body.urlParams,
-          utmSource: body.utmSource,
-          utmMedium: body.utmMedium,
-          utmCampaign: body.utmCampaign,
-          utmTerm: body.utmTerm,
-          utmContent: body.utmContent,
-          device: deviceInfo,
-          os: osInfo,
-          browser: browserInfo,
-          city: finalGeo.cityName || finalGeo.city || "Unknown",
-          region: finalGeo.regionName || finalGeo.region || "Unknown",
-          country: finalGeo.countryName || finalGeo.country || "Unknown",
-          countryCode: finalGeo.countryCode || "Unknown",
-          refParams: body.refParams,
-        })
-        .returning();
-    } else if (body?.type === "event") {
-      result = await db
-        .insert(events)
-        .values({
-          clientId: body.clientId,
-          websiteId: body.websiteId,
-          eventName: body.eventName || "unknown",
-          properties: body.properties ? body.properties : undefined,
-        })
-        .returning();
-    } else {
-      // type === "exit" or "ping"
-      const updateData: Partial<typeof pageViews.$inferInsert> = {
-        totalActiveTime: body.totalActiveTime,
-      };
+      // 3. Verify website ownership
+      const siteCacheKey = `website:${websiteId}:${userId}`;
+      let website = cache.get(siteCacheKey);
 
-      if (body?.type === "exit") {
-        updateData.exitTime = body.exitTime ? new Date(body.exitTime) : new Date();
-        updateData.exitUrl = body.exitUrl;
+      if (!website) {
+        website = await db.query.websites.findFirst({
+          where: and(
+            eq(websites.websiteId, websiteId),
+            eq(websites.userId, userId)
+          ),
+        });
+        if (website) {
+          cache.set(siteCacheKey, website);
+        }
       }
 
-      result = await db
-        .update(pageViews)
-        .set(updateData)
-        .where(
-          body.pageViewId
-            ? and(
-                eq(pageViews.id, body.pageViewId),
-                eq(pageViews.clientId, body.clientId!),
-                eq(pageViews.websiteId, body.websiteId!)
-              )
-            : and(
-                eq(pageViews.clientId, body?.clientId),
-                eq(pageViews.websiteId, body?.websiteId),
-              ),
-        )
-        .returning();
+      if (!website) {
+        // Skip invalid websites in batch 
+        continue;
+      }
+
+      const validation = trackEventSchema.safeParse(bodyItem);
+      if (!validation.success) {
+        continue; // skip invalid items
+      }
+
+      const body = validation.data;
+      let result;
+
+      if (body?.type === "entry") {
+        result = await db
+          .insert(pageViews)
+          .values({
+            clientId: body.clientId,
+            websiteId: body.websiteId,
+            domain: body.domain,
+            url: body.url,
+            type: body.type,
+            referrer: body.referrer,
+            entryTime: body.entryTime ? new Date(body.entryTime) : new Date(),
+            exitTime: body.exitTime,
+            totalActiveTime: body.totalActiveTime,
+            urlParams: body.urlParams,
+            utmSource: body.utmSource,
+            utmMedium: body.utmMedium,
+            utmCampaign: body.utmCampaign,
+            utmTerm: body.utmTerm,
+            utmContent: body.utmContent,
+            device: deviceInfo,
+            os: osInfo,
+            browser: browserInfo,
+            city: finalGeo.cityName || finalGeo.city || "Unknown",
+            region: finalGeo.regionName || finalGeo.region || "Unknown",
+            country: finalGeo.countryName || finalGeo.country || "Unknown",
+            countryCode: finalGeo.countryCode || "Unknown",
+            refParams: body.refParams,
+          })
+          .returning();
+      } else if (body?.type === "event") {
+        result = await db
+          .insert(events)
+          .values({
+            clientId: body.clientId,
+            websiteId: body.websiteId,
+            eventName: body.eventName || "unknown",
+            properties: body.properties ? body.properties : undefined,
+          })
+          .returning();
+      } else {
+        const updateData: Partial<typeof pageViews.$inferInsert> = {
+          totalActiveTime: body.totalActiveTime,
+        };
+
+        if (body?.type === "exit") {
+          updateData.exitTime = body.exitTime ? new Date(body.exitTime) : new Date();
+          updateData.exitUrl = body.exitUrl;
+        }
+
+        result = await db
+          .update(pageViews)
+          .set(updateData)
+          .where(
+            body.pageViewId
+              ? and(
+                  eq(pageViews.id, body.pageViewId),
+                  eq(pageViews.clientId, body.clientId!),
+                  eq(pageViews.websiteId, body.websiteId!)
+                )
+              : and(
+                  eq(pageViews.clientId, body?.clientId),
+                  eq(pageViews.websiteId, body?.websiteId),
+                ),
+          )
+          .returning();
+      }
+      
+      if (result) results.push(result[0]);
     }
 
     return NextResponse.json({
       message: "Data received successfully",
-      data: result,
+      count: results.length,
     }, { headers: cors });
   } catch (error) {
     console.error("Tracking API Error:", error);
