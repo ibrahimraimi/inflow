@@ -20,8 +20,8 @@ This document outlines the performance characteristics of the Inflow Analytics p
 - **Query Depth**: Some queries lack specific indexes for `entryTime` ranges.
 
 ### Optimization Opportunities
-- [ ] **Database Aggregation**: Move heavy JS-side filtering/mapping into PostgreSQL using `jsonb_agg` or materialized views for high-traffic websites.
-- [ ] **Indexing**: Add composite indexes on `(website_id, entry_time)` to speed up date-range filtering.
+- [x] **Database Aggregation**: Move heavy JS-side filtering/mapping into PostgreSQL using `jsonb_agg` or materialized views for high-traffic websites.
+- [x] **Indexing**: Add composite indexes on `(website_id, entry_time)` to speed up date-range filtering.
 - [ ] **HyperLogLog**: For unique visitor counts at scale, consider using Redis HyperLogLog to avoid counting unique IDs in SQL on every request.
 
 ## 3. Frontend / Dashboard (apps/web)

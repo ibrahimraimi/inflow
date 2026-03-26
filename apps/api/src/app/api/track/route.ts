@@ -222,7 +222,7 @@ export async function POST(req: NextRequest) {
           url: body.url,
           type: body.type,
           referrer: body.referrer,
-          entryTime: body.entryTime || new Date().toISOString(),
+          entryTime: body.entryTime ? new Date(body.entryTime) : new Date(),
           exitTime: body.exitTime,
           totalActiveTime: body.totalActiveTime,
           urlParams: body.urlParams,
@@ -258,7 +258,7 @@ export async function POST(req: NextRequest) {
       };
 
       if (body?.type === "exit") {
-        updateData.exitTime = body.exitTime || new Date().toISOString();
+        updateData.exitTime = body.exitTime ? new Date(body.exitTime) : new Date();
         updateData.exitUrl = body.exitUrl;
       }
 
@@ -291,7 +291,7 @@ export async function POST(req: NextRequest) {
         error: "Internal Server Error", 
         message: error instanceof Error ? error.message : String(error) 
       },
-      { status: 500, headers: cors },
+      { status: 500, headers: CORS_HEADERS(req) },
     );
   }
 }

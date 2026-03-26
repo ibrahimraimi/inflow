@@ -8,6 +8,7 @@ import {
   integer,
   varchar,
   jsonb,
+  index,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -146,6 +147,7 @@ export const websites = pgTable("websites", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   apiKey: varchar("api_key", { length: 255 }).unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const links = pgTable("links", {
@@ -172,8 +174,8 @@ export const pageViews = pgTable("page_views", {
   url: text("url"),
   type: varchar("type", { length: 100 }).notNull(),
   referrer: varchar("referrer", { length: 2048 }),
-  entryTime: varchar("entry_time", { length: 100 }),
-  exitTime: varchar("exit_time", { length: 100 }),
+  entryTime: timestamp("entry_time"),
+  exitTime: timestamp("exit_time"),
   totalActiveTime: integer("total_active_time"),
   urlParams: varchar("url_params"),
   utmSource: varchar("utm_source", { length: 255 }),
@@ -190,7 +192,9 @@ export const pageViews = pgTable("page_views", {
   countryCode: varchar("country_code"),
   refParams: varchar("ref_params"),
   exitUrl: varchar("exit_url"),
-});
+}, (table) => ({
+  websiteIdEntryTimeIdx: index("idx_page_views_website_id_entry_time").on(table.websiteId, table.entryTime),
+}));
 export const events = pgTable("events", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   websiteId: varchar("website_id", { length: 255 })
