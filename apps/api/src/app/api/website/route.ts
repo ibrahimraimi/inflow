@@ -24,6 +24,72 @@ import {
   websiteQuerySchema,
 } from "@inflow/core/lib/validations/website";
 
+/**
+ * @swagger
+ * /api/website:
+ *   get:
+ *     summary: List user websites with analytics
+ *     description: Returns a list of websites owned by the authenticated user, including aggregated analytics for each.
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: websiteId
+ *         schema:
+ *           type: string
+ *         description: Specific website ID to fetch
+ *       - in: query
+ *         name: from
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Start date (YYYY-MM-DD)
+ *       - in: query
+ *         name: to
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: End date (YYYY-MM-DD)
+ *       - in: query
+ *         name: websiteOnly
+ *         schema:
+ *           type: string
+ *           enum: [true, false]
+ *         description: If true, only returns website settings without analytics
+ *     responses:
+ *       200:
+ *         description: List of websites
+ *       401:
+ *         description: Unauthorized
+ *   post:
+ *     summary: Create a new website
+ *     description: Registers a new website for tracking.
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [websiteName, domain]
+ *             properties:
+ *               websiteName:
+ *                 type: string
+ *               domain:
+ *                 type: string
+ *               timeZone:
+ *                 type: string
+ *               enableLocalhostTracking:
+ *                 type: boolean
+ *     responses:
+ *       201:
+ *         description: Website created
+ *       400:
+ *         description: Invalid request body
+ *       401:
+ *         description: Unauthorized
+ */
 export async function POST(req: NextRequest) {
   const session = await auth.api.getSession({
     headers: await headers(),
