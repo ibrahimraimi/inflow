@@ -1,109 +1,76 @@
 # Inflow Analytics - Security Analysis
 
 ## Overview
-This document outlines the findings of a comprehensive security audit conducted across the Inflow Analytics codebase. The audit focused on data ingestion validation, API authentication, database ORM query mechanisms, rate limiting capabilities, and architectural limits. 
+This document outlines the findings of a comprehensive security audit conducted across the Inflow Analytics codebase. The audit focused on data ingestion validation, API authentication, database ORM query mechanisms, rate limiting capabilities, and architectural limits.
 
 ## Summary of Findings
 
-| Severity | Vulnerability / Finding | Component Affected |
-|----------|-----------------------|--------------------|
-| **High** | Insecure Direct Object Reference (IDOR) on Page View Exits | `/api/track/route.ts` |
-| **High** | Unauthorized Data Access in Server Actions | `src/server/*.ts` |
-| **Medium** | Server-Side Request Forgery (SSRF) / Injection via X-Forwarded-For | `/api/track/route.ts` |
-| **Medium** | Missing CORS Configuration on Public Ingestion Tunnel | `/api/track/route.ts` |
-| **Medium** | Missing Input Validation in Management API Routes | `src/app/api/*` |
-| **Low** | Ineffective Rate Limit Fallback in Serverless Deployments | `src/lib/rate-limit.ts` |
-| **Low** | Permissive Content Security Policy (CSP) Directives | `next.config.ts` |
-| **Low** | Potential CSS Injection in Chart Component | `src/components/ui/chart.tsx` |
+| Severity | Vulnerability / Finding | Component Affected | Status |
+|----------|-----------------------|--------------------|--------|
+| **High** | Insecure Direct Object Reference (IDOR) on Page View Exits | `apps/api/src/app/api/track/route.ts` | [FIXED] |
+| **High** | Unauthorized Data Access in Server Actions | `packages/core/src/server/*.ts` | [FIXED] |
+| **High** | Authorization Bypass in Permission Utility (`isAdmin`) | `packages/core/src/server/permissions.ts` | [FIXED] |
+| **Medium** | Server-Side Request Forgery (SSRF) / Injection via X-Forwarded-For | `apps/api/src/app/api/track/route.ts` | [FIXED] |
+| **Medium** | Missing CORS Configuration on Public Ingestion Tunnel | `apps/api/src/app/api/track/route.ts` | [FIXED] |
+| **Medium** | Missing Input Validation in Management API Routes | `apps/api/src/app/api/*` | [FIXED] |
+| **Low** | Ineffective Rate Limit Fallback in Serverless Deployments | `apps/api/src/middleware.ts` | [OPEN] |
+| **Low** | Permissive Content Security Policy (CSP) Directives | `apps/web/next.config.ts` | [OPEN] |
+| **Low** | Potential CSS Injection in Chart Component | `packages/core/src/components/ui/chart.tsx` | [OPEN] |
 
 ---
 
 ## Detailed Findings & Implementation Plans
 
-### 1. High Severity: IDOR on Page View Exits
+### 1. [FIXED] High Severity: IDOR on Page View Exits
 **Description:**
-The tracking endpoint `/api/track` allows users or tracking scripts to submit page exit telemetry. When `body.type === "exit"` and a `body.pageViewId` is supplied, the backend blindly updates the `totalActiveTime` and `exitUrl` of the respective `pageViews.id` without validating ownership or verifying that the page view actually belongs to the requesting `clientId` or `websiteId`. 
+The tracking endpoint `/api/track` allowed users or tracking scripts to submit page exit telemetry without validating ownership. When `body.type === "exit"` and a `body.pageViewId` was supplied, the backend previously updated telemetry without verifying membership.
+**Resolution:**
+The `where` clause in `apps/api/src/app/api/track/route.ts` now strictly enforces `clientId` and `websiteId` matches before updating telemetry, preventing arbitrary record overrides.
 
-An attacker can execute a script hitting `/api/track` iterating through integers from `pageViewId = 1` sequentially, arbitrarily overwriting telemetry stats and inserting spam `.exitUrl` across all properties in the platform.
-
-**Implementation Plan (Fix):**
-1. Modify the `where` clause inside the `pageViews` update in `src/app/api/track/route.ts`.
-2. Even if `pageViewId` is supplied, enforce `clientId` and `websiteId` matches:
-   ```typescript
-   .where(
-     body.pageViewId
-       ? and(
-           eq(pageViews.id, body.pageViewId),
-           eq(pageViews.clientId, body.clientId),
-           eq(pageViews.websiteId, body.websiteId)
-         )
-       : and( ... )
-   )
-   ```
-
-### 2. Medium Severity: SSRF/Injection via `X-Forwarded-For`
+### 2. [FIXED] High Severity: Unauthorized Data Access in Server Actions
 **Description:**
-The track endpoint retrieves geolocation data by making an external request: `fetch(\`https://free.freeipapi.com/api/json/${visitorIp}\`)`. 
-Because `$visitorIp` is derived directly from the user-controlled `X-Forwarded-For` header without strict regex validation, an attacker can manipulate the header to execute SSRF attacks or path traversal against the external API, potentially triggering unauthorized calls or backend crashes from malformed URIs.
+Several Server Actions lacked proper session or permission guards, potentially allowing unauthenticated access to sensitive organization/user lists.
+**Resolution:**
+All sensitive Server Actions in `packages/core/src/server` (e.g., `getUsers`, `getOrganizations`, `addMember`) now correctly call `getCurrentUser()` and verify relevant permissions or membership before returning data or performing mutations.
 
-**Implementation Plan (Fix):**
-1. Validate `ip` strictly before using it in the `fetch` request using a Regex pattern ensuring it conforms exactly to an IPv4/IPv6 address.
-2. If validation fails, default to `"Unknown"` geo information rather than executing the `fetch` request.
-
-### 3. Low Severity: Ineffective Rate Limit Fallback
+### 3. [FIXED] High Severity: Authorization Bypass in Permission Utility (`isAdmin`)
 **Description:**
-The application utilizes `@upstash/redis` for distributed rate-limiting. However, if Redis is unavailable, it gracefully defaults to an in-memory `Map` in `src/lib/rate-limit.ts`. While standard for monoliths, in a serverless environment like Vercel (Edge or Node runtimes), each function invocation can spin up in isolated microVMs, resetting the memory state. Consequently, an attacker can bypass the fallback rate-limiter completely by continuously triggering cold starts.
+The `isAdmin()` utility returned an object on error instead of a boolean. Since JavaScript objects are truthy, a failed permission check (due to an internal error or network failure) could be interpreted as "authorized" if called via `if (!isAdmin())`.
+**Resolution:**
+Fixed in `packages/core/src/server/permissions.ts` to always return a boolean (`!!res?.success`) and fail closed (return `false`) on any error or exception.
 
-**Implementation Plan (Enhancement):**
-1. Accept the inherent limitation of serverless memory persistence, but reinforce critical routes (like Next.js native Authentication callbacks) by ensuring that Redis failures trigger an immediate "Fail Closed" state (deny request) on highly sensitive routes (e.g., password resets), while remaining "Fail Open" (with memory limits) on analytics ingestion.
-
-### 4. Medium Severity: Missing CORS Configuration on Public Ingestion Tunnel
+### 4. [FIXED] Medium Severity: SSRF/Injection via `X-Forwarded-For`
 **Description:**
-The `/api/track` endpoint operates as the universal ingestion tunnel for analytics events dispatched from arbitrary external websites. Currently, the endpoint expects tightly structured `application/json` `POST` requests. Modern browsers mandate a CORS preflight (`OPTIONS` request) when delivering cross-origin JSON. Since neither `src/app/api/track/route.ts` nor `next.config.ts` configure an explicit `OPTIONS` handler or append `Access-Control-Allow-Origin: *` to the tracking endpoints, tracking scripts will face hard browser rejections. 
+The track endpoint retrieved geolocation data by making an external request with user-controlled IP strings, which could lead to SSRF.
+**Resolution:**
+Implemented strict IP address format validation (Regex) for the `visitorIp` before making external fetch requests. Malformed inputs now default to "Unknown" geolocation without triggering a lookup.
 
-**Implementation Plan (Fix):**
-1. Export an `async function OPTIONS(req: NextRequest)` in `/api/track/route.ts` immediately returning status `200` with the standard CORS clearance headers.
-2. Ensure the standard `POST` function universally includes the following headers in its response blocks:
-   - `Access-Control-Allow-Origin: *`
-   - `Access-Control-Allow-Methods: POST, OPTIONS`
-   - `Access-Control-Allow-Headers: Content-Type`
-
-### 5. Low Severity: Permissive Content Security Policy (CSP) Directives
+### 5. [FIXED] Medium Severity: Missing CORS Configuration on Public Ingestion Tunnel
 **Description:**
-The global security definitions inside `next.config.ts` define an excellent baseline of headers, enforcing `Strict-Transport-Security`, `X-Frame-Options`, etc. However, the Content Security Policy specifically authorizes `'unsafe-inline'` and `'unsafe-eval'` for `script-src`. While potentially necessary for dynamic rendering environments or specific third-party scripts, this notably increases the theoretical blast radius in the event a localized XSS vector is discovered throughout the platform. 
+The `/api/track` endpoint lacked explicit CORS headers, causing browser rejections for cross-origin tracking scripts.
+**Resolution:**
+Implemented a global `CORS_HEADERS` object and an `OPTIONS` handler in `apps/api/src/app/api/track/route.ts`, allowing authorized cross-origin `POST` requests from the SDK.
 
-**Implementation Plan (Enhancement):**
-1. Perform a script audit to determine whether UI/UX functionality strictly breaks without `'unsafe-eval'`. 
-2. If feasible, remove `'unsafe-eval'` and move towards strict hash-based or nonce-based inline constraints globally.
-
-### 6. High Severity: Unauthorized Data Access in Server Actions
+### 6. [FIXED] Medium Severity: Missing Input Validation in Management API Routes
 **Description:**
-Several Server Actions lack proper session or permission guards, allowing anyone who can invoke a server action (even unauthenticated users depending on the environment) to access or modify sensitive data.
-- `src/server/users.ts:getUsers(organizationId)`: Returns all users NOT in the organization without checking the caller's session.
-- `src/server/organizations.ts:getOrganizationBySlug(slug)`: Returns full organization data and ALL its members (including user objects) without authentication.
-- `src/server/organizations.ts:getActiveOrganization(userId)`: Allows any caller to find out which organization any `userId` belongs to.
-- `src/server/members.ts:addMember()`: Lacks any session or permission checks before modifying organization membership.
+Management API routes accepted payloads without formal validation, potentially allowing malformed data injection.
+**Resolution:**
+Implemented Zod schemas for all management payloads (websites, links, API keys) in `apps/api` and used `safeParse()` in each endpoint to return `400 Bad Request` on invalid inputs.
 
-**Implementation Plan (Fix):**
-1. Ensure all Server Actions that are not explicitly public (like `signIn`/`signUp`) call `getCurrentUser()` at the start.
-2. For sensitive actions like `addMember` or `getUsers`, verify that the `currentUser` has the necessary permissions (e.g., is an admin/owner of the target organization).
-
-### 7. Medium Severity: Missing Input Validation in Management API Routes
+### 7. [OPEN] Low Severity: Ineffective Rate Limit Fallback
 **Description:**
-Multiple API routes use `req.json()` and destructure data without performing Zod validation. This allows for malformed data, excessively large payloads, or injection of unexpected fields into database queries via `set()` blocks.
-- `src/app/api/website/[id]/route.ts` (`PUT`)
-- `src/app/api/links/route.ts` (`POST`)
-- `src/app/api/account/keys/route.ts` (`POST`)
+The application utilizes `@upstash/redis` for distributed rate-limiting, but defaults to an in-memory `Map`. In serverless environments, this can be bypassed by cold-start triggers.
+**Recommendation:**
+Reinforce critical routes (like password resets) by ensuring that Redis failures trigger a "Fail Closed" state on highly sensitive paths.
 
-**Implementation Plan (Fix):**
-1. Define Zod schemas for all management API payloads.
-2. Use `safeParse()` in each endpoint and return `400 Bad Request` on failure.
-
-### 8. Low Severity: Potential CSS Injection in Chart Component
+### 8. [OPEN] Low Severity: Permissive Content Security Policy (CSP)
 **Description:**
-The `ChartStyle` component in `src/components/ui/chart.tsx` uses `dangerouslySetInnerHTML` to inject dynamic CSS variables based on the `config` prop. If keys or colors in this config are ever influenced by user-controlled data (e.g., custom website branding), it could lead to CSS injection.
+The Content Security Policy authorizes `'unsafe-inline'` and `'unsafe-eval'` for `script-src`.
+**Recommendation:**
+Move towards strict hash-based or nonce-based inline constraints globally and remove `'unsafe-eval'` if not strictly required by third-party SDKs.
 
-**Implementation Plan (Enhancement):**
-1. Sanitize keys and values used in the CSS generation or use a more restricted styling approach if user-input is anticipated.
-
-
+### 9. [OPEN] Low Severity: Potential CSS Injection in Chart Component
+**Description:**
+The `ChartStyle` component uses `dangerouslySetInnerHTML` for CSS variables.
+**Recommendation:**
+Sanitize keys and values used in the CSS generation to prevent style-based injection if UI configurations are ever user-influenced.
