@@ -243,7 +243,7 @@ export async function POST(req: NextRequest) {
             type: body.type,
             referrer: body.referrer,
             entryTime: body.entryTime ? new Date(body.entryTime) : new Date(),
-            exitTime: body.exitTime,
+            exitTime: body.exitTime ? new Date(body.exitTime) : undefined,
             totalActiveTime: body.totalActiveTime,
             urlParams: body.urlParams,
             utmSource: body.utmSource,
