@@ -1,3 +1,4 @@
+import NextImage from "next/image";
 const webFeatures = [
   {
     title: "Traffic analysis",
@@ -77,9 +78,11 @@ export function FeaturesSection() {
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div className="order-2 lg:order-1">
           <div className="aspect-4/3 rounded-sm overflow-hidden border bg-muted/30 shadow-2xl">
-            <img
+            <NextImage
               src="/images/guide/4.png"
               alt="Product Analytics"
+              width={800}
+              height={600}
               className="w-full h-full object-cover"
             />
           </div>
