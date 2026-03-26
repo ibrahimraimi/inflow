@@ -131,6 +131,7 @@ class Inflow {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${this.apiKey}`,
         },
+        credentials: "include",
         body: JSON.stringify(event),
       });
 

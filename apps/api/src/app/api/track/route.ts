@@ -7,17 +7,23 @@ import { and, eq } from "drizzle-orm";
 import { UAParser } from "ua-parser-js";
 import { trackEventSchema } from "@inflow/core/lib/validations/track";
 import { rateLimit } from "@inflow/core/lib/rate-limit";
+import { auth } from "@inflow/core/lib/auth";
+import { headers } from "next/headers";
 
 // export const runtime = "edge";
 
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+const CORS_HEADERS = (req: NextRequest) => {
+  const origin = req.headers.get("origin") || "*";
+  return {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Credentials": "true",
+  };
 };
 
-export async function OPTIONS() {
-  return new NextResponse(null, { status: 200, headers: CORS_HEADERS });
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, { status: 200, headers: CORS_HEADERS(req) });
 }
 
 /**
@@ -72,53 +78,71 @@ export async function POST(req: NextRequest) {
       ? authHeader.split(" ")[1]
       : null;
 
+    const cors = CORS_HEADERS(req);
     if (!apiKey) {
-      return NextResponse.json(
-        { error: "Missing or invalid API key. Use Authorization: Bearer <apiKey>" },
-        { status: 401, headers: CORS_HEADERS },
-      );
+      // We don't return 401 yet, we will check session first
     }
 
     const bodyJson = await req.json().catch(() => ({}));
 
-    // 1. Validate API key
-    const keyHash = crypto.createHash("sha256").update(apiKey).digest("hex");
-    const keyRecord = await db.query.apiKeys.findFirst({
-      where: eq(apiKeys.keyHash, keyHash),
-    });
+    let userId: string | null = null;
+    let apiKeyId: string | null = null;
 
-    if (!keyRecord) {
-      return NextResponse.json(
-        { error: "Invalid API key" },
-        { status: 401, headers: CORS_HEADERS },
-      );
+    // 1. Validate API key
+    if (apiKey) {
+      const keyHash = crypto.createHash("sha256").update(apiKey).digest("hex");
+      const keyRecord = await db.query.apiKeys.findFirst({
+        where: eq(apiKeys.keyHash, keyHash),
+      });
+
+      if (keyRecord) {
+        userId = keyRecord.userId;
+        apiKeyId = keyRecord.id;
+
+        // Log usage if it's an API key
+        try {
+          await db.insert(apiKeyUsageLogs).values({
+            id: crypto.randomUUID(),
+            apiKeyId: keyRecord.id,
+            endpoint: "/api/track",
+            method: "POST",
+            status: 200,
+          });
+        } catch (e) {
+          console.error("Failed to log API key usage:", e);
+        }
+      }
     }
 
-    // 2. Log usage
-    try {
-      await db.insert(apiKeyUsageLogs).values({
-        id: crypto.randomUUID(),
-        apiKeyId: keyRecord.id,
-        endpoint: "/api/track",
-        method: "POST",
-        status: 200,
+    // 2. Fallback to Session
+    if (!userId) {
+      const session = await auth.api.getSession({
+        headers: await headers(),
       });
-    } catch (e) {
-      console.error("Failed to log API key usage:", e);
+      if (session) {
+        userId = session.user.id;
+      }
+    }
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Unauthorized. Provide a valid API key or active session." },
+        { status: 401, headers: cors },
+      );
     }
 
     // 3. Verify website ownership
     const website = await db.query.websites.findFirst({
       where: and(
         eq(websites.websiteId, bodyJson.websiteId),
-        eq(websites.userId, keyRecord.userId)
+        eq(websites.userId, userId)
       ),
     });
 
     if (!website) {
       return NextResponse.json(
         { error: "Website not found or unauthorized" },
-        { status: 403, headers: CORS_HEADERS },
+        { status: 403, headers: cors },
       );
     }
 
@@ -135,7 +159,7 @@ export async function POST(req: NextRequest) {
         {
           status: 429,
           headers: {
-            ...CORS_HEADERS,
+            ...cors,
             "X-RateLimit-Limit": ratelimit.limit.toString(),
             "X-RateLimit-Remaining": ratelimit.remaining.toString(),
             "X-RateLimit-Reset": ratelimit.reset.toString(),
@@ -149,7 +173,7 @@ export async function POST(req: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(
         { error: "Invalid request body", details: validation.error.format() },
-        { status: 400, headers: CORS_HEADERS },
+        { status: 400, headers: cors },
       );
     }
 
@@ -259,7 +283,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       message: "Data received successfully",
       data: result,
-    }, { headers: CORS_HEADERS });
+    }, { headers: cors });
   } catch (error) {
     console.error("Tracking API Error:", error);
     return NextResponse.json(
@@ -267,7 +291,7 @@ export async function POST(req: NextRequest) {
         error: "Internal Server Error", 
         message: error instanceof Error ? error.message : String(error) 
       },
-      { status: 500, headers: CORS_HEADERS },
+      { status: 500, headers: cors },
     );
   }
 }
