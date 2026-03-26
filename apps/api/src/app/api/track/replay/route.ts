@@ -5,14 +5,18 @@ import { ReplayService } from "@inflow/core/server/services/replay.service";
 
 export const runtime = "edge";
 
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+const CORS_HEADERS = (req: NextRequest) => {
+  const origin = req.headers.get("origin") || "*";
+  return {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Credentials": "true",
+  };
 };
 
-export async function OPTIONS() {
-  return new NextResponse(null, { status: 200, headers: CORS_HEADERS });
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, { status: 200, headers: CORS_HEADERS(req) });
 }
 
 export async function POST(req: NextRequest) {
@@ -27,7 +31,7 @@ export async function POST(req: NextRequest) {
     if (!ratelimit.success) {
       return NextResponse.json(
         { error: "Too many requests" },
-        { status: 429, headers: CORS_HEADERS }
+        { status: 429, headers: CORS_HEADERS(req) }
       );
     }
 
@@ -37,7 +41,7 @@ export async function POST(req: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(
         { error: "Invalid request body", details: validation.error.format() },
-        { status: 400, headers: CORS_HEADERS }
+        { status: 400, headers: CORS_HEADERS(req) }
       );
     }
 
@@ -46,18 +50,18 @@ export async function POST(req: NextRequest) {
     if (!result.success) {
       return NextResponse.json(
         { error: result.error },
-        { status: 500, headers: CORS_HEADERS }
+        { status: 500, headers: CORS_HEADERS(req) }
       );
     }
 
     return NextResponse.json({
       message: "Replay data received",
-    }, { headers: CORS_HEADERS });
+    }, { headers: CORS_HEADERS(req) });
   } catch (error) {
     console.error("Replay Tracking Error:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500, headers: CORS_HEADERS }
+      { error: "Internal Server Error", message: error instanceof Error ? error.message : String(error) },
+      { status: 500, headers: CORS_HEADERS(req) }
     );
   }
 }

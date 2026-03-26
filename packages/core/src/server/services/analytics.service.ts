@@ -69,12 +69,7 @@ export class AnalyticsService {
         startDate.setDate(startDate.getDate() - 7);
     }
 
-    // Normalizing entry_time
-    const entryTimeAsTimestamp = sql`(CASE 
-      WHEN ${pageViews.entryTime} ~ '^[0-9]+$' THEN to_timestamp(${pageViews.entryTime}::bigint)
-      WHEN ${pageViews.entryTime} ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN ${pageViews.entryTime}::timestamp
-      ELSE NULL
-    END)`;
+    const entryTimeAsTimestamp = pageViews.entryTime;
 
     const baseWhere = websiteIdOrAll === "all" && userId
       ? inArray(pageViews.websiteId, db.select({ id: websites.websiteId }).from(websites).where(eq(websites.userId, userId)))
@@ -121,11 +116,7 @@ export class AnalyticsService {
 
     const chartDataResult = await db.execute(sql`
       SELECT 
-        date_trunc(${dateTruncUnit}, (CASE 
-          WHEN "entry_time" ~ '^[0-9]+$' THEN to_timestamp("entry_time"::bigint)
-          WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp
-          ELSE NULL
-        END)) as date,
+        date_trunc(${dateTruncUnit}::text, "entry_time") as date,
         count(*) as views,
         count(distinct "client_id") as visitors
       FROM ${pageViews}
@@ -134,16 +125,8 @@ export class AnalyticsService {
           ? sql`${pageViews.websiteId} IN (SELECT "website_id" FROM ${websites} WHERE ${websites.userId} = ${userId})`
           : sql`${pageViews.websiteId} = ${websiteIdOrAll}`
       }
-      AND (CASE 
-          WHEN "entry_time" ~ '^[0-9]+$' THEN to_timestamp("entry_time"::bigint)
-          WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp
-          ELSE NULL
-        END) >= ${startDate.toISOString()}::timestamp
-      AND (CASE 
-          WHEN "entry_time" ~ '^[0-9]+$' THEN to_timestamp("entry_time"::bigint)
-          WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp
-          ELSE NULL
-        END) <= ${endDate.toISOString()}::timestamp
+      AND "entry_time" >= ${startDate.toISOString()}::timestamp
+      AND "entry_time" <= ${endDate.toISOString()}::timestamp
       GROUP BY 1
       ORDER BY 1 ASC
     `);
@@ -285,16 +268,8 @@ export class AnalyticsService {
     // 5. Traffic Heatmap
     const trafficDataResult = await db.execute(sql`
       SELECT 
-        extract(dow from (CASE 
-          WHEN "entry_time" ~ '^[0-9]+$' THEN to_timestamp("entry_time"::bigint)
-          WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp
-          ELSE NULL
-        END)) as day,
-        extract(hour from (CASE 
-          WHEN "entry_time" ~ '^[0-9]+$' THEN to_timestamp("entry_time"::bigint)
-          WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp
-          ELSE NULL
-        END)) as hour,
+        extract(dow from "entry_time") as day,
+        extract(hour from "entry_time") as hour,
         count(distinct "client_id") as visitors
       FROM ${pageViews}
       WHERE ${
@@ -302,16 +277,8 @@ export class AnalyticsService {
           ? sql`${pageViews.websiteId} IN (SELECT "website_id" FROM ${websites} WHERE ${websites.userId} = ${userId})`
           : sql`${pageViews.websiteId} = ${websiteIdOrAll}`
       }
-      AND (CASE 
-          WHEN "entry_time" ~ '^[0-9]+$' THEN to_timestamp("entry_time"::bigint)
-          WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp
-          ELSE NULL
-        END) >= ${startDate.toISOString()}::timestamp
-      AND (CASE 
-          WHEN "entry_time" ~ '^[0-9]+$' THEN to_timestamp("entry_time"::bigint)
-          WHEN "entry_time" ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN "entry_time"::timestamp
-          ELSE NULL
-        END) <= ${endDate.toISOString()}::timestamp
+      AND "entry_time" >= ${startDate.toISOString()}::timestamp
+      AND "entry_time" <= ${endDate.toISOString()}::timestamp
       GROUP BY 1, 2
     `);
 
@@ -353,5 +320,38 @@ export class AnalyticsService {
       map: mapDataResult as Array<{ code: string; name?: string; visitors: number; }>,
       traffic: trafficData,
     };
+  }
+
+  static async getUserWebsitesSummary(userId: string): Promise<any[]> {
+    const userWebsites = await db.query.websites.findMany({
+      where: eq(websites.userId, userId),
+      orderBy: desc(websites.createdAt),
+    });
+
+    if (userWebsites.length === 0) return [];
+
+    const siteIds = userWebsites.map((s) => s.websiteId);
+
+    const stats = await db
+      .select({
+        websiteId: pageViews.websiteId,
+        visitors: sql<number>`count(distinct ${pageViews.clientId})`,
+        views: count(),
+        last24hVisitors: sql<number>`count(distinct case when ${pageViews.entryTime} >= now() - interval '24 hours' then ${pageViews.clientId} end)`,
+      })
+      .from(pageViews)
+      .where(inArray(pageViews.websiteId, siteIds))
+      .groupBy(pageViews.websiteId);
+
+    const statsMap = Object.fromEntries(stats.map((s) => [s.websiteId, s]));
+
+    return userWebsites.map((site) => ({
+      website: site,
+      analytics: {
+        totalVisitors: Number(statsMap[site.websiteId]?.visitors || 0),
+        totalViews: Number(statsMap[site.websiteId]?.views || 0),
+        last24hVisitors: Number(statsMap[site.websiteId]?.last24hVisitors || 0),
+      },
+    }));
   }
 }

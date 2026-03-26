@@ -8,6 +8,7 @@ import { and, desc, eq, gte, lte, sql } from "drizzle-orm";
 
 import { auth } from "@inflow/core/lib/auth";
 import { pageViews, websites } from "@inflow/db";
+import { AnalyticsService } from "@inflow/core/server/services/analytics.service";
 import {
   getSafeTimeZone,
   formatDateInTz,
@@ -196,236 +197,41 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(allSites);
   }
 
-  /* FETCH WEBSITES */
-  const userWebsites = await db
-    .select()
-    .from(websites)
-    .where(
-      websiteId
-        ? and(
-            eq(websites.userId, session.user.id),
-            eq(websites.websiteId, websiteId),
-          )
-        : eq(websites.userId, session.user.id),
-    )
-    .orderBy(desc(websites.id));
-
-  const result: WebsiteWithAnalytics[] = [];
-
-  /* LOOP WEBSITES & AGGREGATE DATA */
-  for (const site of userWebsites) {
-    const siteTZ = getSafeTimeZone(site.timeZone);
-
-    const views = await db
-      .select()
-      .from(pageViews)
-      .where(
-        and(
-          eq(pageViews.websiteId, site.websiteId),
-          ...(fromUnix && toUnix
-            ? [
-                gte(
-                  sql`(CASE 
-                    WHEN ${pageViews.entryTime} ~ '^[0-9]+$' THEN ${pageViews.entryTime}::bigint
-                    WHEN ${pageViews.entryTime} ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN extract(epoch from ${pageViews.entryTime}::timestamp)::bigint
-                    ELSE 0
-                  END)`,
-                  fromUnix,
-                ),
-                lte(
-                  sql`(CASE 
-                    WHEN ${pageViews.entryTime} ~ '^[0-9]+$' THEN ${pageViews.entryTime}::bigint
-                    WHEN ${pageViews.entryTime} ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN extract(epoch from ${pageViews.entryTime}::timestamp)::bigint
-                    ELSE 0
-                  END)`,
-                  toUnix,
-                ),
-              ]
-            : []),
-        ),
+  /* FETCH WEBSITES WITH ANALYTICS */
+  try {
+    if (websiteId) {
+      const data = await AnalyticsService.getData(
+        websiteId,
+        from || "last_7_days",
+        from,
+        to,
+        session.user.id,
       );
-
-    const parseEntryTime = (t: string | null) => {
-      if (!t) return null;
-      if (/^\d+$/.test(t)) return new Date(Number(t) * 1000);
-      return new Date(t);
-    };
-
-    const makeSetMap = () => ({}) as Record<string, Set<string>>;
-
-    const countryVisitors = makeSetMap();
-    const cityVisitors = makeSetMap();
-    const regionVisitors = makeSetMap();
-    const deviceVisitors = makeSetMap();
-    const osVisitors = makeSetMap();
-    const browserVisitors = makeSetMap();
-    const referralVisitors = makeSetMap();
-    const refParamsVisitors = makeSetMap();
-    const utmSourceVisitors = makeSetMap();
-    const urlVisitors = makeSetMap();
-
-    const countryCodeMap: Record<string, string> = {};
-    const cityCountryMap: Record<string, string> = {};
-    const regionCountryMap: Record<string, string> = {};
-
-    const uniqueVisitors = new Set<string>();
-    let totalActiveTime = 0;
-
-    views.forEach((v) => {
-      if (!v.clientId) return;
-      uniqueVisitors.add(v.clientId);
-
-      if (v.totalActiveTime && v.totalActiveTime > 0) {
-        totalActiveTime += v.totalActiveTime;
-      }
-
-      const add = (map: Record<string, Set<string>>, key: string) => {
-        map[key] ??= new Set();
-        map[key].add(v.clientId!);
-      };
-
-      if (v.country) {
-        add(countryVisitors, v.country);
-        if (v.countryCode)
-          countryCodeMap[v.country] = v.countryCode.toUpperCase();
-      }
-
-      if (v.city) {
-        add(cityVisitors, v.city);
-        if (v.countryCode) cityCountryMap[v.city] = v.countryCode.toUpperCase();
-      }
-
-      if (v.region) {
-        add(regionVisitors, v.region);
-        if (v.countryCode)
-          regionCountryMap[v.region] = v.countryCode.toUpperCase();
-      }
-
-      if (v.device) add(deviceVisitors, v.device);
-      if (v.os) add(osVisitors, v.os);
-      if (v.browser) add(browserVisitors, v.browser);
-      if (v.referrer) add(referralVisitors, v.referrer);
-      if (v.refParams) add(refParamsVisitors, v.refParams);
-      if (v.utmSource) add(utmSourceVisitors, v.utmSource);
-      if (v.url) add(urlVisitors, v.url);
-    });
-
-    const toCountMap = (map: Record<string, Set<string>>) =>
-      Object.fromEntries(Object.entries(map).map(([k, v]) => [k, v.size]));
-
-    const totalVisitors = uniqueVisitors.size;
-    const totalSessions = views.length;
-    const avgActiveTime =
-      totalVisitors > 0 ? Math.round(totalActiveTime / totalVisitors) : 0;
-
-    /* HOURLY VISITORS */
-    const hourlyMap: Record<string, Set<string>> = {};
-    const hourlyVisitors: WebsiteWithAnalytics["analytics"]["hourlyVisitors"] =
-      [];
-
-    if (views.length > 0) {
-      const viewDates = views
-        .map((v) => parseEntryTime(v.entryTime))
-        .filter((d): d is Date => d !== null);
-
-      const start = fromUnix
-        ? new Date(fromUnix * 1000)
-        : new Date(Math.min(...viewDates.map((d) => d.getTime())));
-      const end = toUnix
-        ? new Date(toUnix * 1000)
-        : new Date(Math.max(...viewDates.map((d) => d.getTime())));
-
-      let cursor = new Date(start);
-
-      // Prevent infinite loop if dates are invalid
-      if (cursor <= end) {
-        // Limit loop to reasonable number of hours approx 1 year to be safe
-        let safetyCount = 0;
-        while (cursor <= end && safetyCount < 24 * 366) {
-          const date = formatDateInTz(cursor, siteTZ);
-          const hour = cursor.getHours();
-          const key = `${date}-${hour}`;
-          const hourLabel = cursor.toLocaleString("en-US", {
-            hour: "numeric",
-            hour12: true,
-            timeZone: siteTZ,
-          });
-
-          hourlyVisitors.push({
-            date,
-            hour,
-            hourLabel,
-            count: 0,
-          });
-
-          hourlyMap[key] = new Set();
-          cursor.setHours(cursor.getHours() + 1);
-          safetyCount++;
-        }
-      }
-
-      views.forEach((v) => {
-        const entryDate = parseEntryTime(v.entryTime);
-        if (!entryDate || !v.clientId) return;
-        const local = toZonedTime(entryDate, siteTZ);
-        const date = formatDateInTz(local, siteTZ);
-        hourlyMap[`${date}-${local.getHours()}`]?.add(v.clientId);
+      
+      const site = await db.query.websites.findFirst({
+        where: and(
+          eq(websites.userId, session.user.id),
+          eq(websites.websiteId, websiteId),
+        ),
       });
 
-      hourlyVisitors.forEach((h) => {
-        h.count = hourlyMap[`${h.date}-${h.hour}`]?.size || 0;
+      if (!site) return NextResponse.json({ error: "Website not found" }, { status: 404 });
+
+      // Return in the format expected by the frontend
+      return NextResponse.json({
+        website: site,
+        analytics: data, // Note: In detail page, this matches AnalyticsData
       });
     }
 
-    /* DAILY VISITORS */
-    const dailyMap: Record<string, Set<string>> = {};
-
-    views.forEach((v) => {
-      const entryDate = parseEntryTime(v.entryTime);
-      if (!entryDate || !v.clientId) return;
-      const local = toZonedTime(entryDate, siteTZ);
-      const date = formatDateInTz(local, siteTZ);
-      dailyMap[date] ??= new Set();
-      dailyMap[date].add(v.clientId);
-    });
-
-    const dailyVisitors = Object.entries(dailyMap).map(([date, set]) => ({
-      date,
-      count: set.size,
-    }));
-
-    /* LAST 24H VISITORS */
-    const last24hViews = views.filter((v) => {
-      const entryDate = parseEntryTime(v.entryTime);
-      if (!entryDate) return false;
-      const entryTime = Math.floor(entryDate.getTime() / 1000);
-      const now = Math.floor(Date.now() / 1000);
-      return entryTime >= now - 24 * 60 * 60;
-    });
-
-    const last24hUniqueVisitors = new Set(
-      last24hViews.map((v) => v.clientId).filter(Boolean),
-    ).size;
-
-    result.push({
-      website: site,
-      analytics: {
-        totalVisitors,
-        totalSessions,
-        totalActiveTime,
-        avgActiveTime,
-        hourlyVisitors,
-        countries: formatCountries(toCountMap(countryVisitors), countryCodeMap),
-        cities: formatCities(toCountMap(cityVisitors), cityCountryMap),
-        regions: formatRegions(toCountMap(regionVisitors), regionCountryMap),
-        referrals: formatReferrals(toCountMap(referralVisitors)),
-        browsers: formatWithImage(toCountMap(browserVisitors)),
-        os: formatWithImage(toCountMap(osVisitors)),
-        devices: formatWithImage(toCountMap(deviceVisitors)),
-        last24hVisitors: last24hUniqueVisitors,
-      },
-    });
+    // List view summary
+    const summary = await AnalyticsService.getUserWebsitesSummary(session.user.id);
+    return NextResponse.json(summary);
+  } catch (error) {
+    console.error("Dashboard Analytics Error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch dashboard data" },
+      { status: 500 },
+    );
   }
-
-  return NextResponse.json(result);
 }

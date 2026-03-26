@@ -27,9 +27,28 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MetricCard } from "../_components/metric-card";
-import { ChartAreaInteractive } from "../_components/chart";
-import { DataTable } from "../_components/data-table";
-import { DataMap } from "../_components/data-map";
+import dynamic from "next/dynamic";
+const ChartAreaInteractive = dynamic(
+  () => import("../_components/chart").then((mod) => mod.ChartAreaInteractive),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-[300px] w-full rounded-xl" />,
+  }
+);
+const DataTable = dynamic(
+  () => import("../_components/data-table").then((mod) => mod.DataTable),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-[300px] w-full rounded-xl" />,
+  }
+);
+const DataMap = dynamic(
+  () => import("../_components/data-map").then((mod) => mod.DataMap),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-[400px] w-full rounded-xl" />,
+  }
+);
 import { useWebsite } from "@/hooks/use-website";
 import { useAnalytics } from "@/hooks/use-analytics";
 import { useRageClicks } from "@/hooks/use-rage-clicks";

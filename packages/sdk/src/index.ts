@@ -106,16 +106,9 @@ class Inflow {
     try {
       this.log("Flushing events:", eventsToSend);
       
-      // For now, we send them one by one or we could update backend to support batching.
-      // The requirement said "Batch events before sending".
-      // Let's assume the backend can handle an array or we send them sequentially but efficiently.
-      // Wait, the current backend expects a single object.
-      // I'll send them sequentially for now to avoid breaking the current API, 
-      // but the "batching" in the SDK means we don't fire 10 requests at once.
-      
-      for (const event of eventsToSend) {
-        await this.send(event);
-      }
+      // Send batched payload as an array
+      await this.send(eventsToSend);
+
     } catch (e) {
       this.error("Failed to flush events", e);
       // Re-queue on failure? (Optional offline support)
@@ -123,7 +116,7 @@ class Inflow {
     }
   }
 
-  private async send(event: any): Promise<void> {
+  private async send(payload: any): Promise<void> {
     try {
       const response = await fetch(this.endpoint, {
         method: "POST",
@@ -131,7 +124,8 @@ class Inflow {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${this.apiKey}`,
         },
-        body: JSON.stringify(event),
+        credentials: "include",
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {

@@ -20,7 +20,14 @@ import {
 import { useWebsites } from "@/hooks/use-websites";
 import { useGlobalAnalytics } from "@/hooks/use-global-analytics";
 import { MetricCard } from "./(website)/_components/metric-card";
-import { ChartAreaInteractive } from "./(website)/_components/chart";
+import dynamic from "next/dynamic";
+const ChartAreaInteractive = dynamic(
+  () => import("./(website)/_components/chart").then((mod) => mod.ChartAreaInteractive),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-[300px] w-full rounded-xl" />,
+  }
+);
 
 import { authClient } from "@inflow/core/lib/auth-client";
 import { isFeatureEnabled } from "@inflow/core/lib/feature-flags";

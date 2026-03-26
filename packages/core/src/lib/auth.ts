@@ -13,9 +13,15 @@ import OrganizationInvitationEmail from "../components/emails/organization-invit
 import { MailerService } from "../server/services/mailer.service";
 import { getBaseUrl } from "./url";
 
+const TRUSTED_ORIGINS = ["http://localhost:3000", "http://localhost:3001", "https://inflowanalytics.vercel.app", "https://inflow-api.vercel.app"];
+
 
 export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET || "fallback_secret_for_build",
+  trustedOrigins: TRUSTED_ORIGINS,
+  advanced: {
+    disableOriginCheck: true, // Bypass strict origin check to handle proxied requests in development
+  },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
       await MailerService.sendEmail({
@@ -48,9 +54,6 @@ export const auth = betterAuth({
       });
     },
     requireEmailVerification: true,
-    changeEmail: {
-      enabled: true,
-    },
   },
   databaseHooks: {
     session: {

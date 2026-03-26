@@ -1,4 +1,5 @@
 import { useState } from "react";
+import NextImage from "next/image";
 import {
   Globe,
   Smartphone,
@@ -44,9 +45,11 @@ export function DataTable({
 
     if (item.icon) {
       return (
-        <img
+        <NextImage
           src={item.icon}
           alt={name}
+          width={16}
+          height={16}
           className="w-4 h-4 object-cover shadow-sm"
         />
       );
