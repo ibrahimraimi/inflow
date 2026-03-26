@@ -62,6 +62,18 @@ jobs:
         with:
           bun-version: latest
 
+      - name: Setup Node Next.js Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ github.workspace }}/.turbo
+            ${{ github.workspace }}/apps/web/.next/cache
+            ${{ github.workspace }}/apps/api/.next/cache
+          key: ${{ runner.os }}-turbo-${{ github.ref_name }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-${{ github.ref_name }}-
+            ${{ runner.os }}-turbo-
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
 

@@ -40,8 +40,8 @@ This document outlines the performance characteristics of the Inflow Analytics p
 - **Deployments**: Separate Vercel deployments for Web and API.
 
 ### Optimization Opportunities
-- [ ] **Remote Caching**: Enable Turborepo Remote Caching to speed up CI/CD pipeline runs.
-- [ ] **Docker Layer Caching**: Optimize Dockerfiles for the `standalone` output mode to reuse layers more effectively.
+- [x] **Remote Caching**: Enable Turborepo Remote Caching to speed up CI/CD pipeline runs.
+- [x] **Docker Layer Caching**: Optimize Dockerfiles for the `standalone` output mode to reuse layers more effectively.
 
 ## 5. Summary of Recommendations
 | Component | Priority | Impact | Effort |
