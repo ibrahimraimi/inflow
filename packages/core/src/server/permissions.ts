@@ -6,7 +6,7 @@ import { auth } from "../lib/auth";
 
 export const isAdmin = async () => {
   try {
-    const { success, error } = await auth.api.hasPermission({
+    const res = await auth.api.hasPermission({
       headers: await headers(),
       body: {
         permissions: {
@@ -15,19 +15,9 @@ export const isAdmin = async () => {
       },
     });
 
-    if (error) {
-      return {
-        success: false,
-        error: error || "Failed to check permissions",
-      };
-    }
-
-    return success;
+    return !!res?.success;
   } catch (error) {
-    console.error(error);
-    return {
-      success: false,
-      error: error || "Failed to check permissions",
-    };
+    console.error("isAdmin check failed:", error);
+    return false;
   }
 };

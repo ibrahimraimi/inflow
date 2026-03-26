@@ -6,6 +6,49 @@ import { db } from "@inflow/db";
 import { apiKeys, websites, apiKeyUsageLogs } from "@inflow/db";
 import { AnalyticsService } from "@inflow/core/server/services/analytics.service";
 
+/**
+ * @swagger
+ * /api/v1/stats:
+ *   get:
+ *     summary: Retrieve website statistics (API Key Auth)
+ *     description: Fetches analytics data for a specific website using a Bearer API key.
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: websiteId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The unique ID of the website
+ *       - in: query
+ *         name: range
+ *         schema:
+ *           type: string
+ *           default: last_30_days
+ *         description: Date range for statistics
+ *       - in: query
+ *         name: from
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Custom start date
+ *       - in: query
+ *         name: to
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Custom end date
+ *     responses:
+ *       200:
+ *         description: Statistics retrieved successfully
+ *       401:
+ *         description: Unauthorized (Missing or invalid API key)
+ *       403:
+ *         description: Forbidden (Invalid scope or unauthorized website access)
+ *       400:
+ *         description: Bad request (Missing websiteId)
+ */
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
 

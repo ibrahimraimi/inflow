@@ -4,6 +4,41 @@ import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@inflow/core/lib/auth";
 import { AnalyticsService } from "@inflow/core/server/services/analytics.service";
 
+/**
+ * @swagger
+ * /api/analytics:
+ *   get:
+ *     summary: Get aggregated analytics for all user websites
+ *     description: Returns aggregated analytics data for all websites owned by the authenticated user.
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: range
+ *         schema:
+ *           type: string
+ *           enum: [last_24_hours, last_7_days, last_30_days, this_month, last_month, this_year, custom]
+ *         description: The date range for analytics
+ *       - in: query
+ *         name: from
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *         description: Start date for custom range
+ *       - in: query
+ *         name: to
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *         description: End date for custom range
+ *     responses:
+ *       200:
+ *         description: Aggregated analytics data
+ *       401:
+ *         description: Unauthorized
+ *       400:
+ *         description: Invalid parameters
+ */
 export async function GET(req: NextRequest) {
   const session = await auth.api.getSession({
     headers: await headers(),

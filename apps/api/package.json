@@ -16,19 +16,22 @@
     "date-fns-tz": "^3.2.0",
     "dotenv": "^17.3.1",
     "drizzle-orm": "^0.45.1",
+    "fumadocs-core": "^16.6.3",
+    "fumadocs-mdx": "^14.2.7",
     "next": "16.1.6",
+    "next-swagger-doc": "^0.4.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "swagger-ui-react": "^5.32.1",
     "ua-parser-js": "^2.0.9",
-    "zod": "^4.3.6",
-    "fumadocs-core": "^16.6.3",
-    "fumadocs-mdx": "^14.2.7"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",
     "@types/node": "^20.19.33",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@types/swagger-ui-react": "^5.18.0",
     "typescript": "^5.9.3"
   }
 }

@@ -91,12 +91,21 @@ export function StatsSection() {
   useEffect(() => {
     const fetchStars = async () => {
       try {
-        const res = await fetch("https://api.github.com/repos/ibrahimraimi/inflow");
+        const res = await fetch("https://api.github.com/repos/ibrahimraimi/inflow", {
+          next: { revalidate: 3600 }, // Hint for Next.js if this was server-side, but good for docs
+        });
+        
+        if (!res.ok) {
+          console.warn(`GitHub API returned ${res.status}: ${res.statusText}`);
+          return;
+        }
+
         const data = await res.json();
-        if (data.stargazers_count) {
+        if (data && typeof data.stargazers_count === "number") {
           setGithubStars(data.stargazers_count);
         }
       } catch (error) {
+        // Silently fail as it's a non-critical enhancement
         console.error("Failed to fetch GitHub stars:", error);
       }
     };

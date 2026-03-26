@@ -20,6 +20,51 @@ export async function OPTIONS() {
   return new NextResponse(null, { status: 200, headers: CORS_HEADERS });
 }
 
+/**
+ * @swagger
+ * /api/track:
+ *   post:
+ *     summary: Track website events and page views
+ *     description: Ingests tracking data from the Inflow SDK or custom integrations.
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [websiteId, clientId, type]
+ *             properties:
+ *               websiteId:
+ *                 type: string
+ *               clientId:
+ *                 type: string
+ *               domain:
+ *                 type: string
+ *               url:
+ *                 type: string
+ *               type:
+ *                 type: string
+ *                 enum: [entry, event, exit, ping]
+ *               referrer:
+ *                 type: string
+ *               eventName:
+ *                 type: string
+ *               properties:
+ *                 type: object
+ *     responses:
+ *       200:
+ *         description: Data received successfully
+ *       401:
+ *         description: Unauthorized (Missing or invalid API key)
+ *       403:
+ *         description: Forbidden (Website not found or unauthorized)
+ *       400:
+ *         description: Invalid request body
+ *       429:
+ *         description: Too many requests
+ */
 export async function POST(req: NextRequest) {
   try {
     const authHeader = req.headers.get("authorization");
