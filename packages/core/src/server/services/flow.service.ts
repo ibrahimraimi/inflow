@@ -1,6 +1,5 @@
-import { db } from "@inflow/db";
-import { sql } from "drizzle-orm";
-import { pageViews, events } from "@inflow/db";
+import { and, eq, gte, lte, sql } from "drizzle-orm";
+import { db, events, pageViews } from "@inflow/db";
 import type { FlowData, FlowNode, FlowLink } from "@inflow/types";
 
 export class FlowService {
@@ -42,67 +41,80 @@ export class FlowService {
     }
 
     // 2. Execute the Flow Reconstruction Query
-    const query = sql`
-      WITH CombinedEvents AS (
-        SELECT 
-          client_id,
-          url AS url_name,
-          'page' as type,
-          entry_time AS timestamp
-        FROM ${pageViews}
-        WHERE website_id = ${websiteId}
-        UNION ALL
-        SELECT 
-          client_id,
-          event_name AS url_name,
-          'event' as type,
-          created_at AS timestamp
-        FROM ${events}
-        WHERE website_id = ${websiteId}
-      ),
-      OrderedEvents AS (
-        SELECT 
-          client_id,
-          url_name,
-          type,
-          timestamp,
-          ROW_NUMBER() OVER (PARTITION BY client_id ORDER BY timestamp) as step_number
-        FROM CombinedEvents
-        WHERE timestamp >= ${startDate.toISOString()}::timestamp 
-          AND timestamp <= ${endDate.toISOString()}::timestamp
-      ),
-      Transitions AS (
-        SELECT 
-          url_name as source_name,
-          type as source_type,
-          LEAD(url_name) OVER (PARTITION BY client_id ORDER BY step_number) as target_name,
-          LEAD(type) OVER (PARTITION BY client_id ORDER BY step_number) as target_type,
-          step_number
-        FROM OrderedEvents
-        WHERE step_number < 5
-      )
-      SELECT 
-        source_name, 
-        source_type,
-        target_name, 
-        target_type,
-        step_number, 
-        COUNT(*)::int as count
-      FROM Transitions
-      WHERE target_name IS NOT NULL
-      GROUP BY source_name, source_type, target_name, target_type, step_number
-      ORDER BY step_number, count DESC;
-    `;
+    const combinedEvents = db.$with("CombinedEvents").as(
+      db
+        .select({
+          client_id: pageViews.clientId,
+          url_name: pageViews.url,
+          type: sql<string>`'page'`.as("type"),
+          timestamp: pageViews.entryTime,
+        })
+        .from(pageViews)
+        .where(eq(pageViews.websiteId, websiteId))
+        .unionAll(
+          db
+            .select({
+              client_id: events.clientId,
+              url_name: events.eventName,
+              type: sql<string>`'event'`.as("type"),
+              timestamp: events.createdAt,
+            })
+            .from(events)
+            .where(eq(events.websiteId, websiteId))
+        )
+    );
 
-    const result = await db.execute(query);
-    const rows = result.rows as unknown as Array<{
-      source_name: string;
-      source_type: "page" | "event";
-      target_name: string;
-      target_type: "page" | "event";
-      step_number: number;
-      count: number;
-    }>;
+    const orderedEvents = db.$with("OrderedEvents").as(
+      db
+        .select({
+          client_id: combinedEvents.client_id,
+          url_name: combinedEvents.url_name,
+          type: combinedEvents.type,
+          timestamp: combinedEvents.timestamp,
+          step_number: sql<number>`ROW_NUMBER() OVER (PARTITION BY ${combinedEvents.client_id} ORDER BY ${combinedEvents.timestamp})`.as("step_number"),
+        })
+        .from(combinedEvents)
+        .where(
+          and(
+            gte(combinedEvents.timestamp, startDate),
+            lte(combinedEvents.timestamp, endDate)
+          )
+        )
+    );
+
+    const transitions = db.$with("Transitions").as(
+      db
+        .select({
+          source_name: orderedEvents.url_name,
+          source_type: orderedEvents.type,
+          target_name: sql<string>`LEAD(${orderedEvents.url_name}) OVER (PARTITION BY ${orderedEvents.client_id} ORDER BY ${orderedEvents.step_number})`.as("target_name"),
+          target_type: sql<string>`LEAD(${orderedEvents.type}) OVER (PARTITION BY ${orderedEvents.client_id} ORDER BY ${orderedEvents.step_number})`.as("target_type"),
+          step_number: orderedEvents.step_number,
+        })
+        .from(orderedEvents)
+        .where(sql`${orderedEvents.step_number} < 5`)
+    );
+
+    const rows = await db
+      .with(combinedEvents, orderedEvents, transitions)
+      .select({
+        source_name: transitions.source_name,
+        source_type: sql<"page" | "event">`${transitions.source_type}`,
+        target_name: transitions.target_name,
+        target_type: sql<"page" | "event">`${transitions.target_type}`,
+        step_number: transitions.step_number,
+        count: sql<number>`COUNT(*)::int`.as("count"),
+      })
+      .from(transitions)
+      .where(sql`${transitions.target_name} IS NOT NULL`)
+      .groupBy(
+        transitions.source_name,
+        transitions.source_type,
+        transitions.target_name,
+        transitions.target_type,
+        transitions.step_number
+      )
+      .orderBy(transitions.step_number, sql`count DESC`);
 
     // 3. Clean and Transform in JS
     const cleanPath = (url: string) => {
@@ -133,15 +145,15 @@ export class FlowService {
     // First pass: clean paths and aggregate
     const initialAgg = new Map<string, number>();
     for (const row of rows) {
-      const sName = cleanPath(row.source_name);
-      const tName = cleanPath(row.target_name);
+      const sName = cleanPath(row.source_name || "");
+      const tName = cleanPath(row.target_name || "");
       const key = `${sName}|${row.source_type}|${tName}|${row.target_type}|${row.step_number}`;
       initialAgg.set(key, (initialAgg.get(key) || 0) + row.count);
     }
 
     // Second pass: Limit to Top 8 transitions per step to keep it clean
     const stepCounts = new Map<number, Array<{ key: string, count: number }>>();
-    for (const [key, count] of initialAgg.entries()) {
+    for (const [key, count] of Array.from(initialAgg.entries())) {
       const step = parseInt(key.split('|')[4]);
       const list = stepCounts.get(step) || [];
       list.push({ key, count });
@@ -163,7 +175,7 @@ export class FlowService {
       return nodeMapping.get(key)!;
     };
 
-    for (const [step, list] of stepCounts.entries()) {
+    for (const [step, list] of Array.from(stepCounts.entries())) {
       const sorted = list.sort((a, b) => b.count - a.count);
       const top = sorted.slice(0, 8);
       const others = sorted.slice(8);
@@ -176,7 +188,7 @@ export class FlowService {
       }
 
       if (others.length > 0) {
-        const otherCount = others.reduce((acc, curr) => acc + curr.count, 0);
+        const otherCount = others.reduce((acc: number, curr: { count: number }) => acc + curr.count, 0);
         // We link "Other" from the sources of the excluded transitions to an "Other" target
         // But for simplicity, we'll just group them into one "Other" transition if they share same step
         const sId = getNodeId("Other", step, "event");
