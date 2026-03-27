@@ -13,7 +13,13 @@ import OrganizationInvitationEmail from "../components/emails/organization-invit
 import { MailerService } from "../server/services/mailer.service";
 import { getBaseUrl } from "./url";
 
-const TRUSTED_ORIGINS = ["http://localhost:3000", "http://localhost:3001", "https://inflowanalytics.vercel.app", "https://inflow-api.vercel.app"];
+const TRUSTED_ORIGINS = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://localhost:3002",
+  "https://inflowanalytics.vercel.app",
+  "https://inflow-api.vercel.app"
+];
 
 
 export const auth = betterAuth({
