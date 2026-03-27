@@ -10,16 +10,16 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { cn } from "@inflow/core/lib/utils";
-import { Input } from "@/components/ui/input";
+import { Input } from "@inflow/ui";
 import { authClient } from "@inflow/core/lib/auth-client";
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@inflow/ui";
 import {
   Form,
   FormControl,
@@ -27,7 +27,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "@inflow/ui";
 
 const formSchema = z.object({
   email: z.string().email(),

@@ -7,23 +7,23 @@ import { ArrowLeft, Loader2, Plus, Trash2 } from "lucide-react";
 
 import { useWebsite } from "@/hooks/use-website";
 import { useFunnels } from "@/hooks/use-funnels";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@inflow/ui";
+import { Input } from "@inflow/ui";
+import { Label } from "@inflow/ui";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@inflow/ui";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@inflow/ui";
 import { toast } from "sonner";
 
 type FunnelStep = {

@@ -5,18 +5,18 @@ import { useState } from "react";
 import { useParams } from "next/navigation";
 import { ArrowLeft, Loader2, Activity, Info } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@inflow/ui";
 import { useWebsite } from "@/hooks/use-website";
 import { useFlow } from "@/hooks/use-flow";
 import { FlowDiagram } from "../../_components/flow-diagram";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@inflow/ui";
 
 export default function FlowPage() {
   const params = useParams();

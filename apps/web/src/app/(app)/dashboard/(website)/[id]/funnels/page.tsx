@@ -6,14 +6,14 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Loader2, Plus, Trash2 } from "lucide-react";
 
 import { useWebsite } from "@/hooks/use-website";
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@inflow/ui";
 import { useFunnels } from "@/hooks/use-funnels";
 
 export default function FunnelsListPage() {

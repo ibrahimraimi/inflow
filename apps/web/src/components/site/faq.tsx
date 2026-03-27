@@ -7,9 +7,9 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "@inflow/ui";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 import Link from "next/link";
 
 const FAQ_QUESTIONS = [

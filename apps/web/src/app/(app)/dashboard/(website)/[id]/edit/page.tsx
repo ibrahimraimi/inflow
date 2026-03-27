@@ -10,11 +10,11 @@ import { toast } from "sonner";
 import { ArrowLeft, Copy, Loader2, ShieldCheck } from "lucide-react";
 
 import { cn } from "@inflow/core/lib/utils";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import { Input } from "@inflow/ui";
+import { Label } from "@inflow/ui";
+import { Switch } from "@inflow/ui";
 import { WebsiteType } from "@inflow/types";
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 import { useWebsite } from "@/hooks/use-website";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 

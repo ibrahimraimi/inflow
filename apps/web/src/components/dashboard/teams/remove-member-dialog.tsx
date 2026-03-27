@@ -10,9 +10,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+} from "@inflow/ui";
+import { Button } from "@inflow/ui";
+import { Alert, AlertDescription, AlertTitle } from "@inflow/ui";
 import { removeMember } from "@inflow/core/server/teams";
 
 interface RemoveMemberDialogProps {

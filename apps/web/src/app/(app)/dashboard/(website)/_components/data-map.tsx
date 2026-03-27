@@ -9,7 +9,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@inflow/ui";
 import { useMemo } from "react";
 
 import { MapData, TrafficData } from "@inflow/types";

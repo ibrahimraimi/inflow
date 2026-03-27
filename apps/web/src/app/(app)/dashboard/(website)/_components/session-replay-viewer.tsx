@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Play, Pause, RotateCcw, X, Loader2, MousePointer2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@inflow/ui";
+import { Slider } from "@inflow/ui";
+import { Badge } from "@inflow/ui";
 
 interface ReplayEvent {
   type: "click" | "scroll" | "nav" | "input";

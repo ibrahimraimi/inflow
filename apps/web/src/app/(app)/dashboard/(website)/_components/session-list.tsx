@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Play, Calendar, User, Loader2, MousePointer2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@inflow/ui";
+import { ScrollArea } from "@inflow/ui";
 import { formatDistanceToNow } from "date-fns";
 
 interface Session {

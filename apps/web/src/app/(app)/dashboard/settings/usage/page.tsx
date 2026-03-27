@@ -14,7 +14,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from "@/components/ui/chart";
+} from "@inflow/ui";
 
 const chartConfig = {
   events: {

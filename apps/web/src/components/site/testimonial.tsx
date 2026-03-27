@@ -1,13 +1,13 @@
 import { cn } from "@inflow/core/lib/utils";
 
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@inflow/ui";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
+} from "@inflow/ui";
 
 const testimonials = [
   {

@@ -19,28 +19,28 @@ import {
 import { useWebsite } from "@/hooks/use-website";
 import { useFunnel } from "@/hooks/use-funnels";
 import type { FunnelEvaluationResult } from "@inflow/types";
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@inflow/ui";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@inflow/ui";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from "@/components/ui/chart";
-import { Badge } from "@/components/ui/badge";
+} from "@inflow/ui";
+import { Badge } from "@inflow/ui";
 
 type ChartDataEntry = {
   name: string;

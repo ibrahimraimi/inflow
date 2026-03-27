@@ -1,7 +1,7 @@
 "use client";
 
 import { ExternalLink, Mail, MessageSquare, BookOpen } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 import { toast } from "sonner";
 
 export default function SupportSettingsPage() {

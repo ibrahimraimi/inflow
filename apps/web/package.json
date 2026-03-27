@@ -66,7 +66,8 @@
     "@inflow/core": "workspace:*",
     "@inflow/db": "workspace:*",
     "@inflow/types": "workspace:*",
-    "@inflow/sdk": "workspace:*"
+    "@inflow/sdk": "workspace:*",
+    "@inflow/ui": "workspace:*"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",

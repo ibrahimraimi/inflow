@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 import { useWebsites } from "@/hooks/use-websites";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@inflow/ui";
 import { Loader2 } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";

@@ -10,16 +10,16 @@ import {
 } from "lucide-react";
 
 import { cn } from "@inflow/core/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@inflow/ui";
 import { fetcherWithParams } from "@inflow/core/lib/fetcher";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@inflow/ui";
 import type { AnalyticsData } from "@inflow/types";
 import { DataMap } from "@/app/(app)/dashboard/(website)/_components/data-map";
 import { DataTable } from "@/app/(app)/dashboard/(website)/_components/data-table";

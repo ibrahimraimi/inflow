@@ -1,5 +1,5 @@
 import { Mail } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 import Link from "next/link";
 
 export default function ReportsSettingsPage() {

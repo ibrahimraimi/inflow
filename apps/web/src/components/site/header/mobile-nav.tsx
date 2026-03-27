@@ -6,7 +6,7 @@ import { MenuIcon, XIcon } from "lucide-react";
 import { cn } from "@inflow/core/lib/utils";
 import { navLinks } from "./site-header";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@inflow/ui";
 import { UserNav } from "@/components/nav-user";
 import { authClient } from "@inflow/core/lib/auth-client";
 import Link from "next/link";

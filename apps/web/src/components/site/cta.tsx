@@ -1,5 +1,5 @@
 import { cn } from "@inflow/core/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 import Link from "next/link";
 
 interface CtaProps {

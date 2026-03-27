@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@inflow/core/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 import type { WebsiteType } from "@inflow/types";
 import {
   Select,
@@ -24,8 +24,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@inflow/ui";
+import { Skeleton } from "@inflow/ui";
 import { MetricCard } from "../_components/metric-card";
 import dynamic from "next/dynamic";
 const ChartAreaInteractive = dynamic(

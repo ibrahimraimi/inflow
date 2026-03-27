@@ -10,9 +10,9 @@ import {
   MoreVertical,
 } from "lucide-react";
 
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@inflow/ui";
+import { Button } from "@inflow/ui";
+import { Skeleton } from "@inflow/ui";
 import { toast } from "sonner";
 import { useLinks } from "@/hooks/use-links";
 import type { LinkType } from "@inflow/types";

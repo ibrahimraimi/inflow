@@ -1,5 +1,5 @@
 import { Check, ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 
 export default function BillingSettingsPage() {
   const plans = [
