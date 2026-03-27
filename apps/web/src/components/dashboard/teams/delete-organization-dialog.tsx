@@ -11,10 +11,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@inflow/ui";
+import { Button } from "@inflow/ui";
+import { Input } from "@inflow/ui";
+import { Label } from "@inflow/ui";
 import { deleteOrganization } from "@inflow/core/server/organizations";
 
 interface DeleteOrganizationDialogProps {

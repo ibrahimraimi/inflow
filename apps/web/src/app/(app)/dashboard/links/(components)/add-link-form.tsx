@@ -15,15 +15,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "@inflow/ui";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-} from "@/components/ui/input-group";
-import { Input } from "@/components/ui/input";
+} from "@inflow/ui";
+import { Input } from "@inflow/ui";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 import { Link as LinkIcon, Loader2, ExternalLink } from "lucide-react";
 
 const formSchema = z.object({

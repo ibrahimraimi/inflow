@@ -2,7 +2,7 @@
 
 import { cn } from "@inflow/core/lib/utils";
 import * as PricingCard from "./pricing-card";
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 import { Briefcase, Building, CheckCircle2, Users } from "lucide-react";
 import { Layout } from "@/components/layout";
 

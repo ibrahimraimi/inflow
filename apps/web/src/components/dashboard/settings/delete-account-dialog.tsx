@@ -11,11 +11,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+} from "@inflow/ui";
+import { Button } from "@inflow/ui";
+import { Input } from "@inflow/ui";
+import { Label } from "@inflow/ui";
+import { Alert, AlertDescription, AlertTitle } from "@inflow/ui";
 
 interface DeleteAccountDialogProps {
   open: boolean;

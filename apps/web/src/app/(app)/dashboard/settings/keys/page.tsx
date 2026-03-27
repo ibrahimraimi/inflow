@@ -7,24 +7,24 @@ import { formatDistanceToNow } from "date-fns";
 import { Key, Plus, Eye, Copy, Trash2, Loader2, AlertTriangle, Terminal, Activity, ShieldCheck, ShieldAlert } from "lucide-react";
 
 import { fetcher } from "@inflow/core/lib/fetcher";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@inflow/ui";
+import { Input } from "@inflow/ui";
+import { Label } from "@inflow/ui";
+import { Badge } from "@inflow/ui";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@inflow/ui";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
+} from "@inflow/ui";
 import {
   Dialog,
   DialogContent,
@@ -32,7 +32,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@inflow/ui";
 
 import { toast } from "sonner";
 

@@ -2,15 +2,15 @@
 
 import { useState } from "react";
 
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import { Button } from "@inflow/ui";
+import { Label } from "@inflow/ui";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@inflow/ui";
 import { toast } from "sonner";
 import ThemeToggle from "@/components/theme-toggle";
 

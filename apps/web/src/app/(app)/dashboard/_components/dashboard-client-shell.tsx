@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Menu, PanelRight } from "lucide-react";
 import { usePathname } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 import { LogoMarkDark, LogoMarkLight } from "@/components/logo";
 import { DashboardSidebar } from "./dashboard-sidebar";
 import { cn } from "@inflow/core/lib/utils";

@@ -16,7 +16,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "@inflow/ui";
 import {
   Select,
   SelectContent,
@@ -25,18 +25,18 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@inflow/ui";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-} from "@/components/ui/input-group";
+} from "@inflow/ui";
 
 import { toast } from "sonner";
-import { Input } from "@/components/ui/input";
+import { Input } from "@inflow/ui";
 import { Globe, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@inflow/ui";
+import { Checkbox } from "@inflow/ui";
 import InstallScriptDialog from "./install-script-dialog";
 
 const formSchema = z.object({

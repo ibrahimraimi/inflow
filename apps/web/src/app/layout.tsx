@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { RootProvider } from "fumadocs-ui/provider/next";
 import { Geist, Geist_Mono, Figtree } from "next/font/google";
 
-import "@/styles/globals.css";
+import "@inflow/ui/globals.css";
+import { Toaster } from "@inflow/ui";
 import siteConfig from "@inflow/core/configs/site";
-import { Toaster } from "@/components/ui/sonner";
 import { SWRProvider } from "@/components/swr-provider";
 import { SiteFooter, SiteHeader } from "@/components/site";
 import { ThemeProvider } from "@/components/theme-provider";

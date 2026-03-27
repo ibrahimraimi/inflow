@@ -3,16 +3,16 @@
 import { useState } from "react";
 
 import { Copy, Loader2 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { Input } from "@inflow/ui";
+import { Label } from "@inflow/ui";
+import { Button } from "@inflow/ui";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@inflow/ui";
 import { toast } from "sonner";
 import { authClient } from "@inflow/core/lib/auth-client";
 import { ChangeEmailDialog } from "@/components/dashboard/settings/change-email-dialog";

@@ -4,14 +4,14 @@ import { useState } from "react";
 import { Sankey, ResponsiveContainer, Tooltip } from "recharts";
 import { Activity, ArrowRight, Users, Play } from "lucide-react";
 import type { FlowData } from "@inflow/types";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@inflow/ui";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
+} from "@inflow/ui";
 import { SessionList } from "./session-list";
 import { SessionReplayViewer } from "./session-replay-viewer";
 

@@ -48,11 +48,7 @@ export class FlowService {
           client_id,
           url AS url_name,
           'page' as type,
-          (CASE 
-            WHEN entry_time ~ '^[0-9]+$' THEN to_timestamp(entry_time::bigint)
-            WHEN entry_time ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN entry_time::timestamp
-            ELSE NULL
-          END) AS timestamp
+          entry_time AS timestamp
         FROM ${pageViews}
         WHERE website_id = ${websiteId}
         UNION ALL

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@inflow/ui";
 import {
   ChartContainer,
   ChartLegend,
@@ -11,7 +11,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from "@/components/ui/chart";
+} from "@inflow/ui";
 
 const chartConfig = {
   visitors: {
@@ -34,7 +34,7 @@ export function ChartAreaInteractive({ data = [] }: ChartProps) {
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer
           config={chartConfig}
-          className="aspect-auto h-70 w-full"
+          className="aspect-auto h-80 w-full"
         >
           <AreaChart data={data}>
             <defs>

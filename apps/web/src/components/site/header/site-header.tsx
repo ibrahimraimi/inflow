@@ -9,7 +9,7 @@ import { MobileNav } from "./mobile-nav";
 import { authClient } from "@inflow/core/lib/auth-client";
 import { useScroll } from "@/hooks/use-scroll";
 import { UserNav } from "@/components/nav-user";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@inflow/ui";
 import { Layout } from "@/components/layout";
 
 export const navLinks = [

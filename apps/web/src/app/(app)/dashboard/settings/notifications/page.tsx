@@ -1,4 +1,4 @@
-import { Switch } from "@/components/ui/switch";
+import { Switch } from "@inflow/ui";
 
 export default function NotificationsSettingsPage() {
   return (

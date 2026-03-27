@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { cn } from "@inflow/core/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 
 interface Hero8Props {
   className?: string;

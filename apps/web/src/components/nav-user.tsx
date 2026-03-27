@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authClient } from "@inflow/core/lib/auth-client";
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,8 +13,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+} from "@inflow/ui";
+import { Avatar, AvatarFallback, AvatarImage } from "@inflow/ui";
 
 export function UserNav({
   user,

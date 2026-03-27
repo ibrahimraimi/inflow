@@ -1,10 +1,10 @@
 "use client";
 
 import { Layout } from "@/components/layout";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@inflow/ui";
+import { Input } from "@inflow/ui";
+import { Label } from "@inflow/ui";
+import { Textarea } from "@inflow/ui";
 import {
   Mail,
   MessageSquare,

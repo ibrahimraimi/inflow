@@ -13,16 +13,16 @@ import {
 } from "lucide-react";
 
 import { cn } from "@inflow/core/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@inflow/ui";
 import { useWebsite } from "@/hooks/use-website";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@inflow/ui";
 import { useAnalytics } from "@/hooks/use-analytics";
 import { DataTable } from "../../_components/data-table";
 import { ChartAreaInteractive } from "../../_components/chart";

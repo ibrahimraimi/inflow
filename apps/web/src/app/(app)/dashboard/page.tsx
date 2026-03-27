@@ -6,16 +6,16 @@ import { useState } from "react";
 import { PlusIcon, Search, SquarePen } from "lucide-react";
 
 import { cn } from "@inflow/core/lib/utils";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@inflow/ui";
+import { Button } from "@inflow/ui";
+import { Skeleton } from "@inflow/ui";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@inflow/ui";
 
 import { useWebsites } from "@/hooks/use-websites";
 import { useGlobalAnalytics } from "@/hooks/use-global-analytics";

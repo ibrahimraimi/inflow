@@ -13,16 +13,16 @@ import {
   Loader2,
   Building2,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@inflow/ui";
+import { Badge } from "@inflow/ui";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+} from "@inflow/ui";
+import { Avatar, AvatarFallback, AvatarImage } from "@inflow/ui";
 import { InviteMemberDialog } from "@/components/dashboard/teams/invite-member-dialog";
 import { UpdateRoleDialog } from "@/components/dashboard/teams/update-role-dialog";
 import { RemoveMemberDialog } from "@/components/dashboard/teams/remove-member-dialog";

@@ -26,7 +26,7 @@ import {
 import { cn } from "@inflow/core/lib/utils";
 import { LogoMarkDark, LogoMarkLight } from "@/components/logo";
 import { UserNav } from "@/components/nav-user";
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 
 interface DashboardSidebarProps {
   user: {

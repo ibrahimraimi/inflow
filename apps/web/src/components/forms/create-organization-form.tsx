@@ -8,9 +8,9 @@ import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Input } from "@/components/ui/input";
+import { Input } from "@inflow/ui";
 import { authClient } from "@inflow/core/lib/auth-client";
-import { Button } from "@/components/ui/button";
+import { Button } from "@inflow/ui";
 import {
   Form,
   FormControl,
@@ -18,7 +18,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "@inflow/ui";
 
 const formSchema = z.object({
   name: z.string().min(2).max(50),
