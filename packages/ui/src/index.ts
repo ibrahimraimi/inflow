@@ -16,6 +16,7 @@ export * from './components/input';
 export * from './components/label';
 export * from './components/scroll-area';
 export * from './components/select';
+export * from './components/render-if';
 export * from './components/separator';
 export * from './components/sheet';
 export * from './components/sidebar';
@@ -26,4 +27,9 @@ export * from './components/switch';
 export * from './components/tabs';
 export * from './components/textarea';
 export * from './components/tooltip';
+export * from './analytics/chart';
+export * from './analytics/data-map';
+export * from './analytics/data-table';
+export * from './analytics/metric-card';
 export * from './hooks/use-mobile';
+export * from './lib/truncate'

@@ -3,7 +3,25 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "env": ["NEXT_PUBLIC_APP_URL", "DATABASE_URL", "BETTER_AUTH_URL"],
+      "env": [
+        "BASE_URL",
+        "NEXT_PUBLIC_APP_URL",
+        "NEXT_PUBLIC_WEBSITE_URL",
+        "NEXT_PUBLIC_DASHBOARD_URL",
+        "API_URL",
+        "BETTER_AUTH_URL",
+        "BETTER_AUTH_SECRET",
+        "DATABASE_URL",
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET",
+        "UPSTASH_REDIS_REST_URL",
+        "UPSTASH_REDIS_REST_TOKEN",
+        "NEXT_PUBLIC_ENABLE_MULTI_SITE_DASHBOARD",
+        "NEXT_PUBLIC_ENABLE_FLOW",
+        "MAILERSEND_TEST_TOKEN",
+        "MAILERSEND_SENDER_EMAIL",
+        "MAILERSEND_SENDER_NAME"
+      ],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "lint": {

@@ -1,13 +1,14 @@
 import type { NextConfig } from "next";
 import { createMDX } from "fumadocs-mdx/next";
 
+const apiUrl = process.env.API_URL || "http://localhost:3001";
+
 const config: NextConfig = {
   reactStrictMode: true,
   reactCompiler: true,
   output: "standalone",
   transpilePackages: ["@inflow/core", "@inflow/db", "@inflow/types"],
   async rewrites() {
-    const apiUrl = process.env.API_URL || "http://localhost:3001";
     return [
       {
         source: "/api/auth/:path*",
@@ -27,7 +28,7 @@ const config: NextConfig = {
           {
             key: "Content-Security-Policy",
             value:
-              "default-src 'self'; script-src 'self' 'unsafe-inline' https://flagsapi.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://flagsapi.com https://api.iconify.design; font-src 'self'; connect-src 'self' https://free.freeipapi.com https://cdn.jsdelivr.net https://api.github.com;",
+              `default-src 'self'; script-src 'self' 'unsafe-inline' https://flagsapi.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://flagsapi.com https://api.iconify.design; font-src 'self'; connect-src 'self' ${apiUrl} http://localhost:3000 http://localhost:3001 http://localhost:3002 https://free.freeipapi.com https://cdn.jsdelivr.net https://api.github.com;`,
           },
           {
             key: "X-Frame-Options",

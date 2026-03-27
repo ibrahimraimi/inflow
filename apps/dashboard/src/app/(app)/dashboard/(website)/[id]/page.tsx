@@ -15,9 +15,8 @@ import {
   Activity,
 } from "lucide-react";
 
-import { cn } from "@inflow/core/lib/utils";
 import { Button } from "@inflow/ui";
-import type { WebsiteType } from "@inflow/types";
+import { cn } from "@inflow/core/lib/utils";
 import {
   Select,
   SelectContent,
@@ -25,38 +24,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@inflow/ui";
-import { Skeleton } from "@inflow/ui";
-import { MetricCard } from "../_components/metric-card";
-import dynamic from "next/dynamic";
-const ChartAreaInteractive = dynamic(
-  () => import("../_components/chart").then((mod) => mod.ChartAreaInteractive),
-  {
-    ssr: false,
-    loading: () => <Skeleton className="h-[300px] w-full rounded-xl" />,
-  }
-);
-const DataTable = dynamic(
-  () => import("../_components/data-table").then((mod) => mod.DataTable),
-  {
-    ssr: false,
-    loading: () => <Skeleton className="h-[300px] w-full rounded-xl" />,
-  }
-);
-const DataMap = dynamic(
-  () => import("../_components/data-map").then((mod) => mod.DataMap),
-  {
-    ssr: false,
-    loading: () => <Skeleton className="h-[400px] w-full rounded-xl" />,
-  }
-);
 import { useWebsite } from "@/hooks/use-website";
 import { useAnalytics } from "@/hooks/use-analytics";
 import { useRageClicks } from "@/hooks/use-rage-clicks";
-import type { AnalyticsData } from "@inflow/types";
-import { RenderIf } from "@inflow/core/lib/render-if";
-import { RageClicksTable } from "../_components/rage-clicks-table";
 import { authClient } from "@inflow/core/lib/auth-client";
 import { isFeatureEnabled } from "@inflow/core/lib/feature-flags";
+import { RageClicksTable } from "../_components/rage-clicks-table";
+import { Skeleton, MetricCard, ChartAreaInteractive, DataTable, DataMap, RenderIf } from "@inflow/ui";
 
 export default function WebsiteDetailPage() {
   const params = useParams();

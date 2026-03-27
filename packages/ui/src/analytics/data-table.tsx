@@ -1,17 +1,18 @@
+"use client";
+
 import { useState } from "react";
 import NextImage from "next/image";
 import {
   Globe,
   Smartphone,
   Monitor,
-  Laptop,
-  HelpCircle,
-  Chrome,
   Command,
   MousePointer2,
+  Chrome,
 } from "lucide-react";
-import { cn } from "@inflow/core/lib/utils";
-import { RenderIf } from "@inflow/core/lib/render-if";
+
+import { cn } from "../lib/utils";
+import { RenderIf } from "../components/render-if";
 
 interface DataItem {
   name?: string;
@@ -70,7 +71,6 @@ export function DataTable({
     }
 
     if (type === "country") {
-      // TODO: Ues the flag libary
       return <Globe className="w-4 h-4" />;
     }
 
@@ -117,6 +117,7 @@ export function DataTable({
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
+              type="button"
               className={cn(
                 "pb-2 border-b-2 transition-colors whitespace-nowrap",
                 activeTab === tab
@@ -189,7 +190,10 @@ export function DataTable({
 
         <RenderIf condition={false}>
           <div className="mt-auto text-center border-t pt-2">
-            <button className="text-xs text-muted-foreground hover:text-foreground transition-colors p-2 w-full">
+            <button
+              type="button"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors p-2 w-full"
+            >
               View more
             </button>
           </div>
