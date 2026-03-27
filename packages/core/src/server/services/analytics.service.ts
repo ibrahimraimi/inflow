@@ -114,30 +114,32 @@ export class AnalyticsService {
     const isHourly = range === "today" || range === "last_24_hours";
     const dateTruncUnit = isHourly ? "hour" : "day";
 
-    const chartDataResult = await db.execute(sql`
-      SELECT 
-        date_trunc(${dateTruncUnit}::text, "entry_time") as date,
-        count(*) as views,
-        count(distinct "client_id") as visitors
-      FROM ${pageViews}
-      WHERE ${
-        websiteIdOrAll === "all" && userId
-          ? sql`${pageViews.websiteId} IN (SELECT "website_id" FROM ${websites} WHERE ${websites.userId} = ${userId})`
-          : sql`${pageViews.websiteId} = ${websiteIdOrAll}`
-      }
-      AND "entry_time" >= ${startDate.toISOString()}::timestamp
-      AND "entry_time" <= ${endDate.toISOString()}::timestamp
-      GROUP BY 1
-      ORDER BY 1 ASC
-    `);
+    const chartDataResult = await db
+      .select({
+        date: sql<string>`date_trunc(${sql.raw(`'${dateTruncUnit}'`)}, ${pageViews.entryTime})`,
+        views: count(),
+        visitors: sql<number>`count(distinct ${pageViews.clientId})`,
+      })
+      .from(pageViews)
+      .where(
+        and(
+          websiteIdOrAll === "all" && userId
+            ? inArray(
+                pageViews.websiteId,
+                db
+                  .select({ id: websites.websiteId })
+                  .from(websites)
+                  .where(eq(websites.userId, userId))
+              )
+            : eq(pageViews.websiteId, websiteIdOrAll),
+          gte(pageViews.entryTime, startDate),
+          lte(pageViews.entryTime, endDate)
+        )
+      )
+      .groupBy(sql`1`)
+      .orderBy(sql`1 ASC`);
 
-    const chartRows = (chartDataResult.rows ||
-      chartDataResult) as unknown as Array<{
-      date: string;
-      views: string | number;
-      visitors: string | number;
-    }>;
-    const chartData: ChartData[] = chartRows.map((row) => ({
+    const chartData: ChartData[] = chartDataResult.map((row) => ({
       date: row.date,
       views: Number(row.views),
       visitors: Number(row.visitors),
@@ -266,29 +268,31 @@ export class AnalyticsService {
       .groupBy(pageViews.countryCode);
 
     // 5. Traffic Heatmap
-    const trafficDataResult = await db.execute(sql`
-      SELECT 
-        extract(dow from "entry_time") as day,
-        extract(hour from "entry_time") as hour,
-        count(distinct "client_id") as visitors
-      FROM ${pageViews}
-      WHERE ${
-        websiteIdOrAll === "all" && userId
-          ? sql`${pageViews.websiteId} IN (SELECT "website_id" FROM ${websites} WHERE ${websites.userId} = ${userId})`
-          : sql`${pageViews.websiteId} = ${websiteIdOrAll}`
-      }
-      AND "entry_time" >= ${startDate.toISOString()}::timestamp
-      AND "entry_time" <= ${endDate.toISOString()}::timestamp
-      GROUP BY 1, 2
-    `);
+    const trafficDataResult = await db
+      .select({
+        day: sql<number>`extract(dow from ${pageViews.entryTime})`,
+        hour: sql<number>`extract(hour from ${pageViews.entryTime})`,
+        visitors: sql<number>`count(distinct ${pageViews.clientId})`,
+      })
+      .from(pageViews)
+      .where(
+        and(
+          websiteIdOrAll === "all" && userId
+            ? inArray(
+                pageViews.websiteId,
+                db
+                  .select({ id: websites.websiteId })
+                  .from(websites)
+                  .where(eq(websites.userId, userId))
+              )
+            : eq(pageViews.websiteId, websiteIdOrAll),
+          gte(pageViews.entryTime, startDate),
+          lte(pageViews.entryTime, endDate)
+        )
+      )
+      .groupBy(sql`1, 2`);
 
-    const trafficRows = (trafficDataResult.rows ||
-      trafficDataResult) as unknown as Array<{
-      day: string | number;
-      hour: string | number;
-      visitors: string | number;
-    }>;
-    const trafficData: TrafficData[] = trafficRows.map((row) => ({
+    const trafficData: TrafficData[] = trafficDataResult.map((row) => ({
       day: Number(row.day),
       hour: Number(row.hour),
       visitors: Number(row.visitors),
