@@ -2,6 +2,11 @@
   "name": "@inflow/config-typescript",
   "version": "1.0.0",
   "private": true,
+  "exports": {
+    "./base.json": "./base.json",
+    "./next.json": "./next.json",
+    "./react-library.json": "./react-library.json"
+  },
   "publishConfig": {
     "access": "public"
   }
