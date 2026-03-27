@@ -22,11 +22,8 @@ import {
   SelectValue,
 } from "@inflow/ui";
 import { useWebsite } from "@/hooks/use-website";
-import { Skeleton } from "@inflow/ui";
+import { Skeleton, DataTable, ChartAreaInteractive, RenderIf } from "@inflow/ui";
 import { useAnalytics } from "@/hooks/use-analytics";
-import { DataTable } from "../../_components/data-table";
-import { ChartAreaInteractive } from "../../_components/chart";
-import { RenderIf } from "@inflow/core/lib/render-if";
 
 export default function CampaignInsightsPage() {
   const params = useParams();

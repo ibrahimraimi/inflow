@@ -9,8 +9,8 @@ import {
   Loader2,
 } from "lucide-react";
 
-import { cn } from "@inflow/core/lib/utils";
 import { Button } from "@inflow/ui";
+import { cn } from "@inflow/core/lib/utils";
 import {
   Select,
   SelectContent,
@@ -18,13 +18,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@inflow/ui";
-import { fetcherWithParams } from "@inflow/core/lib/fetcher";
 import { Skeleton } from "@inflow/ui";
 import type { AnalyticsData } from "@inflow/types";
-import { DataMap } from "@/app/(app)/dashboard/(website)/_components/data-map";
-import { DataTable } from "@/app/(app)/dashboard/(website)/_components/data-table";
-import { MetricCard } from "@/app/(app)/dashboard/(website)/_components/metric-card";
-import { ChartAreaInteractive } from "@/app/(app)/dashboard/(website)/_components/chart";
+import { fetcherWithParams } from "@inflow/core/lib/fetcher";
+import {
+  DataMap,
+  DataTable,
+  MetricCard,
+  ChartAreaInteractive,
+} from "@inflow/ui";
 
 type PublicAnalyticsData = AnalyticsData & {
   website: {

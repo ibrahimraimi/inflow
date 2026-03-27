@@ -1,18 +1,20 @@
-import { cn } from "@inflow/core/lib/utils";
+"use client";
+
+import { useMemo } from "react";
 import {
   ComposableMap,
   Geographies,
   Geography,
   ZoomableGroup,
 } from "react-simple-maps";
+
+import { cn } from "../lib/utils";
+import { MapData, TrafficData } from "@inflow/types";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@inflow/ui";
-import { useMemo } from "react";
-
-import { MapData, TrafficData } from "@inflow/types";
+} from "../components/tooltip";
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
@@ -98,12 +100,9 @@ export function DataMap({ mapData = [], trafficData = [] }: DataMapProps) {
           >
             <ZoomableGroup center={[0, 0]} zoom={1}>
               <Geographies geography={geoUrl}>
-                {({ geographies }) =>
-                  geographies.map((geo) => {
+                {({ geographies }: { geographies: GeographyObject[] }) =>
+                  geographies.map((geo: GeographyObject) => {
                     const visitors = getCountryVisitors(geo);
-                    // Note: verifying world-atlas 110m properties. Usually ISO_A2 or ISO_A3.
-                    // If mapData is empty, default styling.
-
                     const hasVisitors = visitors > 0;
 
                     return (
@@ -182,7 +181,7 @@ export function DataMap({ mapData = [], trafficData = [] }: DataMapProps) {
                           />
                         </div>
                       </TooltipTrigger>
-                      <TooltipContent className="bg-black text-white border-zinc-800 text-xs">
+                      <TooltipContent className="bg-black text-white border-zinc-800 text-xs text-center">
                         <p>Visitors: {value}</p>
                       </TooltipContent>
                     </Tooltip>

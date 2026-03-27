@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
-import { Card, CardContent } from "@inflow/ui";
+import { cn } from "../lib/utils";
+import { Card, CardContent } from "../components/card";
 import {
   ChartContainer,
   ChartLegend,
@@ -11,7 +11,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from "@inflow/ui";
+} from "../components/chart";
 
 const chartConfig = {
   visitors: {
