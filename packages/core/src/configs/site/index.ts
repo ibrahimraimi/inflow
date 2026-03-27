@@ -4,16 +4,19 @@ export const siteConfig = {
   description:
     "Inflow is a simple open source, fast, privacy-friendly self-hosted analytics platform.",
   url:
-    process.env.NEXT_PUBLIC_APP_URL ||
-    process.env.BETTER_AUTH_URL ||
+    process.env.NEXT_PUBLIC_WEBSITE_URL ||
     "http://localhost:3000",
+  websiteUrl:
+    process.env.NEXT_PUBLIC_WEBSITE_URL ||
+    "http://localhost:3000",
+  dashboardUrl:
+    process.env.NEXT_PUBLIC_DASHBOARD_URL ||
+    "http://localhost:3002",
   baseUrl:
-    process.env.NEXT_PUBLIC_APP_URL ||
-    process.env.BETTER_AUTH_URL ||
+    process.env.NEXT_PUBLIC_WEBSITE_URL ||
     "http://localhost:3000",
   domain:
-    process.env.NEXT_PUBLIC_APP_URL ||
-    process.env.BETTER_AUTH_URL ||
+    process.env.NEXT_PUBLIC_WEBSITE_URL ||
     "http://localhost:3000",
   keywords: [],
   author: {
