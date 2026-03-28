@@ -6,7 +6,8 @@ const config: NextConfig = {
   reactStrictMode: true,
   reactCompiler: true,
   output: "standalone",
-  transpilePackages: ["@inflow/core", "@inflow/db", "@inflow/types"],
+  transpilePackages: ["@inflow/core", "@inflow/db", "@inflow/types", "@inflow/logger", "@inflow/cache"],
+  serverExternalPackages: ["pino", "pino-pretty"],
   async rewrites() {
     return [
       {

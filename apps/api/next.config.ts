@@ -3,7 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   output: "standalone",
-  transpilePackages: ["@inflow/core", "@inflow/db", "@inflow/types"],
+  transpilePackages: ["@inflow/core", "@inflow/db", "@inflow/types", "@inflow/logger", "@inflow/cache"],
+  serverExternalPackages: ["pino", "pino-pretty"],
   async headers() {
     return [
       {
