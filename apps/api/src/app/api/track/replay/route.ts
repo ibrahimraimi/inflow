@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
+
+import { logger } from "@inflow/logger";
+import { rateLimit } from "@inflow/cache";
 import { trackReplaySchema } from "@inflow/core/lib/validations/track";
-import { rateLimit } from "@inflow/core/lib/rate-limit";
 import { ReplayService } from "@inflow/core/server/services/replay.service";
 
 export const runtime = "edge";
@@ -58,7 +60,7 @@ export async function POST(req: NextRequest) {
       message: "Replay data received",
     }, { headers: CORS_HEADERS(req) });
   } catch (error) {
-    console.error("Replay Tracking Error:", error);
+    logger.error({ err: error }, "Replay Tracking Error");
     return NextResponse.json(
       { error: "Internal Server Error", message: error instanceof Error ? error.message : String(error) },
       { status: 500, headers: CORS_HEADERS(req) }

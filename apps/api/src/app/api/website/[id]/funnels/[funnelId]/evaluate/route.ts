@@ -1,13 +1,13 @@
 import { headers } from "next/headers";
+import { and, eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 
-import { db } from "@inflow/db";
-import { and, eq } from "drizzle-orm";
 
+import { logger } from "@inflow/logger";
 import { auth } from "@inflow/core/lib/auth";
-import { funnels, websites } from "@inflow/db";
-import { FunnelService } from "@inflow/core/server/services/funnel.service";
+import { funnels, websites, db } from "@inflow/db";
 import type { FunnelStep } from "@inflow/types";
+import { FunnelService } from "@inflow/core/server/services/funnel.service";
 
 export async function GET(
   req: NextRequest,
@@ -73,7 +73,7 @@ export async function GET(
       evaluation: result,
     });
   } catch (error) {
-    console.error("Funnel Evaluation Error:", error);
+    logger.error({ err: error }, "Funnel Evaluation Error");
     return NextResponse.json(
       { error: "Internal Server Error", details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 },

@@ -1,21 +1,14 @@
 import crypto from "crypto";
-import { LRUCache } from "lru-cache";
 import { and, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { UAParser } from "ua-parser-js";
 import { type NextRequest, NextResponse } from "next/server";
 
-import { db } from "@inflow/db";
+import { logger } from "@inflow/logger";
 import { auth } from "@inflow/core/lib/auth";
-import { rateLimit } from "@inflow/core/lib/rate-limit";
+import { rateLimit, memoryCache as cache } from "@inflow/cache";
 import { trackEventSchema } from "@inflow/core/lib/validations/track";
-import { pageViews, events, apiKeys, websites, apiKeyUsageLogs } from "@inflow/db";
-
-// Global cache to persist across requests in the same isolate
-const cache = new LRUCache<string, any>({
-  max: 500, // max 500 items
-  ttl: 1000 * 60 * 5, // 5 minutes cache
-});
+import { pageViews, events, apiKeys, websites, apiKeyUsageLogs, db } from "@inflow/db";
 
 const CORS_HEADERS = (req: NextRequest) => {
   const origin = req.headers.get("origin") || "*";
@@ -126,7 +119,7 @@ export async function POST(req: NextRequest) {
             endpoint: "/api/track",
             method: "POST",
             status: 200,
-          }).catch((e) => console.error("Failed to log API key usage:", e));
+          }).catch((e) => logger.error({ err: e }, "Failed to log API key usage"));
         }
       }
 
@@ -307,7 +300,7 @@ export async function POST(req: NextRequest) {
       count: results.length,
     }, { headers: cors });
   } catch (error) {
-    console.error("Tracking API Error:", error);
+    logger.error({ err: error }, "Tracking API Error");
     return NextResponse.json(
       { 
         error: "Internal Server Error", 

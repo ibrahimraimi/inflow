@@ -1,16 +1,9 @@
-import { Redis } from "@upstash/redis";
+import { redis } from "./redis";
+import { logger } from "@inflow/logger";
 
 type RateLimitStore = Map<string, { count: number; lastReset: number }>;
 
 const stores = new Map<string, RateLimitStore>();
-
-const redis =
-  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-    ? new Redis({
-        url: process.env.UPSTASH_REDIS_REST_URL,
-        token: process.env.UPSTASH_REDIS_REST_TOKEN,
-      })
-    : null;
 
 export async function rateLimit(
   identifier: string,
@@ -39,7 +32,7 @@ export async function rateLimit(
         reset: now + (ttl > 0 ? ttl : windowMs),
       };
     } catch (error) {
-      console.warn("Redis rate limit failed, falling back to memory store:", error);
+      logger.warn({ err: error }, "Redis rate limit failed, falling back to memory store");
       if (failClosedOnRedisFailure) {
         return {
           success: false,
