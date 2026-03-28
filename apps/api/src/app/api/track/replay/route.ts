@@ -5,8 +5,6 @@ import { rateLimit } from "@inflow/cache";
 import { trackReplaySchema } from "@inflow/core/lib/validations/track";
 import { ReplayService } from "@inflow/core/server/services/replay.service";
 
-export const runtime = "edge";
-
 const CORS_HEADERS = (req: NextRequest) => {
   const origin = req.headers.get("origin") || "*";
   return {
