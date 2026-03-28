@@ -1,9 +1,10 @@
+import { and, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
-import { db } from "@inflow/db";
-import { and, eq } from "drizzle-orm";
+
+import { logger } from "@inflow/logger";
+import { websites, db } from "@inflow/db";
 import { auth } from "@inflow/core/lib/auth";
-import { websites } from "@inflow/db";
 import { EventsService } from "@inflow/core/server/services/events.service";
 
 export async function GET(
@@ -41,7 +42,7 @@ export async function GET(
 
     return NextResponse.json(rageClicks);
   } catch (error: unknown) {
-    console.error("Rage Clicks API Error:", error);
+    logger.error({ err: error }, "Rage Clicks API Error");
     const message =
       error instanceof Error ? error.message : "Internal Server Error";
     return NextResponse.json(

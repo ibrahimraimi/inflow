@@ -1,0 +1,9 @@
+{
+  "extends": "@inflow/config-typescript/base.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*"]
+}

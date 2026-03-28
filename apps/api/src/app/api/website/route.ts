@@ -3,11 +3,11 @@ import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { toZonedTime } from "date-fns-tz";
-import { db } from "@inflow/db";
 import { and, desc, eq, gte, lte, sql } from "drizzle-orm";
 
+import { logger } from "@inflow/logger";
 import { auth } from "@inflow/core/lib/auth";
-import { pageViews, websites } from "@inflow/db";
+import { websites, pageViews, db } from "@inflow/db";
 import { AnalyticsService } from "@inflow/core/server/services/analytics.service";
 import {
   getSafeTimeZone,
@@ -228,7 +228,7 @@ export async function GET(req: NextRequest) {
     const summary = await AnalyticsService.getUserWebsitesSummary(session.user.id);
     return NextResponse.json(summary);
   } catch (error) {
-    console.error("Dashboard Analytics Error:", error);
+    logger.error({ err: error }, "Dashboard Analytics Error");
     return NextResponse.json(
       { error: "Failed to fetch dashboard data" },
       { status: 500 },

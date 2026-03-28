@@ -1,9 +1,10 @@
 import { headers } from "next/headers";
-import { type NextRequest, NextResponse } from "next/server";
-import { db } from "@inflow/db";
 import { and, eq } from "drizzle-orm";
+import { type NextRequest, NextResponse } from "next/server";
+
+import { logger } from "@inflow/logger";
+import { websites, db } from "@inflow/db";
 import { auth } from "@inflow/core/lib/auth";
-import { websites } from "@inflow/db";
 import { AnalyticsService } from "@inflow/core/server/services/analytics.service";
 
 export async function GET(
@@ -41,7 +42,7 @@ export async function GET(
 
     return NextResponse.json(analyticsData);
   } catch (error: unknown) {
-    console.error("Analytics API Error:", error);
+    logger.error({ err: error }, "Analytics API Error");
     const message =
       error instanceof Error ? error.message : "Internal Server Error";
     return NextResponse.json(

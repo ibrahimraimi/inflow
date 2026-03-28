@@ -1,9 +1,10 @@
+import { and, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
-import { db } from "@inflow/db";
-import { and, eq } from "drizzle-orm";
+
+import { logger } from "@inflow/logger";
+import { websites, db } from "@inflow/db";
 import { auth } from "@inflow/core/lib/auth";
-import { websites } from "@inflow/db";
 import { FlowService } from "@inflow/core/server/services/flow.service";
 
 export async function GET(
@@ -41,7 +42,7 @@ export async function GET(
 
     return NextResponse.json(flowData);
   } catch (error: unknown) {
-    console.error("Flow API Error:", error);
+    logger.error({ err: error }, "Flow API Error");
     const message =
       error instanceof Error ? error.message : "Internal Server Error";
     return NextResponse.json(
