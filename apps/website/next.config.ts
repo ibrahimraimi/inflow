@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import { createMDX } from "fumadocs-mdx/next";
 
 const apiUrl = process.env.API_URL || "http://localhost:3001";
 
@@ -57,8 +56,4 @@ const config: NextConfig = {
   },
 };
 
-const withMDX = createMDX({
-  // customise the config file path
-  // configPath: "source.config.ts"
-});
-export default withMDX(config);
+export default config;
