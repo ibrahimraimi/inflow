@@ -25,8 +25,7 @@
       "@inflow/db": ["../../packages/db/src/index.ts"],
       "@inflow/db/*": ["../../packages/db/src/*"],
       "@inflow/types": ["../../packages/types/src/index.ts"],
-      "@inflow/types/*": ["../../packages/types/src/*"],
-      "fumadocs-mdx:collections/*": [".source/*"]
+      "@inflow/types/*": ["../../packages/types/src/*"]
     }
   },
   "include": [

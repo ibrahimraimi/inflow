@@ -1,5 +1,5 @@
 <a href="https://inflow.ibrahimraimi.com">
-  <img alt="A modern, comprehensive analytics platform designed to help you collect, analyze, and understand your website data effortlessly." src="./apps/web/public/images/banner.png">
+  <img alt="A modern, comprehensive analytics platform designed to help you collect, analyze, and understand your website data effortlessly." src="./documents/banner.png">
 </a>
 
 <h3 align="center">Inflow Analytics</h3>
@@ -25,7 +25,7 @@
 
 A modern, comprehensive open-source self-hosted analytics platform designed to help you collect, analyze, and understand your website data effortlessly. Now built as a high-performance monorepo for better scalability and developer experience.
 
-## Tech Stack
+<!-- ## Tech Stack
 
 - [Next.js](nextjs.org) - Framework
 - [Turborepo](https://turbo.build) - Monorepo Management
@@ -37,29 +37,13 @@ A modern, comprehensive open-source self-hosted analytics platform designed to h
 - [Tailwind](https://tailwindcss.com) - Styling
 - [MailerSend](https://mailersend.com) - Email
 - [Biome](https://biomejs.dev) - Linting & Formatting
-- [Vercel](https://vercel.com) - Deployment
-
-## Repository Structure
-
-```text
-.
-├── apps/
-│   ├── web/             # Next.js Frontend Dashboard (Port 3000)
-│   └── api/             # Next.js Backend API (Port 3001)
-├── packages/
-│   ├── core/            # Shared server logic, services, and components
-│   ├── db/              # Database schemas and Drizzle client
-│   ├── types/           # Global TypeScript definitions
-│   ├── sdk/             # Client-side tracking SDK
-│   ├── config-typescript/ # Shared TS configurations
-│   └── config-biome/    # Shared Biome configurations
-└── turbo.json           # Turborepo configuration
-```
+- [Vercel](https://vercel.com) - Deployment -->
 
 ## Getting Started
 
 ### Prerequisites
 
+- Node.js v22+
 - Bun v1.1+ (Standardized for this workspace)
 - PostgreSQL database (we recommend Neon for easy setup)
 - MailerSend account for email functionality
@@ -88,10 +72,6 @@ make db-push
 ```bash
 make dev
 ```
-
-The applications will be available at:
-- Dashboard: [http://localhost:3000](http://localhost:3000)
-- API: [http://localhost:3001](http://localhost:3001)
 
 ## Available Scripts
 
