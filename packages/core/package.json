@@ -28,6 +28,7 @@
     "drizzle-orm": "^0.45.1",
     "tailwind-merge": "^3.4.1",
     "@react-email/components": "^1.0.7",
+    "@react-email/render": "^2.0.4",
     "@inflow/cache": "workspace:*",
     "@inflow/logger": "workspace:*",
     "axios": "^1.13.5",
