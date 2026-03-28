@@ -1,0 +1,59 @@
+---
+title: Project Structure
+description: A map of the Inflow codebase and directory organization.
+---
+
+Inflow is organized as a high-performance monorepo using Turborepo and Bun Workspaces. This structure decouples applications from shared logic, improving scalability and enabling efficient code reuse.
+
+## Global Directory Overview
+
+```text
+.
+├── apps/                # Standalone applications
+│   ├── web/             # Next.js Frontend Dashboard
+│   └── api/             # Next.js Backend API & Ingestion
+├── packages/            # Internal shared libraries
+│   ├── core/            # Business logic, services, and shared server actions
+│   ├── db/              # Database schema and Drizzle client
+│   ├── types/           # Global TypeScript interfaces
+│   ├── sdk/             # Client-side tracking script
+│   ├── config-typescript/ # Base TS configurations
+│   └── config-biome/    # Base Biome configurations
+├── turbo.json           # Turborepo task orchestration
+└── package.json         # Workspace-wide dependencies and scripts
+```
+
+## Applications (`apps/`)
+
+### `apps/web`
+The main frontend dashboard where users view analytics, manage websites, and configure teams.
+- Built with **Next.js (App Router)**.
+- Consumes shared components and services from `@inflow/core`.
+- Uses rewrites to proxy API requests to `apps/api`.
+
+### `apps/api`
+The dedicated backend service handling data ingestion, authentication, and heavy analytics processing.
+- Built with **Next.js (API routes)** for optimized serverless deployment.
+- Hosts the `better-auth` handlers and tracking endpoints.
+- Directly interacts with `@inflow/db` for high-performance data operations.
+
+## Internal Packages (`packages/`)
+
+### `@inflow/core`
+The heartbeat of the application logic.
+- **Server Services**: Decoupled logic for analytics, organizations, and email.
+- **Shared Components**: UI components used across multiple apps.
+- **Lib**: General-purpose utilities and auth configuration.
+
+### `@inflow/db`
+The single source of truth for the database.
+- **Schema**: Defined using Drizzle ORM.
+- **Migrations**: Generated and managed within this package.
+- **Client**: Optimized database connection pooling.
+
+### `@inflow/sdk`
+A lightweight, high-performance tracking script served statically to user websites.
+
+---
+
+**Next:** [Architecture Deep Dive](/docs/developer-guide/architecture/overview)

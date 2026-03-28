@@ -1,0 +1,58 @@
+---
+title: Installation Guide
+description: Step-by-step instructions on how to install the Inflow tracking script on your website.
+---
+
+To collect analytics data, you need to install a small snippet of JavaScript on every page you want to track.
+
+## The Tracking Script
+
+When you add a new website to Inflow, a unique tracking script is generated for you.
+
+### How to get your script:
+
+1. Open your Inflow dashboard.
+2. Locate the website you just added.
+3. If the script isn't installed yet, a setup prompt will appear.
+4. Click "Copy" to copy the snippet to your clipboard.
+
+![Tracking Script Modal](/images/guide/3.png)
+*The tracking script modal with your unique Website ID.*
+
+### Installation Steps:
+
+1. Open your website's source code or CMS (WordPress, Webflow, etc.).
+2. Locate the `<head>` section of your HTML template.
+3. Paste the copied snippet just before the closing `</head>` tag.
+
+```html
+<!-- Inflow Analytics -->
+<script
+  defer
+  data-website-id="your-unique-website-id"
+  data-domain="your-domain.com"
+  src="https://your-inflow-instance.com/analytics.js"
+></script>
+<!-- End Inflow Analytics -->
+```
+
+## Verifying Installation
+
+After adding the script and deploying your site:
+
+1. Visit your website in a browser.
+2. Go back to your Inflow dashboard.
+3. You should see "1 Visitor" appearing in the real-time stats or on the website list after a few moments.
+
+![Websites List](/images/guide/1.png)
+*The dashboard will update as soon as the first page view is recorded.*
+
+## Common Installation Issues
+
+- **Ad-blockers**: Some aggressive ad-blockers might block analytics scripts. Try disabling them for your own site if you don't see data.
+- **Domain Mismatch**: Ensure `data-domain` exactly matches the domain you registered in Inflow.
+- **Localhost**: By default, Inflow ignores `localhost` traffic unless you specifically enabled it during website setup.
+
+---
+
+**Next:** [Understand your analytics dashboard](/docs/user-guide/features/analytics)

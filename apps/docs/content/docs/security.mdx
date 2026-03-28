@@ -1,0 +1,32 @@
+---
+title: Security
+description: How Inflow protects your data and privacy.
+---
+
+Security and privacy are at the core of Inflow. We implement industry-standard best practices to ensure your data remains safe.
+
+## Authentication & Authorization
+
+- **Better Auth**: We use a battle-tested library to handle sessions, password hashing, and OAuth.
+- **RBAC**: Strict Role-Based Access Control ensures that only authorized users can view or modify website data.
+- **Session Security**: Sessions are tied to HTTPS-only, SameSite cookies to prevent CSRF and session hijacking.
+
+## Data Privacy
+
+- **No Cookies**: The tracking script does not store cookies on the visitor's browser.
+- **Anonymization**: Unique visitors are identified using a one-way salt + hash of the IP address and User-Agent. This hash is rotated daily and never stored in a way that can be reversed to identify an individual.
+- **GDPR/CCPA Compliance**: By not collecting PII or using tracking cookies, Inflow is compliant with major privacy regulations out of the box.
+
+## Infrastructure Security
+
+- **Environment Variables**: Sensitive data like database credentials and API keys are managed through secure environment variables.
+- **Rate Limiting**: Guard against DDoS and brute-force attacks using Redis-backed rate limiting on all public endpoints.
+- **Input Validation**: All data entering the system is validated via **Zod** schemas to prevent SQL injection and XSS.
+
+## Reporting a Vulnerability
+
+If you find a security issue, please do not open a public issue. Instead, email us at `security@inflowanalytics.com` and we will respond as soon as possible.
+
+---
+
+**Next:** [Performance Guide](/docs/performance)

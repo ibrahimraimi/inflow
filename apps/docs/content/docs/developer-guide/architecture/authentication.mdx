@@ -1,0 +1,52 @@
+---
+title: Authentication
+description: How Inflow handles user identity and organization access.
+---
+
+Inflow integrates **Better Auth** for a secure, feature-rich authentication experience.
+
+## Configuration
+
+The main configuration resides in `src/lib/auth.ts`.
+
+- **Adapter**: `drizzleAdapter` links Better Auth directly to our PostgreSQL schema.
+- **Plugins**:
+  - `organization`: Enables collaborative team features.
+  - `lastLoginMethod`: Remembers how users last signed in.
+  - `nextCookies`: Handles session persistence in Next.js.
+
+## Social Auth
+
+Inflow supports **Google OAuth** out of the box. Ensure you provide `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in your environment variables.
+
+## Organization Logic
+
+We use a custom `databaseHook` to automatically set the `activeOrganizationId` on a session when it's created. This ensures the dashboard always loads the correct context.
+
+```typescript
+databaseHooks: {
+  session: {
+    create: {
+      before: async (session) => {
+        const activeOrg = await getActiveOrganization(session.userId);
+        return { data: { ...session, activeOrganizationId: activeOrg?.id } };
+      },
+    },
+  },
+},
+```
+
+## Permissions & RBAC
+
+Roles are defined in `src/lib/auth/permissions.ts`. We support:
+- `owner`: Full control.
+- `admin`: Manage websites and team.
+- `member`: View-only access to analytics.
+
+## Protecting Routes
+
+We use a helper in `proxy.ts` (middleware) to protect dashboard routes and redirect unauthenticated users to the login page.
+
+---
+
+**Next:** [Integrations](/docs/developer-guide/architecture/integrations)

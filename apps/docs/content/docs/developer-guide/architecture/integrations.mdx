@@ -1,0 +1,38 @@
+---
+title: Third-Party Integrations
+description: External services used by Inflow.
+---
+
+Inflow relies on a few key external services to handle critical tasks like email delivery and rate limiting.
+
+## MailerSend (Email)
+
+We use [MailerSend](https://mailersend.com/) for all transactional emails.
+
+- **Primary use cases**:
+  - Email verification during signup.
+  - Password reset links.
+  - Organization invitations.
+- **Configuration**: Set `MAILERSEND_API_TOKEN`, `MAILERSEND_SENDER_EMAIL`, and `MAILERSEND_SENDER_NAME` in your environment variables.
+- **Templates**: Standard email templates are built using **React Email** (located in `src/components/emails`) and rendered to HTML before sending.
+
+## Upstash (Redis)
+
+[Upstash](https://upstash.com/) provides our serverless Redis instance, which is crucial for edge-compatible state management.
+
+- **Primary use cases**:
+  - Distributed rate limiting for the `/api/track` endpoint.
+  - Key-value storage for ephemeral session data.
+- **Configuration**: Set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
+- **Latency**: We use the REST-based client to ensure compatibility with the Next.js Edge Runtime.
+
+## Neon (PostgreSQL)
+
+[Neon](https://neon.tech/) serves as our serverless PostgreSQL provider.
+
+- **Connection**: We use the Neon serverless driver over HTTP (`@neondatabase/serverless`) to support connections from Edge functions and serverless environments without the overhead of heavy TCP pooling.
+- **SSL**: SSL is required for all production connections.
+
+---
+
+**Next:** [API Reference](/docs/developer-guide/api-reference/endpoints)
