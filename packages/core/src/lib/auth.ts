@@ -13,7 +13,7 @@ import OrganizationInvitationEmail from "../components/emails/organization-invit
 import { MailerService } from "../server/services/mailer.service";
 import { getBaseUrl } from "./url";
 
-const TRUSTED_ORIGINS = [
+export const TRUSTED_ORIGINS = [
   "http://localhost:3000",
   "http://localhost:3001",
   "http://localhost:3002",

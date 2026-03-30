@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import { z } from "zod";
@@ -44,6 +44,11 @@ export function LoginForm({
   const lastMethod = authClient.getLastUsedLoginMethod();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -102,7 +107,7 @@ export function LoginForm({
                       />
                     </svg>
                     Login with Google
-                    {lastMethod === "google" && (
+                    {mounted && lastMethod === "google" && (
                       <Badge className="absolute right-2 text-[9px]">
                         last used
                       </Badge>
@@ -124,7 +129,7 @@ export function LoginForm({
                           <div className="flex items-center justify-between">
                             <FormLabel>Email</FormLabel>
 
-                            {lastMethod === "email" && (
+                            {mounted && lastMethod === "email" && (
                               <Badge className="text-[9px]">last used</Badge>
                             )}
                           </div>

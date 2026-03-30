@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { RootProvider } from "fumadocs-ui/provider/next";
 import { Geist, Geist_Mono, Figtree } from "next/font/google";
 
 import "@inflow/ui/globals.css";
@@ -115,7 +114,7 @@ export default function RootLayout({
           <SWRProvider>
             <SiteHeader />
             <main className="flex-1">
-              <RootProvider>{children}</RootProvider>
+              {children}
             </main>
             <SiteFooter />
             <Toaster />
