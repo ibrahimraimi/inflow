@@ -58,6 +58,9 @@
       "optional": true
     }
   },
+  "dependencies": {
+    "@inflow/engine": "workspace:*"
+  },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",
     "@types/node": "^25.5.0",

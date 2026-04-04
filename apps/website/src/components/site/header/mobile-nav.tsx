@@ -7,7 +7,6 @@ import { cn } from "@inflow/core/lib/utils";
 import { navLinks } from "./site-header";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Button, buttonVariants } from "@inflow/ui";
-import { UserNav } from "@/components/nav-user";
 import { authClient } from "@inflow/core/lib/auth-client";
 import Link from "next/link";
 
@@ -74,6 +73,7 @@ export function MobileNav() {
                     className={buttonVariants({
                       variant: "ghost",
                       className: "justify-start",
+                      size: "sm",
                     })}
                     href={link.href}
                     key={link.label}
@@ -87,7 +87,15 @@ export function MobileNav() {
               {/* Auth Section */}
               <div className="mt-auto pt-4 border-t">
                 {session ? (
-                  <UserNav user={session.user} isMobile />
+                  <Button 
+                    className="w-full" 
+                    onClick={() => {
+                      handleLinkClick();
+                      window.location.href = "/dashboard";
+                    }}
+                  >
+                    Go to Dashboard
+                  </Button>
                 ) : (
                   <div className="flex flex-col gap-2">
                     <Button 

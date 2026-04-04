@@ -25,7 +25,8 @@
       "@inflow/db": ["../../packages/db/src/index.ts"],
       "@inflow/db/*": ["../../packages/db/src/*"],
       "@inflow/types": ["../../packages/types/src/index.ts"],
-      "@inflow/types/*": ["../../packages/types/src/*"]
+      "@inflow/types/*": ["../../packages/types/src/*"],
+      "@inflow/engine": ["../../packages/engine/src/index.ts"]
     }
   },
   "include": [

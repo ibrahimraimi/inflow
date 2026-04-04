@@ -6,9 +6,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@inflow/core/lib/utils";
 import { LogoMarkDark, LogoMarkLight } from "@/components/logo";
 import { MobileNav } from "./mobile-nav";
-import { authClient } from "@inflow/core/lib/auth-client";
 import { useScroll } from "@/hooks/use-scroll";
-import { UserNav } from "@/components/nav-user";
 import { Button, buttonVariants } from "@inflow/ui";
 import { Layout } from "@/components/layout";
 import siteConfig from "@inflow/core/configs/site";
@@ -24,14 +22,12 @@ export const navLinks = [
   },
   {
     label: "Docs",
-    href: "/docs",
+    href: "https://inflowdocs.vercel.app",
   },
 ];
 
 export function SiteHeader() {
   const scrolled = useScroll(10);
-  const { data: session } = authClient.useSession();
-
   const pathname = usePathname();
   if (
     ["/login", "/signup", "/dashboard", "/docs", "/forgot-password"].some((url) => pathname.startsWith(url))
@@ -70,11 +66,10 @@ export function SiteHeader() {
         <div
           className={cn(
             "items-center gap-1",
-            pathname.startsWith("/dashboard") ? "flex" : "hidden md:flex"
+            "hidden md:flex"
           )}
         >
-          {!pathname.startsWith("/dashboard") &&
-            navLinks.map((link) => (
+          {navLinks.map((link) => (
               <Link
                 className={buttonVariants({ variant: "link" })}
                 href={link.href}
@@ -83,20 +78,14 @@ export function SiteHeader() {
                 {link.label}
               </Link>
             ))}
-          {session ? (
-            <UserNav user={session.user} />
-          ) : (
-            <>
-              <Link href={`${siteConfig.dashboardUrl}/login`} className="mr-2">
-                <Button variant="outline" className="cursor-pointer">
-                  Sign In
-                </Button>
-              </Link>
-              <Link href={`${siteConfig.dashboardUrl}/signup`}>
-                <Button className="cursor-pointer">Get Started</Button>
-              </Link>
-            </>
-          )}
+          <Link href={`${siteConfig.dashboardUrl}/login`} className="mr-2 ml-4">
+            <Button variant="outline" className="cursor-pointer">
+              Sign In
+            </Button>
+          </Link>
+          <Link href={`${siteConfig.dashboardUrl}/signup`}>
+            <Button className="cursor-pointer">Get Started</Button>
+          </Link>
         </div>
         {!pathname.startsWith("/dashboard") && <MobileNav />}
       </nav>
