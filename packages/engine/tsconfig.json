@@ -9,11 +9,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
-    "jsx": "react-jsx",
-    "baseUrl": ".",
-    "paths": {
-      "@inflow/engine": ["../engine/src/index.ts"]
-    }
+    "jsx": "react-jsx"
   },
   "include": ["src"]
 }

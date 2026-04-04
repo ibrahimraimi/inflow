@@ -6,7 +6,7 @@ help: ## Show this help message
 	@echo 'Available targets:'
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-20s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-dev: ## Start development server
+run: ## Start development server
 	bun run dev
 
 build: ## Build the applications

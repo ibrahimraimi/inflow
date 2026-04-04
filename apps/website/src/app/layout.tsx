@@ -4,7 +4,6 @@ import { Geist, Geist_Mono, Figtree } from "next/font/google";
 import "@inflow/ui/globals.css";
 import { Toaster } from "@inflow/ui";
 import siteConfig from "@inflow/core/configs/site";
-import { SWRProvider } from "@/components/swr-provider";
 import { SiteFooter, SiteHeader } from "@/components/site";
 import { ThemeProvider } from "@/components/theme-provider";
 
@@ -98,7 +97,7 @@ export default function RootLayout({
           defer
           data-website-id="1c10e3af-ff81-4650-8fd6-4a795a9daf7a"
           data-domain="http://localhost:3000"
-          src="http://localhost:3000/analytics.js"
+          src="http://localhost:3002/analytics.js"
         ></script>
       </head>
       <body
@@ -111,14 +110,10 @@ export default function RootLayout({
           disableTransitionOnChange
           enableSystem
         >
-          <SWRProvider>
-            <SiteHeader />
-            <main className="flex-1">
-              {children}
-            </main>
-            <SiteFooter />
-            <Toaster />
-          </SWRProvider>
+          <SiteHeader />
+          <main className="flex-1">{children}</main>
+          <SiteFooter />
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
