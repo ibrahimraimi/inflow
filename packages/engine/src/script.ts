@@ -1,4 +1,4 @@
-import { instance } from "./index";
+import { inflow } from "./index";
 
 (function () {
   if (typeof document === "undefined") return;
@@ -17,7 +17,7 @@ import { instance } from "./index";
     return;
   }
 
-  instance.init({
+  inflow.init({
     websiteId,
     domain,
     apiUrl,
@@ -26,5 +26,5 @@ import { instance } from "./index";
   });
 
   // Expose to window for custom tracking
-  (window as unknown as { inflow: typeof instance }).inflow = instance;
+  (window as unknown as { inflow: typeof inflow }).inflow = inflow;
 })();

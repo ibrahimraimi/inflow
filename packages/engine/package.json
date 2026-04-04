@@ -10,7 +10,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "bun x tsdown --config tsdown.config.ts && bun x tsdown src/script.ts --format iife --env-file ../../.env",
+    "build": "bun x tsdown --config tsdown.config.ts && bun x tsdown src/script.ts --format iife",
     "dev": "bun x tsdown --config tsdown.config.ts --watch",
     "lint": "biome check src"
   },
