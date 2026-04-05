@@ -18,6 +18,7 @@ export const TRUSTED_ORIGINS = [
   "http://localhost:3001",
   "http://localhost:3002",
   "https://inflowanalytics.vercel.app",
+  "https://inflowcloud.vercel.app",
   "https://inflow-api.vercel.app"
 ];
 

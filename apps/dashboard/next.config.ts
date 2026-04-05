@@ -2,6 +2,14 @@ import type { NextConfig } from "next";
 
 const apiUrl = process.env.API_URL || "http://localhost:3001";
 
+// *vercel.app domain
+const vercelDomain = [
+  "https://inflowanalytics.vercel.app",
+  "https://inflowcloud.vercel.app",
+  "https://inflow-api.vercel.app",
+  "https://inflowdocs.vercel.app",
+]
+
 const config: NextConfig = {
   reactStrictMode: true,
   reactCompiler: true,
@@ -28,7 +36,7 @@ const config: NextConfig = {
           {
             key: "Content-Security-Policy",
             value:
-              `default-src 'self'; script-src 'self' 'unsafe-inline' https://flagsapi.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://flagsapi.com https://api.iconify.design; font-src 'self'; connect-src 'self' ${apiUrl} http://localhost:3000 http://localhost:3001 http://localhost:3002 http://localhost:3003 https://free.freeipapi.com https://cdn.jsdelivr.net https://api.github.com;`,
+              `default-src 'self'; script-src 'self' 'unsafe-inline' https://flagsapi.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://flagsapi.com https://api.iconify.design; font-src 'self'; connect-src 'self' ${apiUrl} http://localhost:3000 http://localhost:3001 http://localhost:3002 http://localhost:3003 https://free.freeipapi.com https://cdn.jsdelivr.net https://api.github.com; ${vercelDomain.join(" ")}`,
           },
           {
             key: "X-Frame-Options",
