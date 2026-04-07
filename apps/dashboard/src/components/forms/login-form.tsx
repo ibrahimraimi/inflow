@@ -189,8 +189,14 @@ export function LoginForm({
       </Card>
       <div className="text-balance text-center text-muted-foreground text-xs *:[a]:underline *:[a]:underline-offset-4 *:[a]:hover:text-primary">
         By clicking continue, you agree to our{" "}
-        <Link href="/terms">Terms of Service</Link> and{" "}
-        <Link href="/privacy">Privacy Policy</Link>.
+        <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}/terms`}>
+          Terms of Service
+        </Link>{" "}
+        and{" "}
+        <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}/privacy`}>
+          Privacy Policy
+        </Link>
+        .
       </div>
     </div>
   );

@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://inflowanalytics.vercel.app"),
+  metadataBase: new URL("https://inflowcloud.vercel.app"),
   alternates: {
     canonical: "/",
   },
