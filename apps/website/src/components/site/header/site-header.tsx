@@ -7,7 +7,7 @@ import { cn } from "@inflow/core/lib/utils";
 import { LogoMarkDark, LogoMarkLight } from "@/components/logo";
 import { MobileNav } from "./mobile-nav";
 import { useScroll } from "@/hooks/use-scroll";
-import { Button, buttonVariants } from "@inflow/ui";
+import { Badge, Button, buttonVariants } from "@inflow/ui";
 import { Layout } from "@/components/layout";
 import siteConfig from "@inflow/core/configs/site";
 
@@ -61,6 +61,9 @@ export function SiteHeader() {
               className="text-foreground hidden h-7 w-7 dark:block"
               aria-hidden={true}
             />
+          <span>
+            <Badge variant="secondary">Beta</Badge>
+          </span>
           </Link>
         </div>
         <div
