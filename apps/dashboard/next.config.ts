@@ -5,7 +5,6 @@ const apiUrl = process.env.API_URL || "http://localhost:3001";
 // *vercel.app domain
 const vercelDomain = [
   "https://inflowcloud.vercel.app",
-  "https://inflowanalytics.vercel.app",
   "https://inflow-api.vercel.app",
   "https://inflowdocs.vercel.app",
 ]
