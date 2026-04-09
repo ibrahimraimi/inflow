@@ -23,7 +23,7 @@
   "author": "Inflow",
   "license": "AGPL-3.0-only",
   "devDependencies": {
-    "@biomejs/biome": "2.2.0",
+    "@biomejs/biome": "2.4.10",
     "@types/node": "^22.5.0",
     "tsdown": "^0.21.7",
     "typescript": "^5.9.3"
