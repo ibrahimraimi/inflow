@@ -63,7 +63,7 @@ jobs:
           bun-version: latest
 
       - name: Setup Node Next.js Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ${{ github.workspace }}/.turbo
