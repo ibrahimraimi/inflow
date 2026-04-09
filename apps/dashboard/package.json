@@ -59,7 +59,7 @@
     "react-email": "^5.2.8",
     "react-hook-form": "^7.71.1",
     "react-simple-maps": "^3.0.0",
-    "recharts": "2.15.4",
+    "recharts": "3.8.1",
     "sonner": "^2.0.7",
     "swr": "^2.4.0",
     "tailwind-merge": "^3.4.1",
