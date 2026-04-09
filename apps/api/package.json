@@ -18,7 +18,7 @@
     "date-fns-tz": "^3.2.0",
     "dotenv": "^17.3.1",
     "drizzle-orm": "^0.45.1",
-    "fumadocs-core": "^16.6.3",
+    "fumadocs-core": "^16.7.10",
     "fumadocs-mdx": "^14.2.7",
     "next": "16.1.6",
     "next-swagger-doc": "^0.4.1",
